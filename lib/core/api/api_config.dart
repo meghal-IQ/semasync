@@ -6,22 +6,17 @@ class ApiConfig {
   
   // Base URL for the API - dynamically determined based on platform
   static String get baseUrl {
-    // Production backend URL - Update this with your deployed backend URL
-    // return 'https://your-backend-url.up.railway.app';
+    // ngrok URL - Backend accessible from anywhere! (Updated)
+    return 'https://807d27122274.ngrok-free.app';
     
-    // Development URL (current)
-    if (Platform.isAndroid) {
-      // For physical Android devices, use your computer's IP
-      // For Android emulator, use 10.0.2.2
-      return 'http://$_computerIp:3000';
-    } else if (Platform.isIOS) {
-      // For physical iOS devices, use your computer's IP
-      // For iOS simulator, use localhost
-      return 'http://$_computerIp:3000';
-    } else {
-      // Desktop or web
-      return 'http://localhost:3000';
-    }
+    // Local development (uncomment to use local backend)
+    // if (Platform.isAndroid) {
+    //   return 'http://$_computerIp:3000';
+    // } else if (Platform.isIOS) {
+    //   return 'http://$_computerIp:3000';
+    // } else {
+    //   return 'http://localhost:3000';
+    // }
   }
   
   // Alternative method to detect if running on emulator/simulator
