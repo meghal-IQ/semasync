@@ -155,14 +155,14 @@ router.get('/daily-summary', authenticate, async (req: AuthRequest, res: express
       date: { $gte: startDate, $lte: endDate }
     });
 
-    const totalCalories = meals.reduce((sum, m) => sum + m.totalCalories, 0);
-    const totalProtein = meals.reduce((sum, m) => sum + m.totalProtein, 0);
-    const totalCarbs = meals.reduce((sum, m) => sum + m.totalCarbs, 0);
-    const totalFat = meals.reduce((sum, m) => sum + m.totalFat, 0);
-    const totalFiber = meals.reduce((sum, m) => sum + m.totalFiber, 0);
+    const totalCalories = Math.max(0, meals.reduce((sum, m) => sum + m.totalCalories, 0));
+    const totalProtein = Math.max(0, meals.reduce((sum, m) => sum + m.totalProtein, 0));
+    const totalCarbs = Math.max(0, meals.reduce((sum, m) => sum + m.totalCarbs, 0));
+    const totalFat = Math.max(0, meals.reduce((sum, m) => sum + m.totalFat, 0));
+    const totalFiber = Math.max(0, meals.reduce((sum, m) => sum + m.totalFiber, 0));
     
-    // Aggregate all water entries for the day
-    const totalWater = waterLogs.reduce((sum, w) => sum + w.amount, 0);
+    // Aggregate all water entries for the day (ensure non-negative)
+    const totalWater = Math.max(0, waterLogs.reduce((sum, w) => sum + w.amount, 0));
     const waterGoal = waterLogs.length > 0 ? waterLogs[0].goal : 2500; // Use goal from first entry
 
     res.json({
@@ -384,6 +384,9 @@ router.get('/todays-log', authenticate, async (req: AuthRequest, res) => {
         }
       });
     });
+    
+    // Ensure water total is never negative
+    totalWater = Math.max(0, totalWater);
 
     // Aggregate protein entries
     let totalProtein = 0;
@@ -392,8 +395,10 @@ router.get('/todays-log', authenticate, async (req: AuthRequest, res) => {
     
     mealLogs.forEach((meal: any) => {
       meal.foods.forEach((food: any) => {
-        if (food.protein !== 0 && !isNaN(food.protein)) {
-          totalProtein += parseFloat(food.protein) || 0;
+        const proteinValue = parseFloat(food.protein) || 0;
+        // Only include positive protein values to avoid negative entries
+        if (proteinValue > 0 && !isNaN(proteinValue)) {
+          totalProtein += proteinValue;
           proteinEntryCount++;
           if (!latestProteinTime || meal.createdAt > latestProteinTime) {
             latestProteinTime = meal.createdAt;
@@ -401,6 +406,9 @@ router.get('/todays-log', authenticate, async (req: AuthRequest, res) => {
         }
       });
     });
+    
+    // Ensure protein total is never negative
+    totalProtein = Math.max(0, totalProtein);
 
     // Aggregate fiber entries
     let totalFiber = 0;
@@ -409,8 +417,10 @@ router.get('/todays-log', authenticate, async (req: AuthRequest, res) => {
     
     mealLogs.forEach((meal: any) => {
       meal.foods.forEach((food: any) => {
-        if (food.fiber !== 0 && !isNaN(food.fiber)) {
-          totalFiber += parseFloat(food.fiber) || 0;
+        const fiberValue = parseFloat(food.fiber) || 0;
+        // Only include positive fiber values to avoid negative entries
+        if (fiberValue > 0 && !isNaN(fiberValue)) {
+          totalFiber += fiberValue;
           fiberEntryCount++;
           if (!latestFiberTime || meal.createdAt > latestFiberTime) {
             latestFiberTime = meal.createdAt;
@@ -418,6 +428,9 @@ router.get('/todays-log', authenticate, async (req: AuthRequest, res) => {
         }
       });
     });
+    
+    // Ensure fiber total is never negative
+    totalFiber = Math.max(0, totalFiber);
 
     // Add exactly 3 entries with standard names
     if (waterEntryCount > 0) {

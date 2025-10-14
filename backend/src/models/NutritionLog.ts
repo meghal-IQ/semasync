@@ -120,11 +120,11 @@ const mealLogSchema = new Schema<IMealLog>({
 // Calculate totals before saving
 mealLogSchema.pre('save', function(next) {
   if (this.foods && this.foods.length > 0) {
-    this.totalCalories = this.foods.reduce((sum, food) => sum + food.calories, 0);
-    this.totalProtein = this.foods.reduce((sum, food) => sum + food.protein, 0);
-    this.totalCarbs = this.foods.reduce((sum, food) => sum + food.carbs, 0);
-    this.totalFat = this.foods.reduce((sum, food) => sum + food.fat, 0);
-    this.totalFiber = this.foods.reduce((sum, food) => sum + (food.fiber || 0), 0);
+    this.totalCalories = Math.max(0, this.foods.reduce((sum, food) => sum + Math.max(0, food.calories), 0));
+    this.totalProtein = Math.max(0, this.foods.reduce((sum, food) => sum + Math.max(0, food.protein), 0));
+    this.totalCarbs = Math.max(0, this.foods.reduce((sum, food) => sum + Math.max(0, food.carbs), 0));
+    this.totalFat = Math.max(0, this.foods.reduce((sum, food) => sum + Math.max(0, food.fat), 0));
+    this.totalFiber = Math.max(0, this.foods.reduce((sum, food) => sum + Math.max(0, food.fiber || 0), 0));
   }
   next();
 });
@@ -202,10 +202,10 @@ const waterLogSchema = new Schema<IWaterLog>({
   }
 });
 
-// Calculate total amount before saving
+// Calculate total amount before saving (ensure non-negative)
 waterLogSchema.pre('save', function(next) {
   if (this.entries && this.entries.length > 0) {
-    this.amount = this.entries.reduce((sum, entry) => sum + entry.amount, 0);
+    this.amount = Math.max(0, this.entries.reduce((sum, entry) => sum + entry.amount, 0));
   }
   next();
 });
