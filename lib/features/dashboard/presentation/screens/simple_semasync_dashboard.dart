@@ -251,10 +251,23 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
   }
 
   Widget _buildEnhancedMedicationCard() {
-    return Consumer<TreatmentProvider>(
-      builder: (context, treatmentProvider, child) {
-        final medLevel = treatmentProvider.medicationLevel;
-        final nextShot = treatmentProvider.nextShotInfo;
+    final isToday = _isSameDay(_selectedDate, DateTime.now());
+    
+    return Consumer2<TreatmentProvider, HistoricalDataProvider>(
+      builder: (context, treatmentProvider, historicalProvider, child) {
+        Map<String, dynamic>? medLevel;
+        Map<String, dynamic>? nextShot;
+        
+        if (isToday) {
+          medLevel = treatmentProvider.medicationLevel;
+          nextShot = treatmentProvider.nextShotInfo;
+        } else {
+          // For historical data, use treatment data from historical provider
+          final treatments = historicalProvider.treatmentData;
+          if (treatments.isNotEmpty) {
+            medLevel = treatments.first;
+          }
+        }
         
         return Container(
           margin: const EdgeInsets.only(top: 8),
@@ -344,7 +357,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                              ).createShader(bounds),
                       child: Text(
                         medLevel != null 
-                            ? '${medLevel.currentLevel.toStringAsFixed(1)}'
+                            ? '${(medLevel['currentLevel'] ?? medLevel['level'] ?? 0.0).toStringAsFixed(1)}'
                             : '0.0',
                         style: const TextStyle(
                           fontSize: 40,
@@ -500,10 +513,18 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
 
 
   Widget _buildFiberCard() {
-    return Consumer<NutritionProvider>(
-      builder: (context, nutritionProvider, child) {
-        final dailySummary = nutritionProvider.dailySummary;
-        final fiber = (dailySummary?.fiber ?? 0).clamp(0, double.infinity);
+    final isToday = _isSameDay(_selectedDate, DateTime.now());
+    
+    return Consumer2<NutritionProvider, HistoricalDataProvider>(
+      builder: (context, nutritionProvider, historicalProvider, child) {
+        double fiber;
+        if (isToday) {
+          final dailySummary = nutritionProvider.dailySummary;
+          fiber = (dailySummary?.fiber ?? 0).clamp(0, double.infinity);
+        } else {
+          final historicalNutrition = historicalProvider.nutritionData;
+          fiber = (historicalNutrition?['fiber'] ?? 0).toDouble().clamp(0, double.infinity);
+        }
         const fiberGoal = 25;
         final progress = (fiber / fiberGoal * 100).clamp(0, 100);
         
@@ -622,11 +643,21 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
   }
 
   Widget _buildWaterCard() {
-    return Consumer<NutritionProvider>(
-      builder: (context, nutritionProvider, child) {
-        final dailySummary = nutritionProvider.dailySummary;
-        final waterAmount = (dailySummary?.water ?? 0).clamp(0, double.infinity);
-        final waterGoal = dailySummary?.waterGoal ?? 2500;
+    final isToday = _isSameDay(_selectedDate, DateTime.now());
+    
+    return Consumer2<NutritionProvider, HistoricalDataProvider>(
+      builder: (context, nutritionProvider, historicalProvider, child) {
+        double waterAmount;
+        double waterGoal;
+        if (isToday) {
+          final dailySummary = nutritionProvider.dailySummary;
+          waterAmount = (dailySummary?.water ?? 0).clamp(0, double.infinity);
+          waterGoal = dailySummary?.waterGoal ?? 2500;
+        } else {
+          final historicalNutrition = historicalProvider.nutritionData;
+          waterAmount = (historicalNutrition?['water'] ?? 0).toDouble().clamp(0, double.infinity);
+          waterGoal = (historicalNutrition?['waterGoal'] ?? 2500).toDouble();
+        }
         final progress = (waterAmount / waterGoal * 100).clamp(0, 100);
         
         return Container(
@@ -748,10 +779,18 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
   }
 
   Widget _buildProteinCard() {
-    return Consumer<NutritionProvider>(
-      builder: (context, nutritionProvider, child) {
-        final dailySummary = nutritionProvider.dailySummary;
-        final protein = (dailySummary?.protein ?? 0).clamp(0, double.infinity);
+    final isToday = _isSameDay(_selectedDate, DateTime.now());
+    
+    return Consumer2<NutritionProvider, HistoricalDataProvider>(
+      builder: (context, nutritionProvider, historicalProvider, child) {
+        double protein;
+        if (isToday) {
+          final dailySummary = nutritionProvider.dailySummary;
+          protein = (dailySummary?.protein ?? 0).clamp(0, double.infinity);
+        } else {
+          final historicalNutrition = historicalProvider.nutritionData;
+          protein = (historicalNutrition?['protein'] ?? 0).toDouble().clamp(0, double.infinity);
+        }
         const proteinGoal = 120;
         final progress = (protein / proteinGoal * 100).clamp(0, 100);
         
@@ -870,9 +909,20 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
   }
 
   Widget _buildGoalCard() {
-    return Consumer<HealthProvider>(
-      builder: (context, healthProvider, child) {
-        final stats = healthProvider.weightStats;
+    final isToday = _isSameDay(_selectedDate, DateTime.now());
+    
+    return Consumer2<HealthProvider, HistoricalDataProvider>(
+      builder: (context, healthProvider, historicalProvider, child) {
+        Map<String, dynamic>? stats;
+        if (isToday) {
+          stats = healthProvider.weightStats;
+        } else {
+          // For historical data, we'll use the weight data if available
+          final weightData = historicalProvider.weightData;
+          if (weightData.isNotEmpty) {
+            stats = weightData.first;
+          }
+        }
         
         return Container(
           decoration: BoxDecoration(

@@ -56,7 +56,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                   ),
                   const SizedBox(width: 8),
                   const Text(
-                    'MeAgain',
+                    'SemaSync',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
