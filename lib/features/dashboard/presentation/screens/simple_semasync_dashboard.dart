@@ -255,18 +255,21 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
     
     return Consumer2<TreatmentProvider, HistoricalDataProvider>(
       builder: (context, treatmentProvider, historicalProvider, child) {
-        Map<String, dynamic>? medLevel;
-        Map<String, dynamic>? nextShot;
+        // For today, use the actual provider objects
+        // For historical, we'll just show basic info or skip advanced features
+        final medLevel = isToday ? treatmentProvider.medicationLevel : null;
+        final nextShot = isToday ? treatmentProvider.nextShotInfo : null;
         
-        if (isToday) {
-          medLevel = treatmentProvider.medicationLevel;
-          nextShot = treatmentProvider.nextShotInfo;
-        } else {
-          // For historical data, use treatment data from historical provider
+        // Get historical medication level if viewing past date
+        double currentLevel = 0.0;
+        if (!isToday) {
           final treatments = historicalProvider.treatmentData;
           if (treatments.isNotEmpty) {
-            medLevel = treatments.first;
+            final treatment = treatments.first;
+            currentLevel = (treatment['currentLevel'] ?? treatment['level'] ?? 0.0).toDouble();
           }
+        } else if (medLevel != null) {
+          currentLevel = medLevel.currentLevel;
         }
         
         return Container(
@@ -356,9 +359,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                                ],
                              ).createShader(bounds),
                       child: Text(
-                        medLevel != null 
-                            ? '${(medLevel['currentLevel'] ?? medLevel['level'] ?? 0.0).toStringAsFixed(1)}'
-                            : '0.0',
+                        currentLevel.toStringAsFixed(1),
                         style: const TextStyle(
                           fontSize: 40,
                           fontWeight: FontWeight.w800,
@@ -424,7 +425,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                 //     height: 1.4,
                 //   ),
                 // ),
-                if (nextShot != null && nextShot.hasShots) ...[
+                if (isToday && nextShot != null && nextShot.hasShots) ...[
                   const SizedBox(height: 24),
                   Container(
                     padding: const EdgeInsets.all(18),
@@ -520,10 +521,11 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
         double fiber;
         if (isToday) {
           final dailySummary = nutritionProvider.dailySummary;
-          fiber = (dailySummary?.fiber ?? 0).clamp(0, double.infinity);
+          fiber = ((dailySummary?.fiber ?? 0) as num).toDouble().clamp(0, double.infinity);
         } else {
           final historicalNutrition = historicalProvider.nutritionData;
-          fiber = (historicalNutrition?['fiber'] ?? 0).toDouble().clamp(0, double.infinity);
+          final fiberValue = historicalNutrition?['fiber'] ?? 0;
+          fiber = (fiberValue as num).toDouble().clamp(0, double.infinity);
         }
         const fiberGoal = 25;
         final progress = (fiber / fiberGoal * 100).clamp(0, 100);
@@ -651,12 +653,14 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
         double waterGoal;
         if (isToday) {
           final dailySummary = nutritionProvider.dailySummary;
-          waterAmount = (dailySummary?.water ?? 0).clamp(0, double.infinity);
-          waterGoal = dailySummary?.waterGoal ?? 2500;
+          waterAmount = ((dailySummary?.water ?? 0) as num).toDouble().clamp(0, double.infinity);
+          waterGoal = ((dailySummary?.waterGoal ?? 2500) as num).toDouble();
         } else {
           final historicalNutrition = historicalProvider.nutritionData;
-          waterAmount = (historicalNutrition?['water'] ?? 0).toDouble().clamp(0, double.infinity);
-          waterGoal = (historicalNutrition?['waterGoal'] ?? 2500).toDouble();
+          final waterValue = historicalNutrition?['water'] ?? 0;
+          final goalValue = historicalNutrition?['waterGoal'] ?? 2500;
+          waterAmount = (waterValue as num).toDouble().clamp(0, double.infinity);
+          waterGoal = (goalValue as num).toDouble();
         }
         final progress = (waterAmount / waterGoal * 100).clamp(0, 100);
         
@@ -786,10 +790,11 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
         double protein;
         if (isToday) {
           final dailySummary = nutritionProvider.dailySummary;
-          protein = (dailySummary?.protein ?? 0).clamp(0, double.infinity);
+          protein = ((dailySummary?.protein ?? 0) as num).toDouble().clamp(0, double.infinity);
         } else {
           final historicalNutrition = historicalProvider.nutritionData;
-          protein = (historicalNutrition?['protein'] ?? 0).toDouble().clamp(0, double.infinity);
+          final proteinValue = historicalNutrition?['protein'] ?? 0;
+          protein = (proteinValue as num).toDouble().clamp(0, double.infinity);
         }
         const proteinGoal = 120;
         final progress = (protein / proteinGoal * 100).clamp(0, 100);
@@ -913,14 +918,21 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
     
     return Consumer2<HealthProvider, HistoricalDataProvider>(
       builder: (context, healthProvider, historicalProvider, child) {
-        Map<String, dynamic>? stats;
+        // Get weight info
+        double? currentWeight;
+        String unit = 'kg';
+        
         if (isToday) {
-          stats = healthProvider.weightStats;
+          final stats = healthProvider.weightStats;
+          currentWeight = stats?.currentWeight;
+          unit = stats?.unit ?? 'kg';
         } else {
-          // For historical data, we'll use the weight data if available
+          // For historical data, get weight from historical provider
           final weightData = historicalProvider.weightData;
           if (weightData.isNotEmpty) {
-            stats = weightData.first;
+            final weight = weightData.first;
+            currentWeight = (weight['weight'] ?? weight['currentWeight'])?.toDouble();
+            unit = weight['unit'] ?? 'kg';
           }
         }
         
@@ -974,8 +986,8 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                   textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
-                      stats?.currentWeight != null 
-                          ? '${stats!.currentWeight!.toStringAsFixed(1)}'
+                      currentWeight != null 
+                          ? currentWeight.toStringAsFixed(1)
                           : '0.0',
                       style: const TextStyle(
                         fontSize: 36,
@@ -987,7 +999,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      stats?.unit ?? 'kg',
+                      unit,
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF9CA3AF),
