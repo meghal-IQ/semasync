@@ -304,7 +304,7 @@ router.get('/water', authenticate, async (req: AuthRequest, res: express.Respons
 
 /**
  * @route   GET /api/nutrition/todays-log
- * @desc    Get all log entries for today (meals, water, shots, weight, activity, side effects, photos)
+ * @desc    Get all log entries for today or a specific date (meals, water, shots, weight, activity, side effects, photos)
  * @access  Private
  */
 router.get('/todays-log', authenticate, async (req: AuthRequest, res) => {
@@ -317,12 +317,27 @@ router.get('/todays-log', authenticate, async (req: AuthRequest, res) => {
       });
     }
 
-    // Get today's date range
-    const today = new Date();
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+    // Get date from query parameter or default to today
+    const dateParam = req.query.date as string;
+    let targetDate: Date;
+    
+    if (dateParam) {
+      targetDate = new Date(dateParam);
+      if (isNaN(targetDate.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid date format. Use YYYY-MM-DD'
+        });
+      }
+    } else {
+      targetDate = new Date();
+    }
 
-    console.log(`Today's Log API: Fetching logs for ${startOfDay} to ${endOfDay}`);
+    // Get date range for the target date
+    const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+    const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59, 999);
+
+    console.log(`Log API: Fetching logs for ${startOfDay} to ${endOfDay}`);
 
     // Fetch all types of logs for today
     const [mealLogs, waterLogs, shotLogs, weightLogs, stepLogs, workoutLogs, sideEffectLogs, photoLogs] = await Promise.all([
@@ -490,7 +505,7 @@ router.get('/todays-log', authenticate, async (req: AuthRequest, res) => {
 
     res.json({
       success: true,
-      message: 'Today\'s log retrieved successfully',
+      message: `Log entries retrieved successfully for ${targetDate.toISOString().split('T')[0]}`,
       data: {
         logs: todaysLogs,
         summary: {
