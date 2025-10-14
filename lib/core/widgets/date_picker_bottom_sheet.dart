@@ -18,6 +18,7 @@ class DatePickerBottomSheet extends StatefulWidget {
 
 class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
   late DateTime _selectedDate;
+  late DateTime _currentMonth;
   late PageController _pageController;
   late int _currentPage;
 
@@ -25,7 +26,8 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
   void initState() {
     super.initState();
     _selectedDate = widget.selectedDate;
-    _currentPage = _getPageForDate(_selectedDate);
+    _currentMonth = DateTime(_selectedDate.year, _selectedDate.month);
+    _currentPage = _getPageForMonth(_currentMonth);
     _pageController = PageController(initialPage: _currentPage);
   }
 
@@ -35,21 +37,24 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
     super.dispose();
   }
 
-  int _getPageForDate(DateTime date) {
-    final today = DateTime.now();
-    final daysDifference = today.difference(date).inDays;
-    return daysDifference;
+  int _getPageForMonth(DateTime month) {
+    final now = DateTime.now();
+    final monthsDifference = (now.year - month.year) * 12 + (now.month - month.month);
+    return monthsDifference;
   }
 
-  DateTime _getDateForPage(int page) {
-    final today = DateTime.now();
-    return today.subtract(Duration(days: page));
+  DateTime _getMonthForPage(int page) {
+    final now = DateTime.now();
+    final targetMonth = now.month - page;
+    final targetYear = now.year + (targetMonth <= 0 ? -1 : 0);
+    final adjustedMonth = targetMonth <= 0 ? targetMonth + 12 : targetMonth;
+    return DateTime(targetYear, adjustedMonth);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.6,
+      height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -86,6 +91,7 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
                     final today = DateTime.now();
                     setState(() {
                       _selectedDate = today;
+                      _currentMonth = DateTime(today.year, today.month);
                       _currentPage = 0;
                     });
                     _pageController.animateToPage(
@@ -106,20 +112,58 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
             ),
           ),
           
-          // Date picker
+          // Calendar
           Expanded(
             child: PageView.builder(
               controller: _pageController,
               onPageChanged: (page) {
                 setState(() {
                   _currentPage = page;
-                  _selectedDate = _getDateForPage(page);
+                  _currentMonth = _getMonthForPage(page);
                 });
               },
               itemBuilder: (context, page) {
-                final date = _getDateForPage(page);
-                return _buildDatePage(date);
+                final month = _getMonthForPage(page);
+                return _buildCalendarMonth(month);
               },
+            ),
+          ),
+          
+          // Month navigation
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    _pageController.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  icon: const Icon(Icons.chevron_left),
+                ),
+                Expanded(
+                  child: Text(
+                    _formatMonth(_currentMonth),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    _pageController.nextPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  icon: const Icon(Icons.chevron_right),
+                ),
+              ],
             ),
           ),
           
@@ -178,141 +222,129 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
     );
   }
 
-  Widget _buildDatePage(DateTime date) {
-    final isToday = _isSameDay(date, DateTime.now());
-    final isSelected = _isSameDay(date, _selectedDate);
+  Widget _buildCalendarMonth(DateTime month) {
+    final firstDayOfMonth = DateTime(month.year, month.month, 1);
+    final lastDayOfMonth = DateTime(month.year, month.month + 1, 0);
+    final firstDayWeekday = firstDayOfMonth.weekday;
+    final daysInMonth = lastDayOfMonth.day;
     
-    return Container(
+    // Calculate days from previous month to fill the first week
+    final previousMonth = DateTime(month.year, month.month - 1);
+    final daysInPreviousMonth = DateTime(previousMonth.year, previousMonth.month + 1, 0).day;
+    
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Date display
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            decoration: BoxDecoration(
-              color: isSelected ? AppColors.primary.withOpacity(0.1) : AppColors.divider.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isSelected ? AppColors.primary : Colors.transparent,
-                width: 2,
+          // Day headers
+          Row(
+            children: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+                .map((day) => Expanded(
+                      child: Center(
+                        child: Text(
+                          day,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // Calendar grid
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 7,
+                childAspectRatio: 1,
               ),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  _formatDate(date),
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isSelected ? AppColors.primary : AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _formatDayOfWeek(date),
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                  ),
-                ),
-                if (isToday) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              itemCount: 42, // 6 weeks * 7 days
+              itemBuilder: (context, index) {
+                final dayOfWeek = index % 7;
+                final week = index ~/ 7;
+                final dayIndex = week * 7 + dayOfWeek - firstDayWeekday + 1;
+                
+                DateTime? dayDate;
+                bool isCurrentMonth = false;
+                bool isPreviousMonth = false;
+                bool isNextMonth = false;
+                
+                if (dayIndex <= 0) {
+                  // Previous month
+                  dayDate = DateTime(previousMonth.year, previousMonth.month, daysInPreviousMonth + dayIndex);
+                  isPreviousMonth = true;
+                } else if (dayIndex > daysInMonth) {
+                  // Next month
+                  dayDate = DateTime(month.year, month.month + 1, dayIndex - daysInMonth);
+                  isNextMonth = true;
+                } else {
+                  // Current month
+                  dayDate = DateTime(month.year, month.month, dayIndex);
+                  isCurrentMonth = true;
+                }
+                
+                if (dayDate == null) return const SizedBox();
+                
+                final isSelected = _isSameDay(dayDate, _selectedDate);
+                final isToday = _isSameDay(dayDate, DateTime.now());
+                final isPast = dayDate.isBefore(DateTime.now().subtract(const Duration(days: 1)));
+                
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedDate = dayDate!;
+                    });
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(12),
+                      color: isSelected 
+                          ? AppColors.primary 
+                          : isToday 
+                              ? AppColors.primary.withOpacity(0.1)
+                              : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      border: isToday && !isSelected
+                          ? Border.all(color: AppColors.primary, width: 1)
+                          : null,
                     ),
-                    child: const Text(
-                      'Today',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                    child: Center(
+                      child: Text(
+                        '${dayDate.day}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected 
+                              ? Colors.white
+                              : isToday 
+                                  ? AppColors.primary
+                                  : isCurrentMonth 
+                                      ? AppColors.textPrimary
+                                      : AppColors.textSecondary.withOpacity(0.5),
+                        ),
                       ),
                     ),
                   ),
-                ],
-              ],
+                );
+              },
             ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Quick navigation
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildQuickNavButton(
-                'Yesterday',
-                () => _navigateToDate(date.subtract(const Duration(days: 1))),
-                Icons.keyboard_arrow_left,
-              ),
-              _buildQuickNavButton(
-                'Tomorrow',
-                () => _navigateToDate(date.add(const Duration(days: 1))),
-                Icons.keyboard_arrow_right,
-              ),
-            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildQuickNavButton(String label, VoidCallback onTap, IconData icon) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.divider.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 16, color: AppColors.textSecondary),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _navigateToDate(DateTime date) {
-    final page = _getPageForDate(date);
-    setState(() {
-      _selectedDate = date;
-      _currentPage = page;
-    });
-    _pageController.animateToPage(
-      page,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  String _formatDate(DateTime date) {
+  String _formatMonth(DateTime month) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
-  }
-
-  String _formatDayOfWeek(DateTime date) {
-    final days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    return days[date.weekday - 1];
+    return '${months[month.month - 1]} ${month.year}';
   }
 
   bool _isSameDay(DateTime date1, DateTime date2) {

@@ -134,91 +134,11 @@ class _DashboardHeaderState extends State<DashboardHeader> {
               ),
             ],
           ),
-          
-          const SizedBox(height: 16),
-          
-          // Day of week selector
-          _buildDayOfWeekSelector(),
         ],
       ),
     );
   }
 
-  Widget _buildDayOfWeekSelector() {
-    final days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-    final dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: List.generate(7, (index) {
-        final dayOfWeek = index + 1; // Monday = 1, Sunday = 7
-        final isSelected = widget.selectedDate.weekday == dayOfWeek;
-        final isToday = DateTime.now().weekday == dayOfWeek;
-        
-        return GestureDetector(
-          onTap: () => _selectDayOfWeek(dayOfWeek),
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: isSelected 
-                  ? AppColors.primary 
-                  : isToday 
-                      ? AppColors.primary.withOpacity(0.1)
-                      : Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
-              border: isToday && !isSelected
-                  ? Border.all(
-                      color: AppColors.primary.withOpacity(0.3),
-                      width: 1,
-                      style: BorderStyle.solid,
-                    )
-                  : null,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  days[index],
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isSelected 
-                        ? Colors.white 
-                        : isToday 
-                            ? AppColors.primary 
-                            : AppColors.textSecondary,
-                  ),
-                ),
-                if (isSelected || isToday) ...[
-                  const SizedBox(height: 2),
-                  Container(
-                    width: 4,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: isSelected 
-                          ? Colors.white 
-                          : AppColors.primary,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        );
-      }),
-    );
-  }
-
-  void _selectDayOfWeek(int dayOfWeek) {
-    final today = DateTime.now();
-    final currentWeekday = widget.selectedDate.weekday;
-    final daysDifference = dayOfWeek - currentWeekday;
-    
-    final newDate = widget.selectedDate.add(Duration(days: daysDifference));
-    widget.onDateChanged(newDate);
-  }
 
   void _showDatePicker() {
     showModalBottomSheet(
