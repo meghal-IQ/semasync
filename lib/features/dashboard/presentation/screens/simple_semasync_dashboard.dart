@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/standard_widgets.dart';
 import '../../../../core/providers/dashboard_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/providers/treatment_provider.dart';
 import '../../../../core/providers/health_provider.dart';
 import '../../../../core/providers/activity_provider.dart';
 import '../../../../core/providers/nutrition_provider.dart';
+import '../../../../core/providers/historical_data_provider.dart';
 import '../../../../core/api/models/nutrition_log_model.dart';
+import '../widgets/dashboard_header.dart';
 
 class SimpleSemaSyncDashboard extends StatefulWidget {
   const SimpleSemaSyncDashboard({super.key});
@@ -22,17 +25,13 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
   bool _isTodaysLogExpanded = false;
   bool _isShotDayExpanded = true;
   Timer? _timeUpdateTimer;
+  DateTime _selectedDate = DateTime.now();
   @override
   void initState() {
     super.initState();
     // Load all data when the screen is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DashboardProvider>().loadDashboardData();
-      context.read<TreatmentProvider>().loadTreatmentData();
-      context.read<HealthProvider>().loadWeightData();
-      context.read<ActivityProvider>().loadActivityData();
-      context.read<NutritionProvider>().loadNutritionData();
-      context.read<NutritionProvider>().loadTodaysLog();
+      _loadDataForSelectedDate();
     });
     
     // Set up timer to update time display every 30 seconds for recent entries
@@ -58,8 +57,12 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
       body: SafeArea(
         child: Column(
           children: [
-            // Beautiful Gradient Header
-            // _buildGradientHeader(),
+            // Dashboard Header with Date Selector
+            DashboardHeader(
+              selectedDate: _selectedDate,
+              onDateChanged: _onDateChanged,
+              streakCount: 1, // TODO: Get actual streak count
+            ),
 
             // Main Content
             Expanded(
@@ -108,8 +111,8 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                     // Shot Day Reminder Section (if today is shot day)
                     _buildShotDayReminder(),
                     
-                    // Today's Log Section
-                    _buildTodaysLogSection(),
+                    // Today's Log Section (or Historical Log Section)
+                    _buildLogSection(),
                     
                     const SizedBox(height: AppConstants.spacing80),
                   ],
@@ -500,7 +503,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
     return Consumer<NutritionProvider>(
       builder: (context, nutritionProvider, child) {
         final dailySummary = nutritionProvider.dailySummary;
-        final fiber = dailySummary?.fiber ?? 0;
+        final fiber = (dailySummary?.fiber ?? 0).clamp(0, double.infinity);
         const fiberGoal = 25;
         final progress = (fiber / fiberGoal * 100).clamp(0, 100);
         
@@ -622,7 +625,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
     return Consumer<NutritionProvider>(
       builder: (context, nutritionProvider, child) {
         final dailySummary = nutritionProvider.dailySummary;
-        final waterAmount = dailySummary?.water ?? 0;
+        final waterAmount = (dailySummary?.water ?? 0).clamp(0, double.infinity);
         final waterGoal = dailySummary?.waterGoal ?? 2500;
         final progress = (waterAmount / waterGoal * 100).clamp(0, 100);
         
@@ -748,7 +751,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
     return Consumer<NutritionProvider>(
       builder: (context, nutritionProvider, child) {
         final dailySummary = nutritionProvider.dailySummary;
-        final protein = dailySummary?.protein ?? 0;
+        final protein = (dailySummary?.protein ?? 0).clamp(0, double.infinity);
         const proteinGoal = 120;
         final progress = (protein / proteinGoal * 100).clamp(0, 100);
         
@@ -1079,6 +1082,36 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
     );
   }
 
+  void _onDateChanged(DateTime newDate) {
+    setState(() {
+      _selectedDate = newDate;
+    });
+    _loadDataForSelectedDate();
+  }
+
+  void _loadDataForSelectedDate() {
+    final isToday = _isSameDay(_selectedDate, DateTime.now());
+    
+    if (isToday) {
+      // Load current day data
+      context.read<DashboardProvider>().loadDashboardData();
+      context.read<TreatmentProvider>().loadTreatmentData();
+      context.read<HealthProvider>().loadWeightData();
+      context.read<ActivityProvider>().loadActivityData();
+      context.read<NutritionProvider>().loadNutritionData();
+      context.read<NutritionProvider>().loadTodaysLog();
+    } else {
+      // Load historical data
+      context.read<HistoricalDataProvider>().loadHistoricalData(_selectedDate);
+    }
+  }
+
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year && 
+           date1.month == date2.month && 
+           date1.day == date2.day;
+  }
+
   void _incrementFiber() {
     _logQuickNutrition(fiber: 1);
   }
@@ -1379,6 +1412,296 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
            now.day == nextDueDate.day;
   }
 
+  Widget _buildLogSection() {
+    final isToday = _isSameDay(_selectedDate, DateTime.now());
+    
+    if (isToday) {
+      return _buildTodaysLogSection();
+    } else {
+      return _buildHistoricalLogSection();
+    }
+  }
+
+  Widget _buildHistoricalLogSection() {
+    return Consumer<HistoricalDataProvider>(
+      builder: (context, historicalProvider, child) {
+        if (historicalProvider.isLoading) {
+          return _buildLoadingCard();
+        }
+
+        if (historicalProvider.errorMessage != null) {
+          return _buildErrorCard(historicalProvider.errorMessage!);
+        }
+
+        if (!historicalProvider.hasData) {
+          return _buildNoDataCard();
+        }
+
+        final logEntries = historicalProvider.logEntries;
+        
+        return Card(
+          margin: const EdgeInsets.only(bottom: AppConstants.spacing16),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: AppColors.divider.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.history_rounded,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        "${historicalProvider.formattedDate} Activity",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A1F36),
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${logEntries.length}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                
+                if (logEntries.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  ...logEntries.map((entry) => _buildHistoricalLogEntry(entry)).toList(),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHistoricalLogEntry(Map<String, dynamic> entry) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9FAFB),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              entry['icon'] ?? '📝',
+              style: const TextStyle(fontSize: 20),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  entry['title'] ?? 'Entry',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1A1F36),
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  entry['subtitle'] ?? '',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color(0xFF8B5CF6).withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              _formatTime(DateTime.parse(entry['time'])),
+              style: const TextStyle(
+                fontSize: 11,
+                color: Color(0xFF8B5CF6),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingCard() {
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppConstants.spacing16),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: AppColors.divider.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.all(40),
+        child: Center(
+          child: CircularProgressIndicator(
+            color: AppColors.primary,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorCard(String error) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppConstants.spacing16),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: AppColors.divider.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: AppColors.error,
+              size: 32,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Unable to load data',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNoDataCard() {
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppConstants.spacing16),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: AppColors.divider.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          children: [
+            const Icon(
+              Icons.inbox_outlined,
+              color: AppColors.textSecondary,
+              size: 32,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'No entries for ${_formatDate(_selectedDate)}',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'No activity was logged on this date',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
   Widget _buildTodaysLogSection() {
     return Consumer<NutritionProvider>(
       builder: (context, nutritionProvider, child) {
@@ -1601,8 +1924,9 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
 
   Widget _buildEntryDetails(dynamic entry) {
     if (entry.type == 'water') {
+      final amount = (entry.data['totalAmount'] as num).clamp(0, double.infinity);
       return Text(
-        'Total: ${entry.data['totalAmount']}ml from ${entry.data['entryCount']} entries',
+        'Total: ${amount.toStringAsFixed(0)}ml from ${entry.data['entryCount']} entries',
         style: const TextStyle(
           fontSize: 10,
           color: AppColors.textSecondary,
@@ -1610,8 +1934,9 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
         ),
       );
     } else if (entry.type == 'protein') {
+      final amount = (entry.data['totalAmount'] as num).clamp(0, double.infinity);
       return Text(
-        'Total: ${entry.data['totalAmount']}g from ${entry.data['entryCount']} entries',
+        'Total: ${amount.toStringAsFixed(0)}g from ${entry.data['entryCount']} entries',
         style: const TextStyle(
           fontSize: 10,
           color: AppColors.textSecondary,
@@ -1619,8 +1944,9 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
         ),
       );
     } else if (entry.type == 'fiber') {
+      final amount = (entry.data['totalAmount'] as num).clamp(0, double.infinity);
       return Text(
-        'Total: ${entry.data['totalAmount']}g from ${entry.data['entryCount']} entries',
+        'Total: ${amount.toStringAsFixed(0)}g from ${entry.data['entryCount']} entries',
         style: const TextStyle(
           fontSize: 10,
           color: AppColors.textSecondary,
