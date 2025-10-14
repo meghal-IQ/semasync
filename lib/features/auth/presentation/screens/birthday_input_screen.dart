@@ -12,7 +12,7 @@ class BirthdayInputScreen extends StatefulWidget {
 }
 
 class _BirthdayInputScreenState extends State<BirthdayInputScreen> {
-  DateTime _selectedDate = DateTime(1995, 9, 16);
+  DateTime _selectedDate = DateTime(1990, 1, 1);
 
   @override
   Widget build(BuildContext context) {
@@ -89,13 +89,16 @@ class _BirthdayInputScreenState extends State<BirthdayInputScreen> {
                                 children: [
                                   _buildDatePickerColumn(
                                     items: _getDays(),
-                                    selectedIndex: _selectedDate.day - 1,
+                                    selectedIndex: _getValidDayIndex(),
                                     onSelected: (index) {
                                       setState(() {
+                                        final newDay = index + 1;
+                                        final daysInMonth = DateTime(_selectedDate.year, _selectedDate.month + 1, 0).day;
+                                        final validDay = newDay <= daysInMonth ? newDay : daysInMonth;
                                         _selectedDate = DateTime(
                                           _selectedDate.year,
                                           _selectedDate.month,
-                                          index + 1,
+                                          validDay,
                                         );
                                       });
                                     },
@@ -111,11 +114,11 @@ class _BirthdayInputScreenState extends State<BirthdayInputScreen> {
                                 children: [
                                   _buildDatePickerColumn(
                                     items: _getYears(),
-                                    selectedIndex: _selectedDate.year - 1993,
+                                    selectedIndex: _getYearIndex(_selectedDate.year),
                                     onSelected: (index) {
                                       setState(() {
                                         _selectedDate = DateTime(
-                                          1993 + index,
+                                          _getYearFromIndex(index),
                                           _selectedDate.month,
                                           _selectedDate.day,
                                         );
@@ -244,11 +247,34 @@ class _BirthdayInputScreenState extends State<BirthdayInputScreen> {
   }
 
   List<String> _getDays() {
-    return List.generate(31, (index) => '${index + 1}');
+    // Get the number of days in the selected month and year
+    final daysInMonth = DateTime(_selectedDate.year, _selectedDate.month + 1, 0).day;
+    return List.generate(daysInMonth, (index) => '${index + 1}');
   }
 
   List<String> _getYears() {
-    return List.generate(20, (index) => '${1993 + index}');
+    final currentYear = DateTime.now().year;
+    final startYear = currentYear - 100; // Allow up to 100 years old
+    final endYear = currentYear - 13; // Minimum age of 13
+    return List.generate(endYear - startYear + 1, (index) => '${startYear + index}');
+  }
+
+  int _getYearIndex(int year) {
+    final currentYear = DateTime.now().year;
+    final startYear = currentYear - 100;
+    return year - startYear;
+  }
+
+  int _getYearFromIndex(int index) {
+    final currentYear = DateTime.now().year;
+    final startYear = currentYear - 100;
+    return startYear + index;
+  }
+
+  int _getValidDayIndex() {
+    final daysInMonth = DateTime(_selectedDate.year, _selectedDate.month + 1, 0).day;
+    final validDay = _selectedDate.day <= daysInMonth ? _selectedDate.day : daysInMonth;
+    return validDay - 1;
   }
 
   void _onContinue() {
