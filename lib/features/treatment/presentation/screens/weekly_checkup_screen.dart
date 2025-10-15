@@ -84,7 +84,7 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
         title: const Text('Weekly Checkup'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        elevation: 0,
+        // elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.spacing16),
@@ -149,7 +149,7 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
                     'Track your progress and get personalized dosage recommendations based on your weight and side effects.',
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],

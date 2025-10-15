@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/standard_widgets.dart';
 import '../../../../core/providers/treatment_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../widgets/enhanced_medication_level_card.dart';
@@ -71,21 +72,12 @@ class _TreatmentScreenState extends State<TreatmentScreen> with AutomaticKeepAli
   Widget build(BuildContext context) {
     super.build(context); // Required for AutomaticKeepAliveClientMixin
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      // title: 'Treatment',
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Treatment',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF1A1F36),
-            letterSpacing: -0.5,
-          ),
-        ),
+        title: Text('Treatment'),
         centerTitle: false,
       ),
+      backgroundColor: Colors.white,
       body: RefreshIndicator(
         onRefresh: () async {
           _loadData();
@@ -93,131 +85,60 @@ class _TreatmentScreenState extends State<TreatmentScreen> with AutomaticKeepAli
           await Future.delayed(const Duration(milliseconds: 500));
         },
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppConstants.spacing16),
           children: [
-          const EnhancedMedicationLevelCard(),
-          const SizedBox(height: 20),
-          const Row(
-            children: [
-              Expanded(child: DoseCard(type: DoseType.last)),
-              SizedBox(width: 20),
-              Expanded(child: DoseCard(type: DoseType.next)),
-            ],
-          ),
-          const SizedBox(height: 20),
-          const SideEffectsCard(),
-          
-          const SizedBox(height: 20),
-          const WeeklyCheckupCard(),
-          
-          const SizedBox(height: 30),
-          
-          // Options Section
-          _buildSectionHeader('OPTIONS'),
-          const SizedBox(height: 16),
-          
-          _buildNavigationItem(
-            context,
-            icon: Icons.history_outlined,
-            title: 'Shot History',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ShotHistoryScreen()),
-              );
-            },
-          ),
-          
-          const SizedBox(height: 12),
-          
-          _buildNavigationItem(
-            context,
-            icon: Icons.settings_outlined,
-            title: 'Treatment Settings',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const TreatmentSettingsScreen()),
-              );
-            },
-          ),
-          
-          const SizedBox(height: 80),
-        ],
-      ),
-    ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF9CA3AF),
-          letterSpacing: 0.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavigationItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+            const EnhancedMedicationLevelCard(),
+            const SizedBox(height: AppConstants.spacing16),
+            const Row(
+              children: [
+                Expanded(child: DoseCard(type: DoseType.last)),
+                SizedBox(width: AppConstants.spacing16),
+                Expanded(child: DoseCard(type: DoseType.next)),
+              ],
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-              ),
-              child: Icon(
-                icon, 
-                color: AppColors.primary, 
-                size: 24,
-              ),
+            const SizedBox(height: AppConstants.spacing16),
+            const SideEffectsCard(),
+            
+            const SizedBox(height: AppConstants.spacing16),
+            const WeeklyCheckupCard(),
+            
+            const SizedBox(height: AppConstants.spacing24),
+            
+            // Options Section
+            StandardSectionHeader(title: 'OPTIONS'),
+            const SizedBox(height: AppConstants.spacing16),
+            
+            StandardNavigationItem(
+              icon: Icons.history_outlined,
+              title: 'Shot History',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ShotHistoryScreen()),
+                );
+              },
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1A1F36),
-                ),
-              ),
+            
+            const SizedBox(height: AppConstants.spacing12),
+            
+            StandardNavigationItem(
+              icon: Icons.settings_outlined,
+              title: 'Treatment Settings',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TreatmentSettingsScreen()),
+                );
+              },
             ),
-            Icon(
-              Icons.arrow_forward_ios_rounded, 
-              color: const Color(0xFF9CA3AF), 
-              size: 16,
-            ),
+            
+            const SizedBox(height: AppConstants.spacing80),
           ],
         ),
       ),
     );
   }
+
 }
 
 

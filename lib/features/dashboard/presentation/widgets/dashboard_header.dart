@@ -61,7 +61,6 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
-                      fontStyle: FontStyle.italic,
                       letterSpacing: -0.3,
                     ),
                   ),

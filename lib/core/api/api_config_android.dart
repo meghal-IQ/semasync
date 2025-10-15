@@ -7,9 +7,14 @@ class ApiConfig {
   
   // Base URL for the API - Android emulator special IP
   static String get baseUrl {
+    // Production backend server
+    return 'http://13.53.200.189:5000';
+    
+    // Alternative URLs (uncomment to use):
     // For physical Android devices, use your computer's IP
+    // return 'http://$_computerIp:5000';
     // For Android emulator, use 10.0.2.2
-    return 'http://$_computerIp:3000';
+    // return 'http://10.0.2.2:5000';
   }
   
   // API endpoints

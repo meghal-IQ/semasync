@@ -17,6 +17,7 @@ import activityRoutes from './routes/activity';
 import nutritionRoutes from './routes/nutrition';
 import weeklyCheckupRoutes from './routes/weeklyCheckup';
 import foodRecognitionRoutes from './routes/foodRecognition';
+import shotDayTasksRoutes from './routes/shotDayTasks';
 
 // Load environment variables
 dotenv.config();
@@ -103,6 +104,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/nutrition', nutritionRoutes);
 app.use('/api/food-recognition', foodRecognitionRoutes);
+app.use('/api/shot-day-tasks', shotDayTasksRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

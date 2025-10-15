@@ -270,20 +270,35 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
     final user = context.read<AuthProvider>().user;
     final preferredUnit = user?.preferredUnits.weight ?? 'kg';
     
-    // Backend stores in kg, convert to preferred unit
-    final startWeightKg = user?.weight ?? stats?.startingWeight ?? 0;
-    final currentWeightKg = stats?.currentWeight ?? 0;
+    // Backend returns weight in the same unit as logged, convert to preferred unit
+    final statsUnit = stats?.unit ?? 'kg';
+    final startWeightRaw = user?.weight ?? stats?.startingWeight ?? 0;
+    final currentWeightRaw = stats?.currentWeight ?? 0;
     final goalWeightKg = user?.goals.targetWeight ?? 91.3;
     
     // Convert to preferred unit for display
-    final startWeight = UnitConverter.convertWeight(startWeightKg, preferredUnit);
-    final currentWeight = UnitConverter.convertWeight(currentWeightKg, preferredUnit);
+    final startWeight = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
+        ? startWeightRaw 
+        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
+            ? UnitConverter.convertWeightToKg(startWeightRaw, 'lbs')
+            : UnitConverter.convertWeight(startWeightRaw, preferredUnit);
+            
+    final currentWeight = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
+        ? currentWeightRaw 
+        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
+            ? UnitConverter.convertWeightToKg(currentWeightRaw, 'lbs')
+            : UnitConverter.convertWeight(currentWeightRaw, preferredUnit);
+            
     final goalWeight = UnitConverter.convertWeight(goalWeightKg, preferredUnit);
     
     double progress = 0.0;
-    if (startWeightKg > 0 && goalWeightKg > 0 && currentWeightKg > 0) {
-      final totalChange = (goalWeightKg - startWeightKg).abs();
-      final currentChange = (currentWeightKg - startWeightKg).abs();
+    if (startWeightRaw > 0 && goalWeightKg > 0 && currentWeightRaw > 0) {
+      // Convert goal weight to same unit as stats for calculation
+      final goalWeightInStatsUnit = statsUnit.toLowerCase() == 'lbs' 
+          ? UnitConverter.convertWeight(goalWeightKg, 'lbs')
+          : goalWeightKg;
+      final totalChange = (goalWeightInStatsUnit - startWeightRaw).abs();
+      final currentChange = (currentWeightRaw - startWeightRaw).abs();
       progress = totalChange > 0 ? (currentChange / totalChange * 100).clamp(0, 100) : 0;
     }
 
@@ -452,16 +467,26 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
     final user = context.read<AuthProvider>().user;
     final preferredUnit = user?.preferredUnits.weight ?? 'kg';
     
-    // Backend data in kg
-    final totalChangeKg = stats?.totalChange ?? 0;
-    final startWeightKg = user?.weight ?? stats?.startingWeight ?? 0;
+    // Backend data in same unit as logged
+    final statsUnit = stats?.unit ?? 'kg';
+    final totalChangeRaw = stats?.totalChange ?? 0;
+    final startWeightRaw = user?.weight ?? stats?.startingWeight ?? 0;
     final firstDate = stats?.firstEntryDate;
     
     // Convert to preferred unit
-    final totalChange = UnitConverter.convertWeight(totalChangeKg.abs(), preferredUnit);
-    final startWeight = UnitConverter.convertWeight(startWeightKg, preferredUnit);
+    final totalChange = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
+        ? totalChangeRaw.abs()
+        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
+            ? UnitConverter.convertWeightToKg(totalChangeRaw.abs(), 'lbs')
+            : UnitConverter.convertWeight(totalChangeRaw.abs(), preferredUnit);
+            
+    final startWeight = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
+        ? startWeightRaw 
+        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
+            ? UnitConverter.convertWeightToKg(startWeightRaw, 'lbs')
+            : UnitConverter.convertWeight(startWeightRaw, preferredUnit);
     
-    final isPositive = totalChangeKg > 0;
+    final isPositive = totalChangeRaw > 0;
     final sign = isPositive ? '+' : '-';
 
     return Container(
@@ -496,7 +521,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
           const SizedBox(height: AppConstants.spacing16),
           
           Text(
-            totalChangeKg != 0 ? '$sign${totalChange.toStringAsFixed(1)}$preferredUnit' : '--',
+            totalChangeRaw != 0 ? '$sign${totalChange.toStringAsFixed(1)}$preferredUnit' : '--',
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -507,7 +532,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
           const SizedBox(height: AppConstants.spacing4),
           
           Text(
-            firstDate != null && startWeightKg > 0
+            firstDate != null && startWeightRaw > 0
                 ? 'From ${startWeight.toStringAsFixed(1)} $preferredUnit, ${_formatDate(firstDate)}'
                 : 'No data yet',
             style: const TextStyle(
@@ -525,21 +550,36 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
     final user = context.read<AuthProvider>().user;
     final preferredUnit = user?.preferredUnits.weight ?? 'kg';
     
-    // Backend data in kg
-    final startWeightKg = user?.weight ?? stats?.startingWeight ?? 0;
-    final currentWeightKg = stats?.currentWeight ?? 0;
+    // Backend data in same unit as logged, convert to preferred unit
+    final statsUnit = stats?.unit ?? 'kg';
+    final startWeightRaw = user?.weight ?? stats?.startingWeight ?? 0;
+    final currentWeightRaw = stats?.currentWeight ?? 0;
     final goalWeightKg = user?.goals.targetWeight ?? 91.3;
     final targetDate = user?.goals.targetDate;
     
-    // Convert to preferred unit
-    final startWeight = UnitConverter.convertWeight(startWeightKg, preferredUnit);
-    final currentWeight = UnitConverter.convertWeight(currentWeightKg, preferredUnit);
+    // Convert to preferred unit for display
+    final startWeight = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
+        ? startWeightRaw 
+        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
+            ? UnitConverter.convertWeightToKg(startWeightRaw, 'lbs')
+            : UnitConverter.convertWeight(startWeightRaw, preferredUnit);
+            
+    final currentWeight = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
+        ? currentWeightRaw 
+        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
+            ? UnitConverter.convertWeightToKg(currentWeightRaw, 'lbs')
+            : UnitConverter.convertWeight(currentWeightRaw, preferredUnit);
+            
     final goalWeight = UnitConverter.convertWeight(goalWeightKg, preferredUnit);
     
     double progress = 0.0;
-    if (startWeightKg > 0 && goalWeightKg > 0) {
-      final totalChange = (goalWeightKg - startWeightKg).abs();
-      final currentChange = (currentWeightKg - startWeightKg).abs();
+    if (startWeightRaw > 0 && goalWeightKg > 0 && currentWeightRaw > 0) {
+      // Convert goal weight to same unit as stats for calculation
+      final goalWeightInStatsUnit = statsUnit.toLowerCase() == 'lbs' 
+          ? UnitConverter.convertWeight(goalWeightKg, 'lbs')
+          : goalWeightKg;
+      final totalChange = (goalWeightInStatsUnit - startWeightRaw).abs();
+      final currentChange = (currentWeightRaw - startWeightRaw).abs();
       progress = totalChange > 0 ? (currentChange / totalChange).clamp(0, 1) : 0;
     }
 
@@ -599,7 +639,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 Text(
-                  currentWeightKg > 0 ? '${currentWeight.toStringAsFixed(0)}$preferredUnit' : '--',
+                  currentWeightRaw > 0 ? '${currentWeight.toStringAsFixed(0)}$preferredUnit' : '--',
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 Text(

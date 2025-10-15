@@ -11,6 +11,7 @@ import 'core/providers/activity_provider.dart';
 import 'core/providers/nutrition_provider.dart';
 import 'core/providers/weekly_checkup_provider.dart';
 import 'core/providers/historical_data_provider.dart';
+import 'core/providers/shot_day_tasks_provider.dart';
 import 'features/treatment/presentation/providers/side_effect_provider.dart';
 import 'features/treatment/presentation/providers/medication_level_provider.dart';
 import 'features/treatment/presentation/providers/treatment_schedule_provider.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ActivityProvider()),
         ChangeNotifierProvider(create: (_) => NutritionProvider()),
         ChangeNotifierProvider(create: (_) => HistoricalDataProvider()),
+        ChangeNotifierProvider(create: (_) => ShotDayTasksProvider()),
         ChangeNotifierProvider(create: (_) => WeeklyCheckupProvider(WeeklyCheckupService(ApiClient().dio))),
         ChangeNotifierProvider(create: (_) => SideEffectProvider(SideEffectApi(ApiClient().dio))),
         ChangeNotifierProvider(create: (_) => MedicationLevelProvider(MedicationLevelApi(ApiClient().dio))),

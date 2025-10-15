@@ -147,8 +147,21 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
     required String preferredUnit,
     required VoidCallback onDelete,
   }) {
-    // Convert weight from kg to preferred unit
-    final weightConverted = UnitConverter.convertWeight(log.weight, preferredUnit);
+    // Convert weight to preferred unit based on original unit
+    double weightConverted;
+    if (log.unit.toLowerCase() == preferredUnit.toLowerCase()) {
+      // Same unit, no conversion needed
+      weightConverted = log.weight;
+    } else if (log.unit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg') {
+      // Convert from lbs to kg
+      weightConverted = UnitConverter.convertWeightToKg(log.weight, 'lbs');
+    } else if (log.unit.toLowerCase() == 'kg' && preferredUnit.toLowerCase() == 'lbs') {
+      // Convert from kg to lbs
+      weightConverted = UnitConverter.convertWeight(log.weight, 'lbs');
+    } else {
+      // Fallback to original weight
+      weightConverted = log.weight;
+    }
     
     // Convert change from kg to preferred unit
     final change = changeKg != null ? UnitConverter.convertWeight(changeKg.abs(), preferredUnit) : null;

@@ -6,27 +6,31 @@ class ApiConfig {
   
   // Base URL for the API - dynamically determined based on platform
   static String get baseUrl {
+    // Production backend server
+    return 'http://13.53.200.189:5000';
+    
+    // Alternative URLs (uncomment to use):
     // ngrok URL - Backend accessible from anywhere! (Updated)
-    return 'https://807d27122274.ngrok-free.app';
+    // return 'https://807d27122274.ngrok-free.app';
     
     // Local development (uncomment to use local backend)
     // if (Platform.isAndroid) {
-    //   return 'http://$_computerIp:3000';
+    //   return 'http://$_computerIp:5000';
     // } else if (Platform.isIOS) {
-    //   return 'http://$_computerIp:3000';
+    //   return 'http://$_computerIp:5000';
     // } else {
-    //   return 'http://localhost:3000';
+    //   return 'http://localhost:5000';
     // }
   }
   
   // Alternative method to detect if running on emulator/simulator
   static String get baseUrlForDevice {
     // You can manually switch between these URLs based on your testing needs:
-    // For emulator/simulator: return 'http://10.0.2.2:3000'; // Android emulator
-    // For emulator/simulator: return 'http://localhost:3000'; // iOS simulator
-    // For physical device: return 'http://$_computerIp:3000';
+    // For emulator/simulator: return 'http://10.0.2.2:5000'; // Android emulator
+    // For emulator/simulator: return 'http://localhost:5000'; // iOS simulator
+    // For physical device: return 'http://$_computerIp:5000';
     
-    return 'http://$_computerIp:3000'; // Currently set for physical device
+    return 'http://$_computerIp:5000'; // Currently set for physical device
   }
   
   // API endpoints

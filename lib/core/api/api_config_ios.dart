@@ -1,7 +1,7 @@
 // Use this configuration if you're running Flutter on iOS Simulator
 class ApiConfig {
-  // Base URL for the API - iOS Simulator can use localhost
-  static const String baseUrl = 'http://localhost:8080';
+  // Base URL for the API - Production backend server
+  static const String baseUrl = 'http://13.53.200.189:5000';
   
   // API endpoints
   static const String authEndpoint = '$baseUrl/api/auth';

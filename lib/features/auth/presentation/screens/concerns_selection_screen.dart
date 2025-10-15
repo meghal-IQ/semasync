@@ -21,22 +21,6 @@ class _ConcernsSelectionScreenState extends State<ConcernsSelectionScreen> {
     'Muscle Loss',
     'Injection Anxiety',
     'Loose Skin',
-    'Constipation',
-    'Bloating',
-    'Sulfur Burps',
-    'Heartburn',
-    'Food Noise',
-    'Vomiting',
-    'Diarrhea',
-    'Headache',
-    'Dizziness',
-    'Abdominal Pain',
-    'Decreased Appetite',
-    'Injection Site Reaction',
-    'Low Blood Sugar',
-    'Mood Changes',
-    'Sleep Disturbances',
-    'Dry Mouth',
   ];
 
   @override

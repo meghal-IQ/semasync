@@ -68,21 +68,19 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
             ),
 
             // Shot Day Selector
-            const SizedBox(height: 16),
-            ShotDaySelector(
-              selectedDays: _shotDays,
-              onDaysChanged: (days) {
-                setState(() {
-                  _shotDays = days;
-                });
-              },
-            ),
+            // const SizedBox(height: 16),
+            // ShotDaySelector(
+            //   selectedDays: _shotDays,
+            //   onDaysChanged: (days) {
+            //     setState(() {
+            //       _shotDays = days;
+            //     });
+            //   },
+            // ),
 
             // Shot Day Widget (only shows on shot days)
             const SizedBox(height: 16),
-            ShotDayWidget(
-              selectedDays: _shotDays,
-            ),
+            const ShotDayWidget(),
 
             // Main Content
             Expanded(
