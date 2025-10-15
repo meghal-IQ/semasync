@@ -488,7 +488,7 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
     final date = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      firstDate: DateTime(1970), // Allow historical data entry from 1970
       lastDate: DateTime.now(),
     );
 
