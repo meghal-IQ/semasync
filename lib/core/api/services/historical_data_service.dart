@@ -74,20 +74,19 @@ class HistoricalDataService {
     try {
       final dateString = date.toIso8601String().split('T')[0]; // YYYY-MM-DD format
       
+      // Get medication level for the specific date
       final response = await _apiClient.get(
-        '/api/treatments/shots',
+        '/api/treatments/medication-level/date',
         queryParameters: {'date': dateString},
       );
 
       if (response.data['success'] == true && response.data['data'] != null) {
-        final shots = (response.data['data']['shots'] as List)
-            .map((shot) => Map<String, dynamic>.from(shot))
-            .toList();
-        
+        // Return medication level data as a list with single item for consistency
+        final medicationData = response.data['data'];
         return ApiResponse<List<Map<String, dynamic>>>(
           success: true,
           message: response.data['message'] ?? 'Historical treatment data retrieved',
-          data: shots,
+          data: [Map<String, dynamic>.from(medicationData)],
         );
       }
 

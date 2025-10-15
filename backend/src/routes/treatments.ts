@@ -396,6 +396,77 @@ router.get('/medication-level', authenticate, async (req: AuthRequest, res: expr
 });
 
 /**
+ * @route   GET /api/treatments/medication-level/date
+ * @desc    Get medication level for a specific date
+ * @access  Private
+ */
+router.get('/medication-level/date', authenticate, [
+  query('date').optional().isISO8601()
+], async (req: AuthRequest, res: express.Response) => {
+  try {
+    const userId = req.user!._id;
+    const { date } = req.query;
+
+    // Parse the target date or use today
+    const targetDate = date ? new Date(date as string) : new Date();
+    targetDate.setHours(23, 59, 59, 999); // End of day
+
+    // Find the most recent shot before or on the target date
+    const latestShot = await ShotLog.findOne({
+      userId,
+      date: { $lte: targetDate }
+    }).sort({ date: -1 });
+
+    if (!latestShot) {
+      return res.json({
+        success: true,
+        data: {
+          hasShots: false,
+          currentLevel: 0,
+          status: 'no_data',
+          date: targetDate
+        }
+      });
+    }
+
+    // Calculate medication level as of the target date
+    const medicationLevel = calculateMedicationLevel(
+      latestShot.medication,
+      latestShot.dosage,
+      latestShot.date,
+      latestShot.nextDueDate || calculateNextDueDate(latestShot.date, 'weekly')
+    );
+
+    // Adjust the level based on time elapsed to target date
+    const hoursSinceShot = (targetDate.getTime() - latestShot.date.getTime()) / (1000 * 60 * 60);
+    const halfLife = getHalfLife(latestShot.medication);
+    const levelAtTargetDate = 100 * Math.pow(0.5, hoursSinceShot / halfLife);
+
+    res.json({
+      success: true,
+      data: {
+        hasShots: true,
+        currentLevel: Math.max(0, levelAtTargetDate),
+        percentageOfPeak: Math.max(0, levelAtTargetDate),
+        status: levelAtTargetDate > 50 ? 'optimal' : levelAtTargetDate > 25 ? 'moderate' : 'low',
+        medication: latestShot.medication,
+        dosage: latestShot.dosage,
+        lastShotDate: latestShot.date,
+        targetDate: targetDate,
+        hoursSinceShot: hoursSinceShot
+      }
+    });
+  } catch (error: any) {
+    console.error('Get historical medication level error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to calculate historical medication level',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
  * @route   GET /api/treatments/injection-sites/recommend
  * @desc    Get recommended injection sites based on rotation
  * @access  Private
