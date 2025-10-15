@@ -13,6 +13,7 @@ import '../../../../core/providers/nutrition_provider.dart';
 import '../../../../core/providers/historical_data_provider.dart';
 import '../../../../core/api/models/nutrition_log_model.dart';
 import '../widgets/dashboard_header.dart';
+import '../widgets/shot_day_widget.dart';
 
 class SimpleSemaSyncDashboard extends StatefulWidget {
   const SimpleSemaSyncDashboard({super.key});
@@ -26,6 +27,8 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
   bool _isShotDayExpanded = true;
   Timer? _timeUpdateTimer;
   DateTime _selectedDate = DateTime.now();
+  List<int> _shotDays = [3, 4]; // Wednesday and Thursday by default
+  
   @override
   void initState() {
     super.initState();
@@ -62,6 +65,23 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
               selectedDate: _selectedDate,
               onDateChanged: _onDateChanged,
               streakCount: 1, // TODO: Get actual streak count
+            ),
+
+            // Shot Day Selector
+            const SizedBox(height: 16),
+            ShotDaySelector(
+              selectedDays: _shotDays,
+              onDaysChanged: (days) {
+                setState(() {
+                  _shotDays = days;
+                });
+              },
+            ),
+
+            // Shot Day Widget (only shows on shot days)
+            const SizedBox(height: 16),
+            ShotDayWidget(
+              selectedDays: _shotDays,
             ),
 
             // Main Content
@@ -287,7 +307,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.all(28),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
