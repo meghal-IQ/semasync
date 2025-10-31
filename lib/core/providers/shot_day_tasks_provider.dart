@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
+import '../api/api_client.dart';
 import '../api/shot_day_tasks_api.dart';
-import '../services/api_client.dart';
 
 class ShotDayTasksProvider with ChangeNotifier {
   final ShotDayTasksApi _api = ShotDayTasksApi(ApiClient().dio);

@@ -17,15 +17,33 @@ class WeightResultsScreen extends StatefulWidget {
   State<WeightResultsScreen> createState() => _WeightResultsScreenState();
 }
 
-class _WeightResultsScreenState extends State<WeightResultsScreen> {
+class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTickerProviderStateMixin {
   String _selectedTimeRange = '7d';
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+    _animationController.forward();
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<HealthProvider>().loadWeightData();
     });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -34,64 +52,100 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
-          children: [
-            // Header
-            _buildHeader(),
+            children: [
+              // Header
+              _buildHeader(),
             
             // Main Content
             Expanded(
               child: Consumer<HealthProvider>(
                 builder: (context, healthProvider, child) {
                   if (healthProvider.isLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
+                    return Center(
+                      child: TweenAnimationBuilder<double>(
+                        duration: const Duration(milliseconds: 800),
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        curve: Curves.easeInOut,
+                        builder: (context, value, child) {
+                          return Opacity(
+                            opacity: value,
+                            child: child,
+                          );
+                        },
+                        child: const CircularProgressIndicator(),
+                      ),
                     );
                   }
 
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.all(AppConstants.spacing16),
-                    child: Column(
-                      children: [
-                        // Weight Graph Card
-                        _buildWeightGraphCard(healthProvider),
-                        
-                        const SizedBox(height: AppConstants.spacing16),
-                        
-                        // Progress and BMI Row
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildProgressCard(healthProvider),
-                            ),
-                            const SizedBox(width: AppConstants.spacing16),
-                            Expanded(
-                              child: _buildBMICard(healthProvider),
-                            ),
-                          ],
-                        ),
-                        
-                        const SizedBox(height: AppConstants.spacing16),
-                        
-                        // Difference Card
-                        _buildDifferenceCard(healthProvider),
-                        
-                        const SizedBox(height: AppConstants.spacing16),
-                        
-                        // Timeline Card
-                        _buildTimelineCard(healthProvider),
-                        
-                        const SizedBox(height: AppConstants.spacing16),
-                        
-                        // Today's Log Card
-                        _buildTodaysLogCard(healthProvider),
-                        
-                        const SizedBox(height: AppConstants.spacing24),
-                        
-                        // Options Section
-                        _buildOptionsSection(),
-                        
-                        const SizedBox(height: AppConstants.spacing80),
-                      ],
+                  return FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(AppConstants.spacing16),
+                      child: Column(
+                        children: [
+                          // Weight Graph Card
+                          _buildAnimatedCard(
+                            delay: 0,
+                            child: _buildWeightGraphCard(healthProvider),
+                          ),
+                          
+                          const SizedBox(height: AppConstants.spacing16),
+                          
+                          // Progress, BMI and Difference Row
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildAnimatedCard(
+                                  delay: 100,
+                                  child: _buildProgressCard(healthProvider),
+                                ),
+                              ),
+                              const SizedBox(width: AppConstants.spacing16),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    _buildAnimatedCard(
+                                      delay: 150,
+                                      child: _buildBMICard(healthProvider),
+                                    ),
+                                    const SizedBox(height: AppConstants.spacing16),
+                                    _buildAnimatedCard(
+                                      delay: 200,
+                                      child: _buildDifferenceCard(healthProvider),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          
+                          const SizedBox(height: AppConstants.spacing16),
+                          
+                          // Timeline Card
+                          _buildAnimatedCard(
+                            delay: 250,
+                            child: _buildTimelineCard(healthProvider),
+                          ),
+                          
+                          const SizedBox(height: AppConstants.spacing16),
+                          
+                          // Today's Log Card
+                          _buildAnimatedCard(
+                            delay: 300,
+                            child: _buildTodaysLogCard(healthProvider),
+                          ),
+                          
+                          const SizedBox(height: AppConstants.spacing24),
+                          
+                          // Options Section
+                          _buildAnimatedCard(
+                            delay: 350,
+                            child: _buildOptionsSection(),
+                          ),
+                          
+                          const SizedBox(height: AppConstants.spacing80),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -100,60 +154,180 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "weight_fab",
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const WeightLoggingScreen()),
+      floatingActionButton: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 600),
+        tween: Tween(begin: 0.0, end: 1.0),
+        curve: Curves.elasticOut,
+        builder: (context, value, child) {
+          return Transform.scale(
+            scale: value,
+            child: child,
           );
         },
-        backgroundColor: Colors.black,
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
+        child: FloatingActionButton(
+          heroTag: "weight_fab",
+          onPressed: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const WeightLoggingScreen(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 1.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: FadeTransition(opacity: animation, child: child),
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 400),
+              ),
+            );
+          },
+          backgroundColor: const Color(0xFF6A34D7),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
+  Widget _buildAnimatedCard({required int delay, required Widget child}) {
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 500 + delay),
+      tween: Tween(begin: 0.0, end: 1.0),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - value)),
+          child: Opacity(
+            opacity: value,
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
+  Widget _buildAnimatedTappableCard({
+    required Widget child,
+    required VoidCallback onTap,
+  }) {
+    return _AnimatedTappableCard(
+      onTap: onTap,
+      child: child,
+    );
+  }
+
+  List<dynamic> _filterWeightHistoryByTimeRange(List<dynamic> history) {
+    if (history.isEmpty) return history;
+    
+    final now = DateTime.now();
+    DateTime cutoffDate;
+    
+    switch (_selectedTimeRange) {
+      case '7d':
+        cutoffDate = now.subtract(const Duration(days: 7));
+        break;
+      case '30d':
+        cutoffDate = now.subtract(const Duration(days: 30));
+        break;
+      case '90d':
+        cutoffDate = now.subtract(const Duration(days: 90));
+        break;
+      case '1y':
+        cutoffDate = now.subtract(const Duration(days: 365));
+        break;
+      default:
+        cutoffDate = now.subtract(const Duration(days: 7));
+    }
+    
+    return history.where((log) {
+      return log.date.isAfter(cutoffDate) || log.date.isAtSameMomentAs(cutoffDate);
+    }).toList();
+  }
+
+  List<dynamic> _normalizeWeightHistory(List<dynamic> history) {
+    final now = DateTime.now();
+    int days;
+    switch (_selectedTimeRange) {
+      case '7d':
+        days = 7;
+        break;
+      case '30d':
+        days = 30;
+        break;
+      case '90d':
+        days = 90;
+        break;
+      case '1y':
+        days = 365;
+        break;
+      default:
+        days = 7;
+    }
+
+    final normalizedHistory = <dynamic>[];
+    
+    // Create a map for quick lookup
+    final historyMap = <DateTime, dynamic>{};
+    for (var log in history) {
+      final logDate = DateTime(log.date.year, log.date.month, log.date.day);
+      historyMap[logDate] = log;
+    }
+    
+    // Get the latest weight and unit for interpolation
+    double? latestWeight;
+    String? latestUnit;
+    if (history.isNotEmpty) {
+      latestWeight = history.first.weight;
+      latestUnit = history.first.unit;
+    }
+    
+    for (int i = 0; i < days; i++) {
+      final date = now.subtract(Duration(days: i));
+      final dateOnly = DateTime(date.year, date.month, date.day);
+      
+      // Check if we have data for this date
+      if (historyMap.containsKey(dateOnly)) {
+        normalizedHistory.add(historyMap[dateOnly]);
+      } else {
+        // Create a placeholder entry for missing dates
+        // Use the latest weight with slight variation for visualization
+        final placeholderWeight = latestWeight != null 
+            ? latestWeight + (math.Random().nextDouble() - 0.5) * 2.0 // Small variation
+            : 70.0; // Default weight if no data
+        
+        normalizedHistory.add({
+          'date': dateOnly,
+          'weight': placeholderWeight,
+          'unit': latestUnit ?? 'kg',
+          'isPlaceholder': true,
+        });
+      }
+    }
+
+    return normalizedHistory.reversed.toList();
+  }
+
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.all(AppConstants.spacing16),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const Text(
             'Results',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: Color(0xFF1A1F36),
             ),
-          ),
-          Row(
-            children: [
-              const Icon(
-                Icons.calendar_today_outlined,
-                color: AppColors.textSecondary,
-                size: 20,
-              ),
-              const SizedBox(width: AppConstants.spacing4),
-              const Text(
-                'Today',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(width: AppConstants.spacing16),
-              const Icon(
-                Icons.filter_list_outlined,
-                color: AppColors.textSecondary,
-                size: 20,
-              ),
-            ],
           ),
         ],
       ),
@@ -162,16 +336,15 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
 
   Widget _buildWeightGraphCard(HealthProvider healthProvider) {
     final stats = healthProvider.weightStats;
-    final history = healthProvider.weightHistory;
+    final history = _normalizeWeightHistory(_filterWeightHistoryByTimeRange(healthProvider.weightHistory));
     final user = context.read<AuthProvider>().user;
     final preferredUnit = user?.preferredUnits.weight ?? 'kg';
 
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacing16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.divider),
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,8 +374,6 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
                   _buildTimeRangeButton('30d', _selectedTimeRange == '30d'),
                   const SizedBox(width: AppConstants.spacing8),
                   _buildTimeRangeButton('90d', _selectedTimeRange == '90d'),
-                  const SizedBox(width: AppConstants.spacing8),
-                  _buildTimeRangeButton('1y', _selectedTimeRange == '1y'),
                 ],
               ),
             ],
@@ -213,24 +384,48 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
           // Weight Graph
           SizedBox(
             height: 200,
-            child: history.isEmpty
-                ? Center(
-                    child: Text(
-                      'No weight data yet',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 14,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              transitionBuilder: (child, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeInOut,
                       ),
                     ),
-                  )
-                    : CustomPaint(
-                    painter: WeightGraphPainter(
-                      weightHistory: history,
-                      currentWeight: stats?.currentWeight,
-                      unit: preferredUnit,
-                    ),
-                    child: Container(),
+                    child: child,
                   ),
+                );
+              },
+              child: history.isEmpty
+                  ? Center(
+                      key: const ValueKey('empty'),
+                      child: Text(
+                        'No weight data for this period',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                    )
+                  : CustomPaint(
+                      key: ValueKey(_selectedTimeRange),
+                      painter: WeightGraphPainter(
+                        weightHistory: history,
+                        currentWeight: stats?.currentWeight != null && stats?.unit != null
+                            ? UnitConverter.convertWeight(
+                                UnitConverter.convertWeightToKg(stats!.currentWeight!, stats!.unit),
+                                preferredUnit
+                              )
+                            : null,
+                        unit: preferredUnit,
+                      ),
+                      child: Container(),
+                    ),
+            ),
           ),
         ],
       ),
@@ -244,22 +439,26 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
           _selectedTimeRange = label;
         });
       },
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(
-          horizontal: AppConstants.spacing8,
-          vertical: AppConstants.spacing4,
+          horizontal: 12,
+          vertical: 6,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.textPrimary : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
+          color: isSelected ? const Color(0xFF6A34D7) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
         ),
-        child: Text(
-          label,
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: isSelected ? Colors.white : AppColors.textSecondary,
+            color: isSelected ? Colors.white : const Color(0xFF6B7280),
           ),
+          child: Text(label),
         ),
       ),
     );
@@ -276,38 +475,27 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
     final currentWeightRaw = stats?.currentWeight ?? 0;
     final goalWeightKg = user?.goals.targetWeight ?? 91.3;
     
-    // Convert to preferred unit for display
-    final startWeight = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
-        ? startWeightRaw 
-        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
-            ? UnitConverter.convertWeightToKg(startWeightRaw, 'lbs')
-            : UnitConverter.convertWeight(startWeightRaw, preferredUnit);
-            
-    final currentWeight = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
-        ? currentWeightRaw 
-        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
-            ? UnitConverter.convertWeightToKg(currentWeightRaw, 'lbs')
-            : UnitConverter.convertWeight(currentWeightRaw, preferredUnit);
-            
+    // Convert all weights to kg first, then to preferred unit for display
+    final startWeightInKg = UnitConverter.convertWeightToKg(startWeightRaw, statsUnit);
+    final currentWeightInKg = UnitConverter.convertWeightToKg(currentWeightRaw, statsUnit);
+    
+    final startWeight = UnitConverter.convertWeight(startWeightInKg, preferredUnit);
+    final currentWeight = UnitConverter.convertWeight(currentWeightInKg, preferredUnit);
     final goalWeight = UnitConverter.convertWeight(goalWeightKg, preferredUnit);
     
     double progress = 0.0;
-    if (startWeightRaw > 0 && goalWeightKg > 0 && currentWeightRaw > 0) {
-      // Convert goal weight to same unit as stats for calculation
-      final goalWeightInStatsUnit = statsUnit.toLowerCase() == 'lbs' 
-          ? UnitConverter.convertWeight(goalWeightKg, 'lbs')
-          : goalWeightKg;
-      final totalChange = (goalWeightInStatsUnit - startWeightRaw).abs();
-      final currentChange = (currentWeightRaw - startWeightRaw).abs();
+    if (startWeightInKg > 0 && goalWeightKg > 0 && currentWeightInKg > 0) {
+      // Calculate progress in kg for accuracy
+      final totalChange = (goalWeightKg - startWeightInKg).abs();
+      final currentChange = (currentWeightInKg - startWeightInKg).abs();
       progress = totalChange > 0 ? (currentChange / totalChange * 100).clamp(0, 100) : 0;
     }
 
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacing16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.divider),
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,8 +503,8 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
           Row(
             children: [
               Icon(
-                Icons.person_outline,
-                color: AppColors.primary,
+                Icons.monitor_weight,
+                color: AppColors.textPrimary,
                 size: 20,
               ),
               const SizedBox(width: AppConstants.spacing8),
@@ -325,7 +513,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: Color(0xFF1A1F36),
                 ),
               ),
             ],
@@ -337,7 +525,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
             'Goal Weight: ${goalWeight.toStringAsFixed(1)}$preferredUnit',
             style: const TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: Color(0xFF6B7280),
             ),
           ),
           
@@ -346,28 +534,33 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
           // Circular Progress
           Center(
             child: SizedBox(
-              width: 80,
-              height: 80,
-              child: Column(
-                children: [
-                  CircularProgressIndicator(
-                    value: progress / 100,
-                    backgroundColor: AppColors.divider,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                    strokeWidth: 8,
-                  ),
-                  SizedBox(height: 4,),
-                  Center(
-                    child: Text(
-                      '${progress.toInt()}%',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+              width: 150,
+              height: 150,
+              child: TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 1200),
+                curve: Curves.easeOutCubic,
+                tween: Tween(begin: 0.0, end: progress),
+                builder: (context, value, child) {
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        value: value / 100,
+                        backgroundColor: Colors.transparent,
+                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6A34D7)),
+                        strokeWidth: 18,
                       ),
-                    ),
-                  ),
-                ],
+                      Text(
+                        '${value.toInt()}%',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A1F36),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -379,25 +572,26 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
   Widget _buildBMICard(HealthProvider healthProvider) {
     final stats = healthProvider.weightStats;
     final user = context.read<AuthProvider>().user;
-    final currentWeightKg = stats?.currentWeight;
+    final currentWeightRaw = stats?.currentWeight;
     final latestDate = stats?.latestEntryDate;
     
     // Calculate BMI using user's height from profile
     final heightCm = user?.height ?? 175.0; // cm from profile
     final heightM = heightCm / 100; // convert to meters
     
+    // Convert current weight to kg for BMI calculation
     double? bmi;
-    if (currentWeightKg != null && currentWeightKg > 0 && heightM > 0) {
+    if (currentWeightRaw != null && currentWeightRaw > 0 && heightM > 0 && stats?.unit != null) {
       // BMI is always calculated with kg and meters
+      final currentWeightKg = UnitConverter.convertWeightToKg(currentWeightRaw, stats!.unit);
       bmi = currentWeightKg / (heightM * heightM);
     }
 
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacing16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.divider),
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,22 +600,8 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
             children: [
               Icon(
                 Icons.bar_chart,
-                color: AppColors.primary,
+                color: AppColors.textPrimary,
                 size: 20,
-              ),
-              const SizedBox(width: AppConstants.spacing4),
-              Container(
-                width: 16,
-                height: 16,
-                decoration: BoxDecoration(
-                  color: AppColors.textSecondary,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.info_outline,
-                  color: Colors.white,
-                  size: 10,
-                ),
               ),
               const SizedBox(width: AppConstants.spacing8),
               const Text(
@@ -429,7 +609,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: Color(0xFF1A1F36),
                 ),
               ),
             ],
@@ -437,13 +617,20 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
           
           const SizedBox(height: AppConstants.spacing16),
           
-          Text(
-            bmi != null ? bmi.toStringAsFixed(1) : '--',
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
+          TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.easeOutCubic,
+            tween: Tween(begin: 0.0, end: bmi ?? 0.0),
+            builder: (context, value, child) {
+              return Text(
+                value > 0 ? value.toStringAsFixed(1) : '--',
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1F36),
+                ),
+              );
+            },
           ),
           
           const SizedBox(height: AppConstants.spacing4),
@@ -454,7 +641,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
                 : 'Today',
             style: const TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: Color(0xFF6B7280),
             ),
           ),
         ],
@@ -473,18 +660,12 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
     final startWeightRaw = user?.weight ?? stats?.startingWeight ?? 0;
     final firstDate = stats?.firstEntryDate;
     
-    // Convert to preferred unit
-    final totalChange = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
-        ? totalChangeRaw.abs()
-        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
-            ? UnitConverter.convertWeightToKg(totalChangeRaw.abs(), 'lbs')
-            : UnitConverter.convertWeight(totalChangeRaw.abs(), preferredUnit);
+    // Convert to preferred unit - first to kg, then to preferred
+    final totalChangeInKg = UnitConverter.convertWeightToKg(totalChangeRaw.abs(), statsUnit);
+    final totalChange = UnitConverter.convertWeight(totalChangeInKg, preferredUnit);
             
-    final startWeight = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
-        ? startWeightRaw 
-        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
-            ? UnitConverter.convertWeightToKg(startWeightRaw, 'lbs')
-            : UnitConverter.convertWeight(startWeightRaw, preferredUnit);
+    final startWeightInKg = UnitConverter.convertWeightToKg(startWeightRaw, statsUnit);
+    final startWeight = UnitConverter.convertWeight(startWeightInKg, preferredUnit);
     
     final isPositive = totalChangeRaw > 0;
     final sign = isPositive ? '+' : '-';
@@ -492,9 +673,8 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacing16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.divider),
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -503,7 +683,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
             children: [
               Icon(
                 Icons.monitor_weight,
-                color: AppColors.primary,
+                color: AppColors.textPrimary,
                 size: 20,
               ),
               const SizedBox(width: AppConstants.spacing8),
@@ -512,7 +692,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: Color(0xFF1A1F36),
                 ),
               ),
             ],
@@ -520,13 +700,20 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
           
           const SizedBox(height: AppConstants.spacing16),
           
-          Text(
-            totalChangeRaw != 0 ? '$sign${totalChange.toStringAsFixed(1)}$preferredUnit' : '--',
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
+          TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.easeOutCubic,
+            tween: Tween(begin: 0.0, end: totalChange),
+            builder: (context, value, child) {
+              return Text(
+                totalChangeRaw != 0 ? '$sign${value.toStringAsFixed(1)}$preferredUnit' : '--',
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1F36),
+                ),
+              );
+            },
           ),
           
           const SizedBox(height: AppConstants.spacing4),
@@ -537,7 +724,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
                 : 'No data yet',
             style: const TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: Color(0xFF6B7280),
             ),
           ),
         ],
@@ -557,44 +744,47 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
     final goalWeightKg = user?.goals.targetWeight ?? 91.3;
     final targetDate = user?.goals.targetDate;
     
-    // Convert to preferred unit for display
-    final startWeight = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
-        ? startWeightRaw 
-        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
-            ? UnitConverter.convertWeightToKg(startWeightRaw, 'lbs')
-            : UnitConverter.convertWeight(startWeightRaw, preferredUnit);
-            
-    final currentWeight = statsUnit.toLowerCase() == preferredUnit.toLowerCase() 
-        ? currentWeightRaw 
-        : (statsUnit.toLowerCase() == 'lbs' && preferredUnit.toLowerCase() == 'kg')
-            ? UnitConverter.convertWeightToKg(currentWeightRaw, 'lbs')
-            : UnitConverter.convertWeight(currentWeightRaw, preferredUnit);
-            
+    // Convert all weights to kg first, then to preferred unit for display
+    final startWeightInKg = UnitConverter.convertWeightToKg(startWeightRaw, statsUnit);
+    final currentWeightInKg = UnitConverter.convertWeightToKg(currentWeightRaw, statsUnit);
+    
+    final startWeight = UnitConverter.convertWeight(startWeightInKg, preferredUnit);
+    final currentWeight = UnitConverter.convertWeight(currentWeightInKg, preferredUnit);
     final goalWeight = UnitConverter.convertWeight(goalWeightKg, preferredUnit);
     
     double progress = 0.0;
-    if (startWeightRaw > 0 && goalWeightKg > 0 && currentWeightRaw > 0) {
-      // Convert goal weight to same unit as stats for calculation
-      final goalWeightInStatsUnit = statsUnit.toLowerCase() == 'lbs' 
-          ? UnitConverter.convertWeight(goalWeightKg, 'lbs')
-          : goalWeightKg;
-      final totalChange = (goalWeightInStatsUnit - startWeightRaw).abs();
-      final currentChange = (currentWeightRaw - startWeightRaw).abs();
+    if (startWeightInKg > 0 && goalWeightKg > 0 && currentWeightInKg > 0) {
+      // Calculate progress in kg for accuracy
+      final totalChange = (goalWeightKg - startWeightInKg).abs();
+      final currentChange = (currentWeightInKg - startWeightInKg).abs();
       progress = totalChange > 0 ? (currentChange / totalChange).clamp(0, 1) : 0;
     }
 
-    return GestureDetector(
+    return _buildAnimatedTappableCard(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const WeightGoalScreen()),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => const WeightGoalScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              const begin = Offset(1.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.easeInOut;
+              var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: FadeTransition(opacity: animation, child: child),
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 400),
+          ),
         );
       },
       child: Container(
         padding: const EdgeInsets.all(AppConstants.spacing16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          border: Border.all(color: AppColors.divider),
+          color: AppColors.lightGrey,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -602,27 +792,35 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
             Row(
               children: [
                 Icon(
-                  Icons.flag,
-                  color: AppColors.primary,
+                  Icons.auto_awesome,
+                  color: AppColors.textPrimary,
                   size: 20,
                 ),
                 const SizedBox(width: AppConstants.spacing8),
                 const Text(
-                  'Timeline',
+                  'TimeLine',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: Color(0xFF1A1F36),
                   ),
                 ),
               const Spacer(),
-              Text(
-                targetDate != null 
-                    ? 'Est. Date ${_formatDate(targetDate)}'
-                    : 'Est. Date Oct 1, 2025',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6A34D7).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  targetDate != null 
+                      ? 'Est. Date ${_formatDate(targetDate)}'
+                      : 'Est. Date Oct 14, 2025',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF6A34D7),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               ],
@@ -631,29 +829,46 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
             const SizedBox(height: AppConstants.spacing16),
             
             // Timeline Progress Bar
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Stack(
               children: [
-                Text(
-                  '${startWeight.toStringAsFixed(0)}$preferredUnit',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${startWeight.toStringAsFixed(1)}$preferredUnit',
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      '${goalWeight.toStringAsFixed(1)}$preferredUnit',
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    ),
+                  ],
                 ),
-                Text(
-                  currentWeightRaw > 0 ? '${currentWeight.toStringAsFixed(0)}$preferredUnit' : '--',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${goalWeight.toStringAsFixed(0)}$preferredUnit',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                Center(
+                  child: Text(
+                    currentWeightRaw > 0 ? '${currentWeight.toStringAsFixed(1)}$preferredUnit' : '--',
+                    style: const TextStyle(
+                      fontSize: 14, 
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1A1F36),
+                    ),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: AppConstants.spacing8),
-            LinearProgressIndicator(
-              value: progress,
-              backgroundColor: AppColors.divider,
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-              minHeight: 8,
+            TweenAnimationBuilder<double>(
+              duration: const Duration(milliseconds: 1200),
+              curve: Curves.easeOutCubic,
+              tween: Tween(begin: 0.0, end: progress),
+              builder: (context, value, child) {
+                return LinearProgressIndicator(
+                  value: value,
+                  backgroundColor: AppColors.background,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6A34D7)),
+                  minHeight: 8,
+                );
+              },
             ),
             const SizedBox(height: AppConstants.spacing8),
             Row(
@@ -663,15 +878,11 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
                   stats?.firstEntryDate != null 
                       ? _formatDate(stats!.firstEntryDate!)
                       : 'Sep 17, 2025',
-                  style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                  style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
                 ),
                 Text(
-                  currentWeight > 0 ? 'Today' : '--',
-                  style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
-                ),
-                const Text(
-                  '--',
-                  style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                  currentWeight > 0 ? 'Today' : 'Today',
+                  style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
                 ),
               ],
             ),
@@ -690,42 +901,60 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
              log.date.day == today.day;
     }).length;
 
-    return GestureDetector(
+    return _buildAnimatedTappableCard(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const WeightLogsListScreen()),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => const WeightLogsListScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              const begin = Offset(1.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.easeInOut;
+              var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: FadeTransition(opacity: animation, child: child),
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 400),
+          ),
         );
       },
       child: Container(
         padding: const EdgeInsets.all(AppConstants.spacing16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          border: Border.all(color: AppColors.divider),
+          color: AppColors.lightGrey,
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(
-              Icons.format_list_bulleted,
-              color: AppColors.textSecondary,
-              size: 20,
-            ),
-            const SizedBox(width: AppConstants.spacing12),
-            Text(
-              "Today's Log ($todaysEntries)",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const Spacer(),
-            const Text(
-              'See more',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.primary,
-              ),
+            Row(
+              children: [
+                const Icon(
+                  Icons.monitor_weight,
+                  color: AppColors.textPrimary,
+                  size: 20,
+                ),
+                const SizedBox(width: AppConstants.spacing12),
+                const Text(
+                  "Today's Log",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1A1F36),
+                  ),
+                ),
+                const Spacer(),
+                const Text(
+                  'See less',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF6B7280),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -750,25 +979,37 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
         const SizedBox(height: AppConstants.spacing16),
         
         // Weight Settings
-        GestureDetector(
+        _buildAnimatedTappableCard(
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const WeightGoalScreen()),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const WeightGoalScreen(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: FadeTransition(opacity: animation, child: child),
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 400),
+              ),
             );
           },
           child: Container(
             padding: const EdgeInsets.all(AppConstants.spacing16),
             decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.divider),
+              color: AppColors.lightGrey,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
                 const Icon(
                   Icons.monitor_weight,
-                  color: AppColors.textSecondary,
+                  color: AppColors.textPrimary,
                   size: 20,
                 ),
                 const SizedBox(width: AppConstants.spacing12),
@@ -782,7 +1023,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
                 const Spacer(),
                 const Icon(
                   Icons.chevron_right,
-                  color: AppColors.textSecondary,
+                  color: Color(0xFF6A34D7),
                   size: 20,
                 ),
               ],
@@ -793,25 +1034,37 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
         const SizedBox(height: AppConstants.spacing12),
         
         // Show All Weight Logs
-        GestureDetector(
+        _buildAnimatedTappableCard(
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const WeightLogsListScreen()),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const WeightLogsListScreen(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: FadeTransition(opacity: animation, child: child),
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 400),
+              ),
             );
           },
           child: Container(
             padding: const EdgeInsets.all(AppConstants.spacing16),
             decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.divider),
+              color: AppColors.lightGrey,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
                 const Icon(
                   Icons.list_alt,
-                  color: AppColors.textSecondary,
+                  color: AppColors.textPrimary,
                   size: 20,
                 ),
                 const SizedBox(width: AppConstants.spacing12),
@@ -825,7 +1078,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
                 const Spacer(),
                 const Icon(
                   Icons.chevron_right,
-                  color: AppColors.textSecondary,
+                  color: Color(0xFF6A34D7),
                   size: 20,
                 ),
               ],
@@ -837,7 +1090,8 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year.toString().substring(2)}';
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
   String _formatTime(DateTime time) {
@@ -845,6 +1099,72 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> {
     final minute = time.minute.toString().padLeft(2, '0');
     final period = time.hour >= 12 ? 'PM' : 'AM';
     return '$hour:$minute $period';
+  }
+}
+
+class _AnimatedTappableCard extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const _AnimatedTappableCard({
+    required this.child,
+    required this.onTap,
+  });
+
+  @override
+  State<_AnimatedTappableCard> createState() => _AnimatedTappableCardState();
+}
+
+class _AnimatedTappableCardState extends State<_AnimatedTappableCard> with SingleTickerProviderStateMixin {
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      lowerBound: 0.95,
+      upperBound: 1.0,
+    );
+    _scaleAnimation = CurvedAnimation(
+      parent: _scaleController,
+      curve: Curves.easeInOut,
+    );
+    _scaleController.value = 1.0;
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    _scaleController.reverse();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    _scaleController.forward();
+  }
+
+  void _onTapCancel() {
+    _scaleController.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      onTap: widget.onTap,
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: widget.child,
+      ),
+    );
   }
 }
 
@@ -859,6 +1179,38 @@ class WeightGraphPainter extends CustomPainter {
     required this.unit,
   });
 
+  double _getWeightFromEntry(dynamic entry) {
+    if (entry is Map) {
+      return entry['weight'] as double;
+    } else {
+      return entry.weight;
+    }
+  }
+
+  String _getUnitFromEntry(dynamic entry) {
+    if (entry is Map) {
+      return entry['unit'] as String? ?? 'kg';
+    } else {
+      return entry.unit;
+    }
+  }
+
+  DateTime _getDateFromEntry(dynamic entry) {
+    if (entry is Map) {
+      return entry['date'] as DateTime;
+    } else {
+      return entry.date;
+    }
+  }
+
+  bool _isPlaceholder(dynamic entry) {
+    if (entry is Map) {
+      return entry['isPlaceholder'] == true;
+    } else {
+      return false; // Real WeightLog objects are never placeholders
+    }
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     if (size.width <= 0 || size.height <= 0 || weightHistory.isEmpty) return;
@@ -872,28 +1224,55 @@ class WeightGraphPainter extends CustomPainter {
     final graphWidth = size.width - leftMargin - rightMargin;
     final graphHeight = size.height - topMargin - bottomMargin;
 
-    // Find min and max weights for scaling
-    double minWeightKg = weightHistory.first.weight;
-    double maxWeightKg = weightHistory.first.weight;
+    // Sort weight history by date to ensure chronological order
+    final sortedHistory = List.from(weightHistory);
+    sortedHistory.sort((a, b) {
+      final dateA = _getDateFromEntry(a);
+      final dateB = _getDateFromEntry(b);
+      return dateA.compareTo(dateB);
+    });
+
+    // Find min and max weights for scaling (convert each to kg first for comparison)
+    double firstWeight = _getWeightFromEntry(sortedHistory.first);
+    String firstUnit = _getUnitFromEntry(sortedHistory.first);
+    double minWeightKg = UnitConverter.convertWeightToKg(firstWeight, firstUnit);
+    double maxWeightKg = minWeightKg;
     
-    for (var log in weightHistory) {
-      if (log.weight < minWeightKg) minWeightKg = log.weight;
-      if (log.weight > maxWeightKg) maxWeightKg = log.weight;
+    for (var log in sortedHistory) {
+      final weight = _getWeightFromEntry(log);
+      final entryUnit = _getUnitFromEntry(log);
+      final weightInKg = UnitConverter.convertWeightToKg(weight, entryUnit);
+      if (weightInKg < minWeightKg) minWeightKg = weightInKg;
+      if (weightInKg > maxWeightKg) maxWeightKg = weightInKg;
     }
     
     // Convert to preferred unit
     double minWeight = UnitConverter.convertWeight(minWeightKg, unit);
     double maxWeight = UnitConverter.convertWeight(maxWeightKg, unit);
     
-    // Add padding to the range
+    // Ensure minimum range for better visualization
     final range = maxWeight - minWeight;
-    final padding = range > 0 ? range * 0.2 : 2.0;
-    minWeight -= padding;
-    maxWeight += padding;
+    final minRange = unit.toLowerCase() == 'kg' ? 10.0 : 20.0; // 10kg or 20lbs minimum range
+    
+    if (range < minRange) {
+      final center = (maxWeight + minWeight) / 2;
+      minWeight = center - minRange / 2;
+      maxWeight = center + minRange / 2;
+    } else {
+      // Add small padding to the range
+      final padding = range * 0.1; // Reduced padding
+      minWeight -= padding;
+      maxWeight += padding;
+    }
     
     // Round to nice numbers
-    minWeight = (minWeight / 5).floor() * 5.0;
-    maxWeight = (maxWeight / 5).ceil() * 5.0;
+    if (unit.toLowerCase() == 'kg') {
+      minWeight = (minWeight / 5).floor() * 5.0;
+      maxWeight = (maxWeight / 5).ceil() * 5.0;
+    } else {
+      minWeight = (minWeight / 10).floor() * 10.0;
+      maxWeight = (maxWeight / 10).ceil() * 10.0;
+    }
     
     // Draw horizontal gridlines and Y-axis labels
     final gridPaint = Paint()
@@ -939,16 +1318,25 @@ class WeightGraphPainter extends CustomPainter {
     final points = <Offset>[];
     final dates = <String>[];
     
-    for (int i = 0; i < weightHistory.length; i++) {
-      final x = leftMargin + (i / (weightHistory.length - 1)) * graphWidth;
-      final weightConverted = UnitConverter.convertWeight(weightHistory[i].weight, unit);
+    for (int i = 0; i < sortedHistory.length; i++) {
+      // Handle single data point case
+      final x = sortedHistory.length == 1 
+          ? leftMargin + graphWidth / 2 
+          : leftMargin + (i / (sortedHistory.length - 1)) * graphWidth;
+      
+      // Convert weight: first to kg, then to preferred unit
+      final entryWeight = _getWeightFromEntry(sortedHistory[i]);
+      final entryUnit = _getUnitFromEntry(sortedHistory[i]);
+      final weightInKg = UnitConverter.convertWeightToKg(entryWeight, entryUnit);
+      final weightConverted = UnitConverter.convertWeight(weightInKg, unit);
+      
       final normalizedWeight = (weightConverted - minWeight) / (maxWeight - minWeight);
       final y = topMargin + graphHeight - (normalizedWeight * graphHeight);
       
       points.add(Offset(x, y));
       
       // Store date for X-axis
-      final date = weightHistory[i].date;
+      final date = _getDateFromEntry(sortedHistory[i]);
       dates.add('${date.month}/${date.day}');
       
       if (i == 0) {
@@ -958,17 +1346,38 @@ class WeightGraphPainter extends CustomPainter {
       }
     }
     
-    // Draw the line
+    // Draw the line with different styles for real vs placeholder data
     final linePaint = Paint()
       ..color = AppColors.primary
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke;
     
-    canvas.drawPath(path, linePaint);
+    final placeholderLinePaint = Paint()
+      ..color = AppColors.primary.withOpacity(0.3)
+      ..strokeWidth = 2.5
+      ..style = PaintingStyle.stroke;
+    
+    // Draw solid line segments for real data
+    for (int i = 0; i < points.length - 1; i++) {
+      final currentIsPlaceholder = _isPlaceholder(sortedHistory[i]);
+      final nextIsPlaceholder = _isPlaceholder(sortedHistory[i + 1]);
+      
+      if (!currentIsPlaceholder && !nextIsPlaceholder) {
+        // Both points are real data - draw solid line
+        canvas.drawLine(points[i], points[i + 1], linePaint);
+      } else if (currentIsPlaceholder || nextIsPlaceholder) {
+        // One or both points are placeholders - draw dashed line
+        _drawDashedLine(canvas, points[i], points[i + 1], placeholderLinePaint);
+      }
+    }
     
     // Draw X-axis date labels
+    final maxLabels = 6;
+    final labelInterval = math.max(1, (points.length / maxLabels).floor());
+    
     for (int i = 0; i < points.length; i++) {
-      if (i % math.max(1, (points.length / 6).floor()) == 0 || i == points.length - 1) {
+      // Show first, last, and evenly spaced labels
+      if (i == 0 || i == points.length - 1 || i % labelInterval == 0) {
         final textSpan = TextSpan(
           text: dates[i],
           style: labelStyle,
@@ -990,8 +1399,21 @@ class WeightGraphPainter extends CustomPainter {
       ..color = AppColors.primary
       ..style = PaintingStyle.fill;
     
-    for (var point in points) {
-      canvas.drawCircle(point, 5, pointPaint);
+    final placeholderPaint = Paint()
+      ..color = AppColors.primary.withOpacity(0.3)
+      ..style = PaintingStyle.fill;
+    
+    for (int i = 0; i < points.length; i++) {
+      final point = points[i];
+      final isPlaceholder = _isPlaceholder(sortedHistory[i]);
+      
+      if (isPlaceholder) {
+        // Draw smaller, semi-transparent circles for placeholder points
+        canvas.drawCircle(point, 3, placeholderPaint);
+      } else {
+        // Draw normal circles for real data points
+        canvas.drawCircle(point, 5, pointPaint);
+      }
     }
     
     // Draw latest weight indicator
@@ -1026,8 +1448,7 @@ class WeightGraphPainter extends CustomPainter {
         ..color = Colors.black.withOpacity(0.1)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
       
-      final currentWeightConverted = UnitConverter.convertWeight(currentWeight!, unit);
-      final bubbleText = '${currentWeightConverted.toStringAsFixed(1)}$unit';
+      final bubbleText = '${currentWeight!.toStringAsFixed(1)}$unit';
       
       // Measure text to size bubble
       final textSpan = TextSpan(
@@ -1085,6 +1506,24 @@ class WeightGraphPainter extends CustomPainter {
           bubbleY + (bubbleHeight - textPainter.height) / 2,
         ),
       );
+    }
+  }
+
+  void _drawDashedLine(Canvas canvas, Offset start, Offset end, Paint paint) {
+    const dashWidth = 5.0;
+    const dashSpace = 3.0;
+    
+    final distance = (end - start).distance;
+    final dashCount = (distance / (dashWidth + dashSpace)).floor();
+    
+    for (int i = 0; i < dashCount; i++) {
+      final startRatio = (i * (dashWidth + dashSpace)) / distance;
+      final endRatio = ((i * (dashWidth + dashSpace)) + dashWidth) / distance;
+      
+      final dashStart = Offset.lerp(start, end, startRatio)!;
+      final dashEnd = Offset.lerp(start, end, endRatio)!;
+      
+      canvas.drawLine(dashStart, dashEnd, paint);
     }
   }
 

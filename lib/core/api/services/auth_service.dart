@@ -242,12 +242,12 @@ class AuthService {
         data: updates,
       );
 
-      // Extract user from nested structure: data.user
+      // Extract user from response data
       return ApiResponse.fromJson(
         response.data,
         (data) {
-          final userData = (data as Map<String, dynamic>)['user'];
-          return UserModel.fromJson(userData as Map<String, dynamic>);
+          // The profile endpoint returns user directly in data
+          return UserModel.fromJson(data as Map<String, dynamic>);
         },
       );
     } catch (e) {

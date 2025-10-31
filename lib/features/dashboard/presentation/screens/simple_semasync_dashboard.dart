@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/widgets/standard_widgets.dart';
 import '../../../../core/providers/dashboard_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/providers/treatment_provider.dart';
@@ -27,7 +26,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
   bool _isShotDayExpanded = true;
   Timer? _timeUpdateTimer;
   DateTime _selectedDate = DateTime.now();
-  List<int> _shotDays = [3, 4]; // Wednesday and Thursday by default
+  int? _selectedTaskIndex; // Track selected task for radio button
   
   @override
   void initState() {
@@ -67,20 +66,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
               streakCount: 1, // TODO: Get actual streak count
             ),
 
-            // Shot Day Selector
-            // const SizedBox(height: 16),
-            // ShotDaySelector(
-            //   selectedDays: _shotDays,
-            //   onDaysChanged: (days) {
-            //     setState(() {
-            //       _shotDays = days;
-            //     });
-            //   },
-            // ),
 
-            // Shot Day Widget (only shows on shot days)
-            const SizedBox(height: 16),
-            const ShotDayWidget(),
 
             // Main Content
             Expanded(
@@ -90,7 +76,11 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                 child: Column(
                   children: [
                     const SizedBox(height: AppConstants.spacing20),
-                    
+
+                    ShotDayWidget(
+                      selectedDate: _selectedDate,
+                    ),
+
                     // Medication Level Card with gradient
                     _buildEnhancedMedicationCard(),
                     
@@ -318,8 +308,8 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.primary,  // Mint/teal
-                  AppColors.primary,  // Mint/teal
+                  AppColors.primary,
+                  AppColors.primary,
                 ],
               ),
                         borderRadius: BorderRadius.circular(10),
@@ -1394,6 +1384,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                   'High-Protein Meal/Drink',
                   '7:00 PM',
                   false,
+                  0,
                 ),
                 
                 const Divider(height: 1, color: AppColors.divider),
@@ -1402,6 +1393,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                   'Drink lots of Water\n(+electrolytes)',
                   '7:00 PM',
                   false,
+                  1,
                 ),
                 
                 const Divider(height: 1, color: AppColors.divider),
@@ -1410,6 +1402,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                   'Load Syringe and let come to\nroom temp',
                   '7:15 PM',
                   false,
+                  2,
                 ),
                 
                 const Divider(height: 1, color: AppColors.divider),
@@ -1418,6 +1411,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                   'Take Shot',
                   '8:00 PM',
                   true, // Highlighted task
+                  3,
                 ),
                 
                 const Divider(height: 1, color: AppColors.divider),
@@ -1426,6 +1420,7 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
                   'Another High Protein Meal/Drink',
                   '9:00 PM',
                   false,
+                  4,
                 ),
               ],
             ],
@@ -1436,50 +1431,68 @@ class _SimpleSemaSyncDashboardState extends State<SimpleSemaSyncDashboard> {
     );
   }
 
-  Widget _buildShotDayTask(String title, String time, bool isHighlighted) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing12),
-      child: Row(
-        children: [
-          // Checkbox
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(
-                color: AppColors.divider,
-                width: 2,
+  Widget _buildShotDayTask(String title, String time, bool isHighlighted, int index) {
+    final isSelected = _selectedTaskIndex == index;
+    
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedTaskIndex = index;
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing12),
+        child: Row(
+          children: [
+            // Radio Button
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFF6A34D7) : Colors.white,
+                border: Border.all(
+                  color: const Color(0xFF6A34D7),
+                  width: 2,
+                ),
+                shape: BoxShape.circle,
               ),
-              borderRadius: BorderRadius.circular(10),
+              child: isSelected
+                  ? const Center(
+                      child: Icon(
+                        Icons.check,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                    )
+                  : null,
             ),
-          ),
-          
-          const SizedBox(width: AppConstants.spacing16),
-          
-          // Task title
-          Expanded(
-            child: Text(
-              title,
+            
+            const SizedBox(width: AppConstants.spacing16),
+            
+            // Task title
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w400,
+                  color: isHighlighted ? AppColors.primary : AppColors.textPrimary,
+                  height: 1.3,
+                ),
+              ),
+            ),
+            
+            // Time
+            Text(
+              time,
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w400,
-                color: isHighlighted ? AppColors.primary : AppColors.textPrimary,
-                height: 1.3,
+                fontWeight: FontWeight.w400,
+                color: isHighlighted ? AppColors.primary : AppColors.textSecondary,
               ),
             ),
-          ),
-          
-          // Time
-          Text(
-            time,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: isHighlighted ? AppColors.primary : AppColors.textSecondary,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

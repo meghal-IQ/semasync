@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import '../services/api_client.dart';
 
 class ShotDayTasksApi {
   final Dio _dio;

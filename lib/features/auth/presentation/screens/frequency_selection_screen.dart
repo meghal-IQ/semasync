@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../data/auth_data.dart';
+import 'shot_day_selection_screen.dart';
 import 'birthday_input_screen.dart';
 
 class FrequencySelectionScreen extends StatefulWidget {
@@ -188,21 +189,26 @@ class _FrequencySelectionScreenState extends State<FrequencySelectionScreen> {
     
     authData.frequency = frequencies[_selectedFrequency];
     
-    // Set default injection days based on frequency
-    if (authData.frequency == 'Every 7 days (most common)') {
-      authData.injectionDays = ['Monday'];
-    } else if (authData.frequency == 'Every day') {
-      authData.injectionDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    // If "Not sure" is selected, skip shot day selection and go to birthday
+    if (authData.frequency == 'Not sure, still figuring it out') {
+      // Set default injection days for "not sure" users
+      authData.injectionDays = ['Monday']; // Default to Monday
+      authData.startDate = DateTime.now();
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const BirthdayInputScreen()),
+      );
     } else {
-      authData.injectionDays = ['Monday']; // Default for other frequencies
+      // Navigate to shot day selection screen for other frequencies
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ShotDaySelectionScreen(
+            frequency: authData.frequency!,
+          ),
+        ),
+      );
     }
-    
-    // Set default start date to today
-    authData.startDate = DateTime.now();
-    
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const BirthdayInputScreen()),
-    );
   }
 }

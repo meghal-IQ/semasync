@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -52,6 +53,12 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
     'Right Arm',
     'Left Abdomen',
     'Right Abdomen',
+    'Upper Left Abdomen',
+    'Upper Right Abdomen',
+    'Lower Left Abdomen',
+    'Lower Right Abdomen',
+    'Left Groin',
+    'Right Groin',
     'Left Buttock',
     'Right Buttock',
   ];
@@ -164,7 +171,9 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
+        titleTextStyle: TextStyle(fontWeight: FontWeight.w500, color: Colors.black, fontSize: 20),
         title: Text(widget.existingShot != null ? 'Edit Shot' : 'Log Shot'),
         actions: [
           if (_isSaving)
@@ -211,6 +220,8 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
 
   Widget _buildDateSelector() {
     return Card(
+      color: AppColors.lightGrey,
+      elevation: 0,
       child: ListTile(
         leading: const Icon(Icons.calendar_today, color: AppColors.primary),
         title: const Text('Date & Time'),
@@ -225,6 +236,8 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
 
   Widget _buildMedicationSelector() {
     return Card(
+      color: AppColors.lightGrey,
+      elevation: 0,
       child: ListTile(
         leading: const Icon(Icons.medical_services, color: AppColors.primary),
         title: const Text('Medication'),
@@ -237,6 +250,8 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
 
   Widget _buildDosageSelector() {
     return Card(
+      color: AppColors.lightGrey,
+      elevation: 0,
       child: ListTile(
         leading: const Icon(Icons.science_outlined, color: AppColors.primary),
         title: const Text('Dosage'),
@@ -254,6 +269,8 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
             provider.siteRecommendations!.recommendedSites.isNotEmpty;
 
         return Card(
+          color: AppColors.lightGrey,
+          elevation: 0,
           child: Column(
             children: [
               ListTile(
@@ -298,6 +315,8 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
 
   Widget _buildPainLevelSlider() {
     return Card(
+      color: AppColors.lightGrey,
+      elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.spacing16),
         child: Column(
@@ -363,6 +382,8 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
 
   Widget _buildSideEffectsSection() {
     return Card(
+      color: AppColors.lightGrey,
+      elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.spacing16),
         child: Column(
@@ -386,6 +407,7 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
                 return FilterChip(
                   label: Text(effect),
                   selected: isSelected,
+                  backgroundColor: AppColors.background,
                   onSelected: (selected) {
                     setState(() {
                       if (isNone) {
@@ -419,6 +441,8 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
 
   Widget _buildNotesField() {
     return Card(
+      color: AppColors.lightGrey,
+      elevation: 0,
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.spacing16),
         child: Column(
@@ -581,50 +605,298 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
   }
 
   Future<void> _selectLocation() async {
-    final result = await showDialog<String>(
+    String? result = _selectedLocation;
+    
+    await showDialog(
       context: context,
-      builder: (context) => SimpleDialog(
-        title: const Text('Select Injection Site'),
-        children: _injectionSites.map((site) {
-          final provider = context.read<TreatmentProvider>();
-          final isRecommended = provider.siteRecommendations?.recommendedSites.contains(site) ?? false;
-          
-          return SimpleDialogOption(
-            onPressed: () => Navigator.pop(context, site),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                children: [
-                  if (isRecommended)
-                    const Icon(
-                      Icons.check_circle,
-                      color: AppColors.success,
-                      size: 20,
-                    ),
-                  if (isRecommended) const SizedBox(width: 8),
-                  Text(
-                    site,
-                    style: TextStyle(
-                      color: site == _selectedLocation
-                          ? AppColors.primary
-                          : AppColors.textPrimary,
-                      fontWeight: site == _selectedLocation
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }).toList(),
+      barrierDismissible: true,
+      builder: (context) => _InjectionSiteSelector(
+        initialSelection: _selectedLocation,
+        onSiteSelected: (site) {
+          result = site;
+        },
       ),
     );
 
-    if (result != null) {
+    if (result != null && result != _selectedLocation) {
       setState(() {
-        _selectedLocation = result;
+        _selectedLocation = result!;
       });
     }
   }
 }
+
+// Widget for injection site selection with body outline
+class _InjectionSiteSelector extends StatefulWidget {
+  final String initialSelection;
+  final Function(String) onSiteSelected;
+
+  const _InjectionSiteSelector({
+    required this.initialSelection,
+    required this.onSiteSelected,
+  });
+
+  @override
+  State<_InjectionSiteSelector> createState() => _InjectionSiteSelectorState();
+}
+
+class _InjectionSiteSelectorState extends State<_InjectionSiteSelector> {
+  late String _selectedSite;
+  bool _isSiteSelected = false;
+
+  // Define injection sites with their positions as fractional coordinates (0.0 to 1.0)
+  // Positions carefully tuned to match the actual PNG image asset locations
+  // Based on body diagram: head at top, torso in middle, legs at bottom
+  final List<_InjectionSite> _injectionSites = const [
+    _InjectionSite(name: 'Left Arm', x: 0.20, y: 0.28),           // Upper left shoulder/arm
+    _InjectionSite(name: 'Right Arm', x: 0.80, y: 0.28),          // Upper right shoulder/arm
+    _InjectionSite(name: 'Upper Left Abdomen', x: 0.38, y: 0.40),  // Upper chest/abdomen left
+    _InjectionSite(name: 'Upper Right Abdomen', x: 0.62, y: 0.40), // Upper chest/abdomen right
+    _InjectionSite(name: 'Left Groin', x: 0.32, y: 0.62),         // Left groin/upper thigh area (where selection is)
+    _InjectionSite(name: 'Right Groin', x: 0.68, y: 0.62),       // Right groin/upper thigh area
+    _InjectionSite(name: 'Lower Left Abdomen', x: 0.40, y: 0.75), // Lower abdomen/thigh left
+    _InjectionSite(name: 'Lower Right Abdomen', x: 0.60, y: 0.75), // Lower abdomen/thigh right
+  ];
+  
+  @override
+  void initState() {
+    super.initState();
+    // Map initial selection to visual name if needed
+    _selectedSite = _mapStandardToVisual(widget.initialSelection);
+    // If we have a valid initial selection, mark as selected
+    _isSiteSelected = _injectionSites.any((site) => site.name == _selectedSite);
+  }
+  
+  // Map standard API names back to visual names (for initial selection)
+  String _mapStandardToVisual(String standardName) {
+    // Find matching visual site - prefer upper positions for initial selection
+    if (standardName == 'Left Abdomen') {
+      return 'Upper Left Abdomen';
+    }
+    if (standardName == 'Right Abdomen') {
+      return 'Upper Right Abdomen';
+    }
+    if (standardName == 'Left Thigh') {
+      return 'Left Groin';
+    }
+    if (standardName == 'Right Thigh') {
+      return 'Right Groin';
+    }
+    // For arms, return as-is
+    return standardName;
+  }
+  
+  // Map visual site names to standard API names
+  String _mapSiteToStandard(String visualName) {
+    if (visualName.contains('Upper Left Abdomen') || visualName.contains('Lower Left Abdomen')) {
+      return 'Left Abdomen';
+    }
+    if (visualName.contains('Upper Right Abdomen') || visualName.contains('Lower Right Abdomen')) {
+      return 'Right Abdomen';
+    }
+    if (visualName.contains('Left Groin')) {
+      return 'Left Thigh';
+    }
+    if (visualName.contains('Right Groin')) {
+      return 'Right Thigh';
+    }
+    return visualName;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.8,
+        width: MediaQuery.of(context).size.width * 0.9,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Column(
+          children: [
+            // Title
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Log Shot',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Body with PNG image and precisely positioned points
+            Expanded(
+              child: Center(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Use a fixed aspect ratio approach for consistent positioning
+                    // The body diagram is typically taller than wide
+                    final double containerWidth = constraints.maxWidth * 0.85;
+                    final double containerHeight = constraints.maxHeight * 0.85;
+                    
+                    // Body diagram approximate aspect ratio (width/height)
+                    const double bodyAspectRatio = 0.65;
+                    
+                    // Calculate how the image will actually render with BoxFit.contain
+                    double imageWidth, imageHeight, imageOffsetX, imageOffsetY;
+                    
+                    if (containerWidth / containerHeight > bodyAspectRatio) {
+                      // Container is wider - height is the limiting factor
+                      imageHeight = containerHeight;
+                      imageWidth = imageHeight * bodyAspectRatio;
+                      imageOffsetX = (containerWidth - imageWidth) / 2;
+                      imageOffsetY = 0;
+                    } else {
+                      // Container is taller - width is the limiting factor
+                      imageWidth = containerWidth;
+                      imageHeight = imageWidth / bodyAspectRatio;
+                      imageOffsetX = 0;
+                      imageOffsetY = (containerHeight - imageHeight) / 2;
+                    }
+                    
+                    return SizedBox(
+                      width: containerWidth,
+                      height: containerHeight,
+                      child: Stack(
+                        children: [
+                          // Body outline PNG image
+                          Center(
+                            child: SizedBox(
+                              width: imageWidth,
+                              height: imageHeight,
+                              child: Image.asset(
+                                'assets/images/injection_body.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                          // Points overlay - positioned relative to actual image bounds
+                          ..._injectionSites.map((site) {
+                            return Positioned(
+                              left: imageOffsetX + (imageWidth * site.x) - 14,
+                              top: imageOffsetY + (imageHeight * site.y) - 14,
+                              child: _InjectionPoint(
+                                selected: _selectedSite == site.name,
+                                onTap: () {
+                                  setState(() {
+                                    _selectedSite = site.name;
+                                    _isSiteSelected = true;
+                                  });
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            
+            // Selected site label
+            if (_isSiteSelected)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(
+                  _selectedSite,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            
+            // Save button
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isSiteSelected ? () {
+                    // Map visual name to standard name before returning
+                    widget.onSiteSelected(_mapSiteToStandard(_selectedSite));
+                    Navigator.pop(context);
+                  } : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isSiteSelected ? AppColors.primary : Colors.grey,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InjectionSite {
+  final String name;
+  final double x; // Position as percentage (0.0 to 1.0)
+  final double y; // Position as percentage (0.0 to 1.0)
+
+  const _InjectionSite({
+    required this.name,
+    required this.x,
+    required this.y,
+  });
+}
+
+// Simple circular point widget to match the design (filled purple when selected,
+// outlined circle when not selected).
+class _InjectionPoint extends StatelessWidget {
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _InjectionPoint({
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : Colors.transparent,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: selected ? AppColors.primary : Colors.grey[400]!,
+            width: selected ? 0 : 2,
+            style: BorderStyle.solid,
+          ),
+        ),
+      ),
+    );
+  }
+}
+

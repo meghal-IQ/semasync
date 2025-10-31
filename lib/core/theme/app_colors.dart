@@ -7,12 +7,14 @@ class AppColors {
   static const Color accent = Color(0xFF10B981); // Emerald
   
   // Background Colors
-  static const Color background = Color(0xFFF7F8FA); // Light gray
+  static const Color background = Color(0xFFFFFFFF); // Light gray
+  static const Color lightGrey = Color(0xFFF5F5F5); // Light gray
+  static const Color darkGrey = Color(0xFFDBDBDB); // Light gray
   static const Color surface = Colors.white;
   
   // Text Colors
-  static const Color textPrimary = Color(0xFF1A1F36); // Dark blue-gray
-  static const Color textSecondary = Color(0xFF9CA3AF); // Light gray
+  static const Color textPrimary = Color(0xFF1F1F1F); // Dark blue-gray
+  static const Color textSecondary = Color(0xFF666666); // Light gray
   
   // Feature Colors - Purple theme
   static const Color activityRed = Color(0xFFDC2626); // Red

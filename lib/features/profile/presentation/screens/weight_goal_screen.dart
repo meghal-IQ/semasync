@@ -38,9 +38,17 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.chevron_left, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.add, color: Colors.black),
+        //     onPressed: () {
+        //       // Add new entry
+        //     },
+        //   ),
+        // ],
       ),
       body: Consumer2<HealthProvider, AuthProvider>(
         builder: (context, healthProvider, authProvider, child) {
@@ -79,8 +87,8 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppConstants.spacing16),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+                    color: AppColors.lightGrey,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,62 +98,74 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.flag, color: AppColors.primary, size: 20),
+                              const Icon(Icons.auto_awesome, color: Colors.black, size: 20),
                               const SizedBox(width: AppConstants.spacing8),
                               const Text(
-                                'Timeline',
+                                'TimeLine',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1A1F36),
                                 ),
                               ),
                             ],
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: AppConstants.spacing8,
-                              vertical: AppConstants.spacing4,
+                              horizontal: 10,
+                              vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+                              color: const Color(0xFF6A34D7).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               targetDate != null
-                                  ? 'Est. Date ${_formatDate(targetDate)}'
-                                  : 'Est. Date Oct 1, 2025',
+                                  ? 'Est. Date ${_formatDateForTimeline(targetDate)}'
+                                  : 'Est. Date Oct 14, 2025',
                               style: const TextStyle(
                                 fontSize: 12,
-                                color: AppColors.textSecondary,
+                                color: Color(0xFF6A34D7),
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: AppConstants.spacing16),
-                      // Progress bar
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // Progress bar with centered current weight
+                      Stack(
                         children: [
-                          Text(
-                            '${startWeight.toStringAsFixed(0)}$preferredUnit',
-                            style: const TextStyle(fontSize: 14),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${startWeight.toStringAsFixed(1)}$preferredUnit',
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                '${goalWeight.toStringAsFixed(1)}$preferredUnit',
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                              ),
+                            ],
                           ),
-                          Text(
-                            currentWeightKg > 0 ? '${currentWeight.toStringAsFixed(0)}$preferredUnit' : '--',
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                          ),
-                          Text(
-                            '${goalWeight.toStringAsFixed(0)}$preferredUnit',
-                            style: const TextStyle(fontSize: 14),
+                          Center(
+                            child: Text(
+                              currentWeightKg > 0 ? '${currentWeight.toStringAsFixed(1)}$preferredUnit' : '--',
+                              style: const TextStyle(
+                                fontSize: 14, 
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1A1F36),
+                              ),
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: AppConstants.spacing8),
                       LinearProgressIndicator(
                         value: progress,
-                        backgroundColor: AppColors.border.withOpacity(0.3),
-                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        backgroundColor: AppColors.background,
+                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6A34D7)),
                         minHeight: 8,
                       ),
                       const SizedBox(height: AppConstants.spacing8),
@@ -153,26 +173,14 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            startDate != null ? _formatDate(startDate) : 'Sep 17, 2025',
-                            style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                            startDate != null ? _formatDateForTimeline(startDate) : 'Sep 17, 2025',
+                            style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
                           ),
                           Text(
-                            currentWeight > 0 ? 'Today' : '--',
-                            style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
-                          ),
-                          const Text(
-                            '--',
-                            style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                            currentWeight > 0 ? 'Today, 6:18 PM' : 'Today',
+                            style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: AppConstants.spacing12),
-                      const Text(
-                        'ℹ️ Based on your calorie budget and current weight',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
                       ),
                     ],
                   ),
@@ -180,16 +188,15 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                 
                 const SizedBox(height: AppConstants.spacing24),
                 
-                // Settings section
+                // Start section
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'START',
+                    'Start',
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
-                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF6B7280),
                     ),
                   ),
                 ),
@@ -197,7 +204,7 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                 _buildEditableItem(
                   context,
                   Icons.calendar_today,
-                  'Start Date',
+                  'Starting Date',
                   startDate != null ? _formatDate(startDate) : 'Not set',
                   () => _editStartDate(context, startDate),
                 ),
@@ -213,12 +220,11 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'CURRENT',
+                    'Current',
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
-                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF6B7280),
                     ),
                   ),
                 ),
@@ -235,12 +241,11 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'GOAL',
+                    'Goal',
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
-                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF6B7280),
                     ),
                   ),
                 ),
@@ -280,22 +285,19 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
         margin: const EdgeInsets.only(bottom: AppConstants.spacing8),
         padding: const EdgeInsets.all(AppConstants.spacing16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-          border: Border.all(
-            color: onTap != null ? AppColors.divider : AppColors.divider.withOpacity(0.5),
-          ),
+          color: AppColors.lightGrey,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.textPrimary, size: 24),
+            Icon(icon, color: Colors.black, size: 24),
             const SizedBox(width: AppConstants.spacing16),
             Expanded(
               child: Text(
                 label,
                 style: const TextStyle(
                   fontSize: 16,
-                  color: AppColors.textPrimary,
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -304,13 +306,13 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
+                color: Colors.black,
               ),
             ),
             const SizedBox(width: AppConstants.spacing8),
             Icon(
               Icons.chevron_right,
-              color: onTap != null ? AppColors.textSecondary : Colors.transparent,
+              color: onTap != null ? const Color(0xFF6A34D7) : Colors.transparent,
               size: 20,
             ),
           ],
@@ -510,5 +512,10 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
     final day = date.day.toString().padLeft(2, '0');
     final year = date.year.toString().substring(2);
     return '$month/$day/$year';
+  }
+
+  String _formatDateForTimeline(DateTime date) {
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }

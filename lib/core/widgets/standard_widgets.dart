@@ -74,7 +74,7 @@ class StandardSectionHeader extends StatelessWidget {
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: AppColors.textPrimary,
               letterSpacing: 0.5,
             ),
           ),
@@ -106,58 +106,52 @@ class StandardNavigationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StandardCard(
+    return Card(
+      color: AppColors.lightGrey,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing4),
+          padding: const EdgeInsets.all(AppConstants.spacing16),
           child: Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(AppConstants.spacing12),
-                decoration: BoxDecoration(
-                  color: (iconColor ?? AppColors.primary).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
-                ),
-                child: Icon(
-                  icon,
-                  color: iconColor ?? AppColors.primary,
-                  size: 20,
-                ),
+              Icon(
+                icon,
+                color: AppColors.textPrimary,
+                size: 20,
               ),
-              const SizedBox(width: AppConstants.spacing16),
+              const SizedBox(width: AppConstants.spacing12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: AppConstants.spacing4),
-                      Text(
-                        subtitle!,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ],
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
+              if (subtitle != null) ...[
+                const SizedBox(width: AppConstants.spacing8),
+                Text(
+                  subtitle!,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+              const SizedBox(width: AppConstants.spacing8),
               if (trailing != null) 
                 trailing!
               else
                 Icon(
                   Icons.chevron_right,
-                  color: AppColors.textSecondary,
+                  color: AppColors.textPrimary,
                   size: 20,
                 ),
             ],

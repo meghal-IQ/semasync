@@ -175,6 +175,24 @@ class NextShotInfo {
     this.message,
   });
 
+  NextShotInfo copyWith({
+    double? daysUntilNext,
+    double? hoursUntilNext,
+    DateTime? nextDueDate,
+    bool? isOverdue,
+    String? countdown,
+    bool? hasShots,
+  }) {
+    return NextShotInfo(
+      daysUntilNext: daysUntilNext ?? this.daysUntilNext,
+      hoursUntilNext: hoursUntilNext ?? this.hoursUntilNext,
+      nextDueDate: nextDueDate ?? this.nextDueDate,
+      isOverdue: isOverdue ?? this.isOverdue,
+      countdown: countdown ?? this.countdown,
+      hasShots: hasShots ?? this.hasShots,
+    );
+  }
+
   factory NextShotInfo.fromJson(Map<String, dynamic> json) {
     return NextShotInfo(
       hasShots: json['hasShots'] ?? false,

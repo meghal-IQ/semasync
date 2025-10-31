@@ -7,6 +7,7 @@ import '../../../../core/api/services/treatment_service.dart';
 import '../../../../core/api/models/shot_log_model.dart';
 import '../../../../core/api/models/api_response.dart';
 import '../../../../core/providers/treatment_provider.dart';
+import '../../../logging/presentation/screens/shot_logging_screen.dart';
 import '../providers/side_effect_provider.dart';
 import '../widgets/shot_log_item.dart';
 
@@ -84,10 +85,10 @@ class _ShotHistoryScreenState extends State<ShotHistoryScreen> {
           IconButton(
             icon: const Icon(Icons.add, color: Colors.black),
             onPressed: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => const ShotLoggingScreen()),
-              // ).then((_) => _loadShots()); // Reload after adding new shot
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ShotLoggingScreen()),
+              ).then((_) => _loadShots()); // Reload after adding new shot
             },
           ),
         ],

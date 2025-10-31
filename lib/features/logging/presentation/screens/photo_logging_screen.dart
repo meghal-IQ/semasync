@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';
 import '../../../../core/theme/app_colors.dart';

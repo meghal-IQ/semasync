@@ -19,17 +19,11 @@ class WeeklyCheckupCard extends StatelessWidget {
         final isDue = checkupProvider.isDueForWeeklyCheckup();
         final daysSince = checkupProvider.getDaysSinceLastCheckup();
 
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+        return Card(
+          color: AppColors.lightGrey,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
             padding: const EdgeInsets.all(AppConstants.spacing16),
@@ -83,12 +77,16 @@ class WeeklyCheckupCard extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () => _showWeeklyCheckupDialog(context),
-                    icon: const Icon(Icons.medical_services),
-                    label: Text(isDue ? 'Start Weekly Checkup' : 'View Checkup'),
+                    icon: const Icon(Icons.add_box_outlined,),
+                    label: const Text('View Checkup'),
                     style: ElevatedButton.styleFrom(
+                      textStyle: TextStyle( fontSize: 16, fontWeight: FontWeight.bold),
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing12),
+                      padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
@@ -113,87 +111,172 @@ class WeeklyCheckupCard extends StatelessWidget {
     );
   }
 
+
+  Widget _buildCheckupCard({
+    required IconData icon,
+    required String title,
+    required String value,
+    String? badge,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(AppConstants.spacing12),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(height: AppConstants.spacing8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: AppConstants.spacing4),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+
+            ],
+          ),
+          if (badge != null) ...[
+            const SizedBox(height: AppConstants.spacing4),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.spacing4,
+                vertical: 2,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                badge,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildCheckupSummary(WeeklyCheckup checkup) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(
-              Icons.calendar_today,
-              size: 16,
-              color: AppColors.textSecondary,
-            ),
-            const SizedBox(width: AppConstants.spacing8),
-            Text(
-              'Last checkup: ${_formatDate(checkup.date)}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
+            Expanded(
+              child: _buildCheckupCard(
+                icon: Icons.calendar_today,
+                title: 'Last Checkup',
+                value: _formatDate(checkup.date),
               ),
             ),
+            const SizedBox(width: AppConstants.spacing8),
+            Expanded(
+              child: _buildCheckupCard(
+                icon: Icons.monitor_weight,
+                title: 'Weight',
+                badge: '${checkup.weightChange! > 0 ? '+' : ''}${checkup.weightChange!.toStringAsFixed(1)} ${checkup.weightUnit}',
+                value: '${checkup.currentWeight.toStringAsFixed(1)} ${checkup.weightUnit}',
+              ),
+            ),
+            const SizedBox(width: AppConstants.spacing8),
+            Expanded(
+              child: _buildCheckupCard(
+                icon: Icons.warning_amber,
+                title: 'Side \neffects',
+                value: '${checkup.sideEffects.length} (${checkup.overallSideEffectSeverity.toStringAsFixed(1)}/10)',
+              ),
+            ),
+
           ],
         ),
         
         const SizedBox(height: AppConstants.spacing8),
-        
-        Row(
-          children: [
-            Icon(
-              Icons.monitor_weight,
-              size: 16,
-              color: AppColors.textSecondary,
-            ),
-            const SizedBox(width: AppConstants.spacing8),
-            Text(
-              'Weight: ${checkup.currentWeight.toStringAsFixed(1)} ${checkup.weightUnit}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            if (checkup.weightChange != null) ...[
-              const SizedBox(width: AppConstants.spacing8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppConstants.spacing6,
-                  vertical: AppConstants.spacing2,
-                ),
-                decoration: BoxDecoration(
-                  color: checkup.weightChange! > 0 ? AppColors.success : AppColors.error,
-                ),
-                child: Text(
-                  '${checkup.weightChange! > 0 ? '+' : ''}${checkup.weightChange!.toStringAsFixed(1)} ${checkup.weightUnit}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-        
-        const SizedBox(height: AppConstants.spacing8),
-        
-        Row(
-          children: [
-            Icon(
-              Icons.warning_amber,
-              size: 16,
-              color: AppColors.textSecondary,
-            ),
-            const SizedBox(width: AppConstants.spacing8),
-            Text(
-              'Side effects: ${checkup.sideEffects.length} (${checkup.overallSideEffectSeverity.toStringAsFixed(1)}/10)',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
+        //
+        // Row(
+        //   children: [
+        //     Icon(
+        //       Icons.monitor_weight,
+        //       size: 16,
+        //       color: AppColors.textSecondary,
+        //     ),
+        //     const SizedBox(width: AppConstants.spacing8),
+        //     Text(
+        //       'Weight: ${checkup.currentWeight.toStringAsFixed(1)} ${checkup.weightUnit}',
+        //       style: const TextStyle(
+        //         fontSize: 14,
+        //         color: AppColors.textSecondary,
+        //       ),
+        //     ),
+        //     if (checkup.weightChange != null) ...[
+        //       const SizedBox(width: AppConstants.spacing8),
+        //       Container(
+        //         padding: const EdgeInsets.symmetric(
+        //           horizontal: AppConstants.spacing6,
+        //           vertical: AppConstants.spacing2,
+        //         ),
+        //         decoration: BoxDecoration(
+        //           color: checkup.weightChange! > 0 ? AppColors.success : AppColors.error,
+        //         ),
+        //         child: Text(
+        //           '${checkup.weightChange! > 0 ? '+' : ''}${checkup.weightChange!.toStringAsFixed(1)} ${checkup.weightUnit}',
+        //           style: const TextStyle(
+        //             color: Colors.white,
+        //             fontSize: 12,
+        //             fontWeight: FontWeight.w500,
+        //           ),
+        //         ),
+        //       ),
+        //     ],
+        //   ],
+        // ),
+        //
+        // const SizedBox(height: AppConstants.spacing8),
+        //
+        // Row(
+        //   children: [
+        //     Icon(
+        //       Icons.warning_amber,
+        //       size: 16,
+        //       color: AppColors.textSecondary,
+        //     ),
+        //     const SizedBox(width: AppConstants.spacing8),
+        //     Text(
+        //       'Side effects: ${checkup.sideEffects.length} (${checkup.overallSideEffectSeverity.toStringAsFixed(1)}/10)',
+        //       style: const TextStyle(
+        //         fontSize: 14,
+        //         color: AppColors.textSecondary,
+        //       ),
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }
@@ -230,18 +313,25 @@ class WeeklyCheckupCard extends StatelessWidget {
         break;
     }
 
+    // For "Continue Current Dose", use light green background
+    final isContinue = recommendation == DosageRecommendation.continueCurrent;
+    
     return Container(
-      padding: const EdgeInsets.all(AppConstants.spacing12),
+      padding: const EdgeInsets.all(AppConstants.spacing16),
       decoration: BoxDecoration(
-        color: cardColor.withOpacity(0.1),
-        border: Border.all(color: cardColor.withOpacity(0.3)),
+        color: isContinue ? AppColors.success.withOpacity(0.1) : cardColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(iconData, color: cardColor, size: 20),
+              Icon(
+                isContinue ? Icons.check_circle : iconData, 
+                color: isContinue ? AppColors.success : cardColor, 
+                size: 20,
+              ),
               const SizedBox(width: AppConstants.spacing8),
               Expanded(
                 child: Text(
@@ -249,14 +339,14 @@ class WeeklyCheckupCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: cardColor,
+                    color: isContinue ? AppColors.success : cardColor,
                   ),
                 ),
               ),
             ],
           ),
           
-          const SizedBox(height: AppConstants.spacing8),
+          const SizedBox(height: AppConstants.spacing12),
           
           Text(
             recommendation.description,
@@ -270,10 +360,9 @@ class WeeklyCheckupCard extends StatelessWidget {
           
           Text(
             checkup.recommendationReason,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
-              fontStyle: FontStyle.italic,
             ),
           ),
         ],

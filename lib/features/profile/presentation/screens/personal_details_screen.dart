@@ -44,28 +44,28 @@ class PersonalDetailsScreen extends StatelessWidget {
                 value: user != null && user.weight > 0 ? '${user.weight.toStringAsFixed(1)}kg' : '--',
                 onTap: () => _showEditDialog(context, 'Current Weight', 'weight'),
               ),
-              _buildDivider(),
+              // _buildDivider(),
               _buildDetailItem(
                 icon: Icons.height,
                 label: 'Height',
                 value: user != null ? _formatHeight(user.height) : '--',
                 onTap: () => _showEditDialog(context, 'Height', 'height'),
               ),
-              _buildDivider(),
+              // _buildDivider(),
               _buildDetailItem(
                 icon: Icons.calendar_today,
                 label: 'Birthday',
                 value: user != null ? _formatDate(user.dateOfBirth) : '--',
                 onTap: () => _showDatePicker(context),
               ),
-              _buildDivider(),
+              // _buildDivider(),
               _buildDetailItem(
                 icon: Icons.person,
                 label: 'Gender',
                 value: user != null ? _capitalize(user.gender) : '--',
                 onTap: () => _showGenderPicker(context),
               ),
-              _buildDivider(),
+              // _buildDivider(),
               _buildDetailItem(
                 icon: Icons.directions_run,
                 label: 'Activity Level',
@@ -88,9 +88,17 @@ class PersonalDetailsScreen extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
+        decoration: BoxDecoration(
+            color: AppColors.lightGrey,
+          borderRadius: BorderRadius.circular(12)
+        ),
         padding: const EdgeInsets.symmetric(
           horizontal: AppConstants.spacing16,
-          vertical: AppConstants.spacing20,
+          vertical: AppConstants.spacing12,
+        ),
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppConstants.spacing16,
+          vertical: AppConstants.spacing6,
         ),
         child: Row(
           children: [

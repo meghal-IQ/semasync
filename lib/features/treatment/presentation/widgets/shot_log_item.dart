@@ -52,15 +52,8 @@ class ShotLogItem extends StatelessWidget {
         child: Container(
           margin: const EdgeInsets.only(bottom: AppConstants.spacing12),
           decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(12),
+            color: AppColors.lightGrey,
           ),
           child: Padding(
             padding: const EdgeInsets.all(AppConstants.spacing16),
@@ -68,16 +61,11 @@ class ShotLogItem extends StatelessWidget {
           children: [
             // Syringe icon
             Container(
-              width: 48,
-              height: 48,
+              padding: const EdgeInsets.all(9),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: AppColors.background,
               ),
-              child: const Icon(
-                Icons.medical_services,
-                color: AppColors.primary,
-                size: 24,
-              ),
+              child: Image.asset('assets/images/injection.png')
             ),
             
             const SizedBox(width: AppConstants.spacing12),
@@ -102,9 +90,31 @@ class ShotLogItem extends StatelessWidget {
                   // Injection site and pain level
                   Row(
                     children: [
-                      Expanded(
+                      Container(
+                        padding: const EdgeInsets.all(9),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.background,
+                        ),
                         child: Text(
-                          '${shot.injectionSite} - ${shot.painLevel}/10 pain',
+                          '${shot.injectionSite}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: AppConstants.spacing4),
+
+                      Container(
+                        padding: const EdgeInsets.all(9),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.background,
+                        ),
+                        child: Text(
+                          '${shot.painLevel}/10 pain',
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary,
@@ -155,7 +165,8 @@ class ShotLogItem extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
+                Text(maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   _getTimeDisplay(shot.date, isToday, isYesterday),
                   style: const TextStyle(
                     fontSize: 14,
@@ -165,6 +176,8 @@ class ShotLogItem extends StatelessWidget {
                 ),
                 if (!isToday && !isYesterday)
                   Text(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     timeFormatter.format(shot.date),
                     style: const TextStyle(
                       fontSize: 12,
@@ -280,9 +293,9 @@ class ShotLogItem extends StatelessWidget {
     final timeFormatter = DateFormat('h:mm a');
     
     if (isToday) {
-      return 'Today, ${timeFormatter.format(date)}';
+      return 'Today\n ${timeFormatter.format(date)}';
     } else if (isYesterday) {
-      return 'Yesterday, ${timeFormatter.format(date)}';
+      return 'Yesterday\n ${timeFormatter.format(date)}';
     } else {
       final dateFormatter = DateFormat('MMM dd');
       return dateFormatter.format(date);

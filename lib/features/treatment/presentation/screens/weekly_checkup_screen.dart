@@ -82,12 +82,12 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Weekly Checkup'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        // backgroundColor: AppColors.primary,
+        // foregroundColor: Colors.white,
         // elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppConstants.spacing16),
+        padding: const EdgeInsets.all(AppConstants.spacing6),
         child: Form(
           key: _formKey,
           child: Column(
@@ -113,25 +113,19 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
   Widget _buildHeaderCard() {
     return Container(
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
         color: AppColors.primary.withOpacity(0.1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.spacing16),
         child: Row(
           children: [
-            Icon(
-              Icons.medical_services,
-              color: AppColors.primary,
-              size: 32,
-            ),
-            const SizedBox(width: AppConstants.spacing16),
+            // Icon(
+            //   Icons.medical_services,
+            //   color: AppColors.primary,
+            //   size: 32,
+            // ),
+            // const SizedBox(width: AppConstants.spacing16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +135,7 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: AppColors.primary,
                     ),
                   ),
                   const SizedBox(height: AppConstants.spacing4),
@@ -165,13 +159,6 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.spacing16),
@@ -182,7 +169,7 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
               children: [
                 Icon(
                   Icons.monitor_weight,
-                  color: AppColors.primary,
+                  color: AppColors.darkGrey,
                   size: 24,
                 ),
                 const SizedBox(width: AppConstants.spacing8),
@@ -553,11 +540,9 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
 
       if (mounted) {
         if (success) {
-          // Refresh data before navigating back
           await checkupProvider.loadLatestWeeklyCheckup();
           await checkupProvider.loadWeeklyCheckups();
           await healthProvider.loadWeightData();
-          
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

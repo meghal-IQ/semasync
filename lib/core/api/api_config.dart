@@ -6,21 +6,20 @@ class ApiConfig {
   
   // Base URL for the API - dynamically determined based on platform
   static String get baseUrl {
-    // Production backend server
+    // Production backend server - ACTIVE
     return 'http://13.53.200.189:5000';
     
-    // Alternative URLs (uncomment to use):
-    // ngrok URL - Backend accessible from anywhere! (Updated)
-    // return 'https://807d27122274.ngrok-free.app';
-    
-    // Local development (uncomment to use local backend)
+    // Local development (commented out for production)
     // if (Platform.isAndroid) {
-    //   return 'http://$_computerIp:5000';
+    //   return 'http://$_computerIp:4000';
     // } else if (Platform.isIOS) {
-    //   return 'http://$_computerIp:5000';
+    //   return 'http://$_computerIp:4000';
     // } else {
-    //   return 'http://localhost:5000';
+    //   return 'http://localhost:4000';
     // }
+    
+    // ngrok URL - Backend accessible from anywhere! (uncomment to use)
+    // return 'https://807d27122274.ngrok-free.app';
   }
   
   // Alternative method to detect if running on emulator/simulator

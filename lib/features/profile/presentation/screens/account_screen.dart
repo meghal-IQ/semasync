@@ -4,6 +4,7 @@ import '../../../../core/api/models/user_model.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/utils/unit_converter.dart';
 import '../../../auth/presentation/screens/holographic_login_screen.dart';
 import 'personal_details_screen.dart';
 import 'units_settings_screen.dart';
@@ -47,24 +48,6 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Account',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _isRefreshing ? null : _refreshUserData,
-          ),
-        ],
-      ),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
           final user = authProvider.user;
@@ -95,13 +78,47 @@ class _AccountScreenState extends State<AccountScreen> {
           return _buildContent(user);
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: "account_fab",
+        onPressed: () {
+          // Add action
+        },
+        backgroundColor: const Color(0xFF6A34D7),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 
   Widget _buildContent(UserModel? user) {
-    return ListView(
-            padding: const EdgeInsets.all(AppConstants.spacing16),
-            children: [
+    return SafeArea(
+      child: Column(
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Text(
+                  'Account',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1F36),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Content
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              children: [
               // Quick stats cards
               Row(
                 children: [
@@ -110,7 +127,9 @@ class _AccountScreenState extends State<AccountScreen> {
                       context,
                       icon: Icons.scale,
                       label: 'Weight',
-                      value: user != null && user.weight > 0 ? '${user.weight.toStringAsFixed(1)}kg' : '--',
+                      value: user != null && user.weight > 0 
+                          ? _formatWeight(user) 
+                          : '--',
                       onTap: () => _navigateToWeightGoal(context),
                     ),
                   ),
@@ -169,12 +188,11 @@ class _AccountScreenState extends State<AccountScreen> {
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: AppConstants.spacing8),
                 child: Text(
-                  'SETTINGS',
+                  'Settings',
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                    letterSpacing: 0.5,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF6B7280),
                   ),
                 ),
               ),
@@ -234,6 +252,10 @@ class _AccountScreenState extends State<AccountScreen> {
               
               const SizedBox(height: AppConstants.spacing24),
             ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -241,24 +263,21 @@ class _AccountScreenState extends State<AccountScreen> {
     return InkWell(
       onTap: () => _handleSignOut(context),
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacing16),
         padding: const EdgeInsets.all(AppConstants.spacing16),
         decoration: BoxDecoration(
-          color: AppColors.error.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-          border: Border.all(color: AppColors.error.withOpacity(0.3)),
+          color: const Color(0xFFFFF1F2),
+          border: Border.all(color: Color(0xFFDC2626)),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.logout, color: AppColors.error, size: 24),
-            const SizedBox(width: AppConstants.spacing12),
             const Text(
               'Sign Out',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppColors.error,
+                color: Color(0xFFDC2626),
               ),
             ),
           ],
@@ -328,28 +347,28 @@ class _AccountScreenState extends State<AccountScreen> {
       child: Container(
         padding: const EdgeInsets.all(AppConstants.spacing16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+          color: AppColors.lightGrey,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 24, color: AppColors.textPrimary),
+            Icon(icon, size: 24, color: Colors.black),
             const SizedBox(height: AppConstants.spacing8),
             Text(
               label,
               style: const TextStyle(
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                color: Color(0xFF6B7280),
               ),
             ),
             const SizedBox(height: AppConstants.spacing4),
             Text(
               value,
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
               ),
             ),
           ],
@@ -371,19 +390,19 @@ class _AccountScreenState extends State<AccountScreen> {
         margin: const EdgeInsets.only(bottom: AppConstants.spacing8),
         padding: const EdgeInsets.all(AppConstants.spacing16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+          color: AppColors.lightGrey,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.textSecondary, size: 24),
+            Icon(icon, color: Colors.black, size: 24),
             const SizedBox(width: AppConstants.spacing16),
             Expanded(
               child: Text(
                 title,
                 style: const TextStyle(
                   fontSize: 16,
-                  color: AppColors.textPrimary,
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -408,11 +427,19 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               const SizedBox(width: AppConstants.spacing8),
             ],
-            Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 20),
+            Icon(Icons.chevron_right, color: const Color(0xFF6A34D7), size: 20),
           ],
         ),
       ),
     );
+  }
+
+  String _formatWeight(UserModel user) {
+    // User weight is stored in kg according to the backend
+    // Convert to preferred unit
+    final preferredUnit = user.preferredUnits.weight.toLowerCase();
+    final weightInPreferredUnit = UnitConverter.convertWeight(user.weight, preferredUnit);
+    return '${weightInPreferredUnit.toStringAsFixed(2)}${preferredUnit.toLowerCase()}';
   }
 
   String _formatHeight(double height) {

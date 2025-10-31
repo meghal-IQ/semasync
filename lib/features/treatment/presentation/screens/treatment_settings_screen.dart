@@ -87,21 +87,29 @@ class _TreatmentSettingsScreenState extends State<TreatmentSettingsScreen> {
     return InkWell(
       onTap: onTap,
       child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.lightGrey,
+          borderRadius: BorderRadius.all(Radius.circular(12))
+        ),
         padding: const EdgeInsets.symmetric(
           horizontal: AppConstants.spacing16,
-          vertical: AppConstants.spacing20,
+          vertical: AppConstants.spacing6,
+        ),
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppConstants.spacing16,
+          vertical: AppConstants.spacing4,
         ),
         child: Row(
           children: [
             Container(
-              width: 40,
-              height: 40,
+              // width: 40,
+              // height: 40,
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                // color: AppColors.surface,
               ),
               child: Icon(
                 icon,
-                color: AppColors.primary,
+                // color: AppColors.primary,
                 size: 20,
               ),
             ),
@@ -142,9 +150,9 @@ class _TreatmentSettingsScreenState extends State<TreatmentSettingsScreen> {
 
   Widget _buildDivider() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacing16),
-      height: 1,
-      color: AppColors.border,
+      // margin: const EdgeInsets.symmetric(horizontal: AppConstants.spacing16),
+      // height: 1,
+      // color: AppColors.border,
     );
   }
 

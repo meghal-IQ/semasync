@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../dashboard/presentation/screens/simple_semasync_dashboard.dart' as dashboard;
+import '../../../dashboard/presentation/screens/meagain_home_screen.dart';
 import '../../../treatment/presentation/screens/treatment_screen.dart';
 import '../../../lifestyle/presentation/screens/lifestyle_screen.dart';
 import '../../../nutrition/presentation/screens/nutrition_screen.dart';
@@ -20,7 +21,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const dashboard.SimpleSemaSyncDashboard(),
+    const MeAgainHomeScreen(),
     const TreatmentScreen(),
     const LifestyleScreen(),
     // const NutritionScreen(),

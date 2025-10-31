@@ -1,197 +1,212 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/providers/treatment_provider.dart';
 
 class InjectionSiteCard extends StatelessWidget {
   const InjectionSiteCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Consumer<TreatmentProvider>(
+      builder: (context, treatmentProvider, child) {
+        final lastShot = treatmentProvider.latestShot;
+        
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
+          child: Padding(
             padding: const EdgeInsets.all(AppConstants.spacing16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Injection Sites',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      'Last 7 days',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppConstants.spacing16),
-                const Text(
-                  'Recommended next site:',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: AppConstants.spacing8),
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppConstants.spacing12,
-                        vertical: AppConstants.spacing8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.location_on_outlined,
-                            color: AppColors.primary,
-                            size: 16,
-                          ),
-                          SizedBox(width: AppConstants.spacing4),
-                          Text(
-                            'Left Thigh',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                    Icon(
+                      Icons.person_outline,
+                      size: 20,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: AppConstants.spacing8),
+                    const Text(
+                      'Injection',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(height: AppConstants.spacing12),
+                if (lastShot != null) ...[
+                  Text(
+                    _getInjectionSiteDisplay(lastShot.injectionSite),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: AppConstants.spacing8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildBodyDiagram(lastShot.injectionSite),
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  const Text(
+                    'No data',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppConstants.spacing8),
+                  const Text(
+                    'Log your first shot',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
-          Container(
-            height: 200,
-            decoration: const BoxDecoration(
-              border: Border(
-                top: BorderSide(color: AppColors.divider),
+        );
+      },
+    );
+  }
+
+  String _getInjectionSiteDisplay(String injectionSite) {
+    // Parse the injection site to get the main area
+    if (injectionSite.toLowerCase().contains('thigh')) {
+      return 'Thigh';
+    } else if (injectionSite.toLowerCase().contains('stomach') || injectionSite.toLowerCase().contains('abdomen')) {
+      return 'Stomach';
+    } else if (injectionSite.toLowerCase().contains('arm')) {
+      return 'Arm';
+    } else if (injectionSite.toLowerCase().contains('buttock')) {
+      return 'Buttock';
+    }
+    return injectionSite.split(' ').first;
+  }
+
+  Widget _buildBodyDiagram(String injectionSite) {
+    return Container(
+      height: 120,
+      child: Stack(
+        children: [
+          // Body outline
+          Center(
+            child: Container(
+              width: 60,
+              height: 100,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: AppColors.border,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Column(
+                children: [
+                  // Head
+                  Container(
+                    width: 40,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: AppColors.border,
+                        width: 2,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  // Body
+                  Expanded(
+                    child: Container(
+                      width: 50,
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppColors.border,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Stack(
-              children: [
-                // Body outline would go here
-                Center(
-                  child: Image.asset(
-                    'assets/images/body_outline.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                // Injection site markers would be positioned here
-                Positioned(
-                  left: 120,
-                  top: 80,
-                  child: _buildInjectionMarker(
-                    date: 'Sep 17',
-                    isRecommended: true,
-                  ),
-                ),
-                Positioned(
-                  right: 100,
-                  top: 60,
-                  child: _buildInjectionMarker(
-                    date: 'Sep 10',
-                    isRecommended: false,
-                  ),
-                ),
-              ],
-            ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(AppConstants.spacing16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildLegendItem(
-                  color: AppColors.success,
-                  label: 'Available',
-                ),
-                const SizedBox(width: AppConstants.spacing24),
-                _buildLegendItem(
-                  color: AppColors.warning,
-                  label: 'Recent',
-                ),
-                const SizedBox(width: AppConstants.spacing24),
-                _buildLegendItem(
-                  color: AppColors.error,
-                  label: 'Unavailable',
-                ),
-              ],
-            ),
-          ),
+          // Injection site highlight
+          _buildInjectionSiteHighlight(injectionSite),
         ],
       ),
     );
   }
 
-  Widget _buildInjectionMarker({
-    required String date,
-    required bool isRecommended,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.spacing4),
-      decoration: BoxDecoration(
-        color: isRecommended ? AppColors.success : AppColors.warning,
-        shape: BoxShape.circle,
-      ),
-      child: const Icon(
-        Icons.circle,
-        size: 8,
-        color: Colors.white,
-      ),
-    );
-  }
+  Widget _buildInjectionSiteHighlight(String injectionSite) {
+    // Determine position based on injection site
+    Offset position;
+    if (injectionSite.toLowerCase().contains('thigh')) {
+      if (injectionSite.toLowerCase().contains('left')) {
+        position = const Offset(20, 80); // Left thigh
+      } else {
+        position = const Offset(100, 80); // Right thigh
+      }
+    } else if (injectionSite.toLowerCase().contains('stomach') || injectionSite.toLowerCase().contains('abdomen')) {
+      if (injectionSite.toLowerCase().contains('left')) {
+        position = const Offset(20, 50); // Left stomach
+      } else {
+        position = const Offset(100, 50); // Right stomach
+      }
+    } else if (injectionSite.toLowerCase().contains('arm')) {
+      if (injectionSite.toLowerCase().contains('left')) {
+        position = const Offset(20, 40); // Left arm
+      } else {
+        position = const Offset(100, 40); // Right arm
+      }
+    } else {
+      position = const Offset(60, 50); // Default center
+    }
 
-  Widget _buildLegendItem({required Color color, required String label}) {
-    return Row(
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
+    return Positioned(
+      left: position.dx,
+      top: position.dy,
+      child: Container(
+        width: 20,
+        height: 20,
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white,
+            width: 2,
           ),
         ),
-        const SizedBox(width: AppConstants.spacing8),
-        Text(
-          label,
-          style: const TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 12,
-          ),
+        child: const Icon(
+          Icons.location_on,
+          size: 12,
+          color: Colors.white,
         ),
-      ],
+      ),
     );
   }
 }
-
-
-
-

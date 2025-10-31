@@ -29,7 +29,7 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
-          'All Weight Logs',
+          'All Log Shot',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -39,7 +39,7 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.chevron_left, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -117,25 +117,10 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
                 changeKg: changeKg,
                 isFirst: isFirst,
                 preferredUnit: preferredUnit,
-                onDelete: () => _deleteLog(context, log.id),
               );
             },
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "weight_logs_fab",
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const WeightLoggingScreen()),
-          );
-        },
-        backgroundColor: Colors.black,
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
       ),
     );
   }
@@ -145,7 +130,6 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
     double? changeKg,
     required bool isFirst,
     required String preferredUnit,
-    required VoidCallback onDelete,
   }) {
     // Convert weight to preferred unit based on original unit
     double weightConverted;
@@ -173,17 +157,17 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
       margin: const EdgeInsets.only(bottom: AppConstants.spacing12),
       padding: const EdgeInsets.all(AppConstants.spacing16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.divider),
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          // Weight Display
+          // Weight Display - darker grey badge
           Container(
-            width: 60,
-            height: 60,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: const Color(0xFFFFFFFF),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -191,16 +175,17 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
                 Text(
                   weightConverted.toStringAsFixed(0),
                   style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black,
                   ),
                 ),
                 Text(
-                  preferredUnit,
+                  preferredUnit.toLowerCase(),
                   style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
                   ),
                 ),
               ],
@@ -219,7 +204,7 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(height: AppConstants.spacing4),
@@ -227,25 +212,25 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
                   children: [
                     if (change != null) ...[
                       Icon(
-                        isPositive ? Icons.arrow_upward : Icons.arrow_downward,
-                        size: 14,
-                        color: isPositive ? AppColors.error : Colors.green,
+                        isNegative ? Icons.arrow_downward : Icons.arrow_upward,
+                        size: 16,
+                        color: isNegative ? const Color(0xFF10B981) : const Color(0xFFDC2626),
                       ),
                       const SizedBox(width: AppConstants.spacing4),
                       Text(
-                        '$sign${change.toStringAsFixed(1)}$preferredUnit',
+                        '$sign${change.toStringAsFixed(1)}${preferredUnit.toLowerCase()}',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: isPositive ? AppColors.error : Colors.green,
+                          color: isNegative ? const Color(0xFF10B981) : const Color(0xFFDC2626),
                         ),
                       ),
                     ] else ...[
                       Text(
-                        '0.00$preferredUnit',
+                        '0.00${preferredUnit.toLowerCase()}',
                         style: const TextStyle(
                           fontSize: 14,
-                          color: AppColors.textSecondary,
+                          color: Color(0xFF6B7280),
                         ),
                       ),
                     ],
@@ -268,89 +253,24 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
             ),
           ),
           
-          // Date and Actions
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                _formatDateTime(log.date),
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: AppConstants.spacing8),
-              GestureDetector(
-                onTap: () => _showDeleteDialog(context, onDelete),
-                child: Icon(
-                  Icons.delete_outline,
-                  size: 20,
-                  color: AppColors.error.withOpacity(0.7),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDeleteDialog(BuildContext context, VoidCallback onDelete) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Weight Entry'),
-        content: const Text('Are you sure you want to delete this weight entry?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              onDelete();
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.error,
+          // Timestamp only
+          Text(
+            _formatTime(log.date),
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF6B7280),
             ),
-            child: const Text('Delete'),
           ),
         ],
       ),
     );
-  }
-
-  Future<void> _deleteLog(BuildContext context, String logId) async {
-    final success = await context.read<HealthProvider>().deleteWeight(logId);
-    
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(success ? 'Weight entry deleted' : 'Failed to delete entry'),
-          backgroundColor: success ? Colors.green : AppColors.error,
-        ),
-      );
-    }
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final logDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-    
-    if (logDate == today) {
-      return 'Today, ${_formatTime(dateTime)}';
-    }
-    
-    return '${dateTime.month}/${dateTime.day}/${dateTime.year.toString().substring(2)}';
   }
 
   String _formatTime(DateTime time) {
     final hour = time.hour > 12 ? time.hour - 12 : time.hour == 0 ? 12 : time.hour;
     final minute = time.minute.toString().padLeft(2, '0');
     final period = time.hour >= 12 ? 'PM' : 'AM';
-    return '$hour:$minute$period';
+    return '$hour:$minute $period';
   }
 }
 
