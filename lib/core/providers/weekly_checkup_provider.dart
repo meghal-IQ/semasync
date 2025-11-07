@@ -206,8 +206,12 @@ class WeeklyCheckupProvider extends ChangeNotifier {
     try {
       final response = await _weeklyCheckupService.getLatestWeeklyCheckup();
 
-      if (response['success'] == true && response['data'] != null) {
-        _latestCheckup = WeeklyCheckup.fromJson(response['data']);
+      if (response['success'] == true) {
+        if (response['data'] != null) {
+          _latestCheckup = WeeklyCheckup.fromJson(response['data']);
+        } else {
+          _latestCheckup = null;
+        }
         notifyListeners();
       }
     } catch (e) {
