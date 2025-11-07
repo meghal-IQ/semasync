@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class WaterLoggingScreen extends StatefulWidget {
   const WaterLoggingScreen({super.key});
@@ -46,7 +47,7 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Log Water'),
+        title: Text('Log Water'),
         actions: [
           IconButton(
             icon: const Icon(Icons.save_outlined),
@@ -79,7 +80,7 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.calendar_today, color: AppColors.primary),
-        title: const Text('Date'),
+        title: Text('Date'),
         subtitle: Text(
           '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
         ),
@@ -101,9 +102,9 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Water Intake',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
@@ -176,7 +177,7 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
                       remaining > 0 
                           ? '${remaining}ml more to reach your goal!'
                           : 'Great job! You\'ve reached your daily water goal!',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: remaining > 0 ? AppColors.waterBlue : AppColors.success,
                         fontWeight: FontWeight.w500,
                       ),
@@ -198,9 +199,9 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Quick Add',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -268,7 +269,7 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
               const SizedBox(height: AppConstants.spacing12),
               Text(
                 'No water logged yet',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   color: AppColors.textSecondary,
                   fontSize: 16,
                 ),
@@ -276,7 +277,7 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
               const SizedBox(height: AppConstants.spacing8),
               Text(
                 'Start logging your water intake',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   color: AppColors.textSecondary,
                   fontSize: 12,
                 ),
@@ -294,9 +295,9 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Today\'s Entries',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -361,9 +362,9 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Custom Amount',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -391,7 +392,7 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.waterBlue,
                   ),
-                  child: const Text('Add'),
+                  child: Text('Add'),
                 ),
               ],
             ),
@@ -408,9 +409,9 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Notes (Optional)',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -443,9 +444,9 @@ class _WaterLoggingScreenState extends State<WaterLoggingScreen> {
           backgroundColor: AppColors.waterBlue,
           padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
         ),
-        child: const Text(
+        child: Text(
           'Log Water',
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),

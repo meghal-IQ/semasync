@@ -110,8 +110,6 @@ class AuthProvider extends ChangeNotifier {
 
   /// Logout user
   Future<void> logout() async {
-    _setStatus(AuthStatus.loading);
-
     try {
       await _authService.logout();
       _user = null;

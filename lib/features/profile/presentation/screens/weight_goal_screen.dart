@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/health_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
@@ -14,6 +15,8 @@ class WeightGoalScreen extends StatefulWidget {
 }
 
 class _WeightGoalScreenState extends State<WeightGoalScreen> {
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -27,34 +30,35 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Weight Goal',
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
           ),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.add, color: Colors.black),
-        //     onPressed: () {
-        //       // Add new entry
-        //     },
-        //   ),
-        // ],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: AppColors.textPrimary),
+            onPressed: () {
+              // Add new entry
+            },
+          ),
+        ],
       ),
-      body: Consumer2<HealthProvider, AuthProvider>(
-        builder: (context, healthProvider, authProvider, child) {
-          final stats = healthProvider.weightStats;
-          final user = authProvider.user;
-          final preferredUnit = user?.preferredUnits.weight ?? 'kg';
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Consumer2<HealthProvider, AuthProvider>(
+              builder: (context, healthProvider, authProvider, child) {
+                final stats = healthProvider.weightStats;
+                final user = authProvider.user;
+                final preferredUnit = user?.preferredUnits.weight ?? 'kg';
           
           // Backend data in kg
           final startWeightKg = user?.weight ?? stats?.startingWeight ?? 0;
@@ -98,14 +102,18 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.auto_awesome, color: Colors.black, size: 20),
+                              Image.asset(
+                                'assets/images/injection_site.png',
+                                width: 20,
+                                height: 20,
+                                color: AppColors.textPrimary,
+                              ),
                               const SizedBox(width: AppConstants.spacing8),
-                              const Text(
+                              Text(
                                 'TimeLine',
-                                style: TextStyle(
+                                style: AppTextStyles.title(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF1A1F36),
                                 ),
                               ),
                             ],
@@ -116,16 +124,16 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF6A34D7).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(20),
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                             ),
                             child: Text(
                               targetDate != null
                                   ? 'Est. Date ${_formatDateForTimeline(targetDate)}'
                                   : 'Est. Date Oct 14, 2025',
-                              style: const TextStyle(
+                              style: AppTextStyles.text(
                                 fontSize: 12,
-                                color: Color(0xFF6A34D7),
+                                color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -133,40 +141,45 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                         ],
                       ),
                       const SizedBox(height: AppConstants.spacing16),
-                      // Progress bar with centered current weight
+                      // Progress bar with weight labels
                       Stack(
                         children: [
+                          // Weight labels above progress bar
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 '${startWeight.toStringAsFixed(1)}$preferredUnit',
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                style: AppTextStyles.text(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Text(
+                                currentWeightKg > 0 ? '${currentWeight.toStringAsFixed(1)}$preferredUnit' : '--',
+                                style: AppTextStyles.title(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                               Text(
                                 '${goalWeight.toStringAsFixed(1)}$preferredUnit',
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                style: AppTextStyles.text(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
-                          ),
-                          Center(
-                            child: Text(
-                              currentWeightKg > 0 ? '${currentWeight.toStringAsFixed(1)}$preferredUnit' : '--',
-                              style: const TextStyle(
-                                fontSize: 14, 
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF1A1F36),
-                              ),
-                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: AppConstants.spacing8),
                       LinearProgressIndicator(
                         value: progress,
-                        backgroundColor: AppColors.background,
+                        backgroundColor: AppColors.lightGrey,
                         valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6A34D7)),
                         minHeight: 8,
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       const SizedBox(height: AppConstants.spacing8),
                       Row(
@@ -189,70 +202,68 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
                 const SizedBox(height: AppConstants.spacing24),
                 
                 // Start section
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Start',
-                    style: TextStyle(
+                    style: AppTextStyles.subtitle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF6B7280),
                     ),
                   ),
                 ),
                 const SizedBox(height: AppConstants.spacing12),
                 _buildEditableItem(
                   context,
-                  Icons.calendar_today,
+                  'assets/images/calender.png',
                   'Starting Date',
                   startDate != null ? _formatDate(startDate) : 'Not set',
                   () => _editStartDate(context, startDate),
                 ),
+                const SizedBox(height: AppConstants.spacing8),
                 _buildEditableItem(
                   context,
-                  Icons.scale,
+                  'assets/images/calender.png',
                   'Start Weight',
                   startWeightKg > 0 ? '${startWeight.toStringAsFixed(1)}$preferredUnit' : 'Not set',
                   () => _editStartWeight(context, startWeight, preferredUnit),
                 ),
                 
                 const SizedBox(height: AppConstants.spacing24),
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Current',
-                    style: TextStyle(
+                    style: AppTextStyles.subtitle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF6B7280),
                     ),
                   ),
                 ),
                 const SizedBox(height: AppConstants.spacing12),
                 _buildEditableItem(
                   context,
-                  Icons.scale,
+                  'assets/images/calender.png',
                   'Current Weight',
                   currentWeightKg > 0 ? '${currentWeight.toStringAsFixed(1)}$preferredUnit' : 'Not set',
                   null, // Not directly editable - log weight instead
                 ),
                 
                 const SizedBox(height: AppConstants.spacing24),
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Goal',
-                    style: TextStyle(
+                    style: AppTextStyles.subtitle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF6B7280),
                     ),
                   ),
                 ),
                 const SizedBox(height: AppConstants.spacing12),
                 _buildEditableItem(
                   context,
-                  Icons.flag,
+                  'assets/images/calender.png',
                   'Goal Weight',
                   '${goalWeight.toStringAsFixed(1)}$preferredUnit',
                   () => _editGoalWeight(context, goalWeight, preferredUnit),
@@ -274,7 +285,7 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
 
   Widget _buildEditableItem(
     BuildContext context,
-    IconData icon,
+    String imagePath,
     String label,
     String value,
     VoidCallback? onTap,
@@ -282,39 +293,43 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppConstants.spacing8),
-        padding: const EdgeInsets.all(AppConstants.spacing16),
+        padding: const EdgeInsets.all(AppConstants.spacing12),
         decoration: BoxDecoration(
           color: AppColors.lightGrey,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.black, size: 24),
+            Image.asset(
+              imagePath,
+              width: 20,
+              height: 20,
+              color: AppColors.textPrimary,
+            ),
             const SizedBox(width: AppConstants.spacing16),
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
+                style: AppTextStyles.text(
+                  fontSize: 12,
                 ),
               ),
             ),
             Text(
               value,
-              style: const TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.black,
               ),
             ),
-            const SizedBox(width: AppConstants.spacing8),
-            Icon(
-              Icons.chevron_right,
-              color: onTap != null ? const Color(0xFF6A34D7) : Colors.transparent,
-              size: 20,
-            ),
+            if (onTap != null) ...[
+              const SizedBox(width: AppConstants.spacing8),
+              const Icon(
+                Icons.chevron_right,
+                color: AppColors.textSecondary,
+                size: 16,
+              ),
+            ],
           ],
         ),
       ),
@@ -340,13 +355,43 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
     );
 
     if (picked != null && mounted) {
-      // TODO: Update user profile with new start date
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Start date updated'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      setState(() => _isLoading = true);
+      
+      final authProvider = context.read<AuthProvider>();
+      final user = authProvider.user;
+      
+      if (user != null) {
+        // Update glp1Journey.startDate
+        final success = await authProvider.updateProfile({
+          'glp1Journey': {
+            ...user.glp1Journey.toJson(),
+            'startDate': picked.toIso8601String(),
+          },
+        });
+        
+        setState(() => _isLoading = false);
+        
+        if (success && mounted) {
+          // Refresh health data to get updated stats
+          await context.read<HealthProvider>().loadWeightData();
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Start date updated successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? 'Failed to update start date'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -358,7 +403,7 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
     final result = await showDialog<double>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Start Weight'),
+        title: Text('Edit Start Weight'),
         content: TextField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -366,36 +411,60 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
             labelText: 'Weight',
             suffixText: unit,
             border: const OutlineInputBorder(),
+            helperText: 'Weight is stored in kg in the database',
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               final value = double.tryParse(controller.text);
-              Navigator.pop(context, value);
+              if (value != null && value > 0) {
+                Navigator.pop(context, value);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
             ),
-            child: const Text('Save'),
+            child: Text('Save', style: AppTextStyles.title(color: AppColors.surface),),
           ),
         ],
       ),
     );
 
     if (result != null && mounted) {
-      // TODO: Update user profile with new start weight
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Start weight updated'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      setState(() => _isLoading = true);
+      
+      // Convert to kg for API
+      final weightInKg = UnitConverter.convertWeightToKg(result, unit);
+      
+      final authProvider = context.read<AuthProvider>();
+      final success = await authProvider.updateProfile({'weight': weightInKg});
+      
+      setState(() => _isLoading = false);
+      
+      if (success && mounted) {
+        // Refresh health data to get updated stats
+        await context.read<HealthProvider>().loadWeightData();
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Start weight updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authProvider.errorMessage ?? 'Failed to update start weight'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -407,7 +476,7 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
     final result = await showDialog<double>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Goal Weight'),
+        title: Text('Edit Goal Weight'),
         content: TextField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -415,36 +484,72 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
             labelText: 'Goal Weight',
             suffixText: unit,
             border: const OutlineInputBorder(),
+            helperText: 'Weight is stored in kg in the database',
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               final value = double.tryParse(controller.text);
-              Navigator.pop(context, value);
+              if (value != null && value > 0) {
+                Navigator.pop(context, value);
+              }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.primary
             ),
-            child: const Text('Save'),
+            child: Text('Save', style: AppTextStyles.title(color: AppColors.surface),),
           ),
         ],
       ),
     );
 
     if (result != null && mounted) {
-      // TODO: Update user profile with new goal weight
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Goal weight updated'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      setState(() => _isLoading = true);
+      
+      // Convert to kg for API
+      final weightInKg = UnitConverter.convertWeightToKg(result, unit);
+      
+      final authProvider = context.read<AuthProvider>();
+      final user = authProvider.user;
+      
+      if (user != null) {
+        // Update goals.targetWeight
+        final success = await authProvider.updateProfile({
+          'goals': {
+            ...user.goals.toJson(),
+            'targetWeight': weightInKg,
+          },
+        });
+        
+        setState(() => _isLoading = false);
+        
+        if (success && mounted) {
+          // Refresh health data to get updated stats
+          await context.read<HealthProvider>().loadWeightData();
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Goal weight updated successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? 'Failed to update goal weight'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -456,7 +561,7 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
     final result = await showDialog<double>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Weekly Pace'),
+        title: Text('Edit Weekly Pace'),
         content: TextField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -471,7 +576,7 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -481,7 +586,7 @@ class _WeightGoalScreenState extends State<WeightGoalScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
             ),
-            child: const Text('Save'),
+            child: Text('Save'),
           ),
         ],
       ),

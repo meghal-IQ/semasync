@@ -4,6 +4,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/barcode_scanner_service.dart';
 import '../../../../core/services/food_database_service.dart';
 import '../../../../core/services/food_recognition_service.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../logging/presentation/screens/meal_logging_screen.dart';
 
 class FoodScannerScreen extends StatefulWidget {
@@ -21,7 +22,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Scan Food'),
+        title: Text('Scan Food'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -46,9 +47,9 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
                     color: AppColors.primary,
                   ),
                   const SizedBox(height: AppConstants.spacing12),
-                  const Text(
+                  Text(
                     'Scan Food Items',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -57,7 +58,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
                   Text(
                     'Use barcode scanning or take a photo to identify food items and automatically log nutrition information.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       color: Colors.grey[600],
                       fontSize: 14,
                     ),
@@ -135,7 +136,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
                     Expanded(
                       child: Text(
                         _errorMessage!,
-                        style: TextStyle(color: AppColors.error, fontSize: 14),
+                        style: AppTextStyles.title(color: AppColors.error, fontSize: 14),
                       ),
                     ),
                   ],
@@ -204,7 +205,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: Colors.grey[600],
                         fontSize: 14,
                       ),
@@ -460,9 +461,9 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  const Text(
+                  Text(
                     'Food Recognition Results',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -501,10 +502,10 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
             // Results
             Expanded(
               child: results.isEmpty 
-                ? const Center(
+                ? Center(
                     child: Text(
                       'No food items detected',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 16,
                         color: Colors.grey,
                       ),
@@ -561,7 +562,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
           backgroundColor: AppColors.primary.withOpacity(0.1),
           child: Text(
             '${(result.confidence * 100).toInt()}%',
-            style: TextStyle(
+            style: AppTextStyles.title(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
               fontSize: 12,
@@ -591,7 +592,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen> {
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
-          child: const Text('Add'),
+          child: Text('Add'),
         ),
       ),
     );

@@ -98,6 +98,29 @@ class ActivityService {
     }
   }
 
+  Future<ApiResponse<void>> deleteStepLog(String id) async {
+    try {
+      final response = await _apiClient.delete('/api/activity/steps/$id');
+
+      if (response.data['success'] == true) {
+        return ApiResponse<void>(
+          success: true,
+          message: response.data['message'] ?? 'Step log deleted successfully',
+        );
+      }
+
+      return ApiResponse<void>(
+        success: false,
+        message: response.data['message'] ?? 'Failed to delete step log',
+      );
+    } catch (e) {
+      return ApiResponse<void>(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
   // ============================================================================
   // WORKOUT TRACKING
   // ============================================================================
@@ -143,6 +166,15 @@ class ActivityService {
         },
       );
 
+      // Handle 404 errors gracefully
+      if (response.statusCode == 404) {
+        return ApiResponse<List<WorkoutLog>>(
+          success: true,
+          message: 'Workouts retrieved',
+          data: [], // Return empty list instead of error
+        );
+      }
+
       if (response.data['success'] == true && response.data['data'] != null) {
         final logs = (response.data['data']['workouts'] as List)
             .map((e) => WorkoutLog.fromJson(e))
@@ -159,6 +191,15 @@ class ActivityService {
         message: response.data['message'] ?? 'Failed to get workouts',
       );
     } catch (e) {
+      final errorMsg = e.toString().toLowerCase();
+      // Handle 404 or route not found errors gracefully
+      if (errorMsg.contains('route not found') || errorMsg.contains('404') || errorMsg.contains('resource not found')) {
+        return ApiResponse<List<WorkoutLog>>(
+          success: true,
+          message: 'Workouts retrieved',
+          data: [], // Return empty list instead of error
+        );
+      }
       return ApiResponse<List<WorkoutLog>>(
         success: false,
         message: e.toString(),
@@ -185,6 +226,29 @@ class ActivityService {
       );
     } catch (e) {
       return ApiResponse<WorkoutStats>(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse<void>> deleteWorkoutLog(String id) async {
+    try {
+      final response = await _apiClient.delete('/api/activity/workouts/$id');
+
+      if (response.data['success'] == true) {
+        return ApiResponse<void>(
+          success: true,
+          message: response.data['message'] ?? 'Workout log deleted successfully',
+        );
+      }
+
+      return ApiResponse<void>(
+        success: false,
+        message: response.data['message'] ?? 'Failed to delete workout log',
+      );
+    } catch (e) {
+      return ApiResponse<void>(
         success: false,
         message: e.toString(),
       );

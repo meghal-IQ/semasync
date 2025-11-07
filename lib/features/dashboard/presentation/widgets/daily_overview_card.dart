@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class DailyOverviewCard extends StatelessWidget {
   const DailyOverviewCard({super.key});
@@ -16,9 +17,9 @@ class DailyOverviewCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Today\'s Overview',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
@@ -32,9 +33,9 @@ class DailyOverviewCard extends StatelessWidget {
                     color: AppColors.success.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Great Day!',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       color: AppColors.success,
                       fontWeight: FontWeight.w500,
                       fontSize: 12,
@@ -107,10 +108,10 @@ class DailyOverviewCard extends StatelessWidget {
                     size: 20,
                   ),
                   const SizedBox(width: AppConstants.spacing8),
-                  const Expanded(
+                   Expanded(
                     child: Text(
                       'You\'re making excellent progress! Keep up the momentum.',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w500,
                       ),

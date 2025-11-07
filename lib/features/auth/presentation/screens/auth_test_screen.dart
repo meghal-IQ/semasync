@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../navigation/presentation/screens/main_navigation_screen.dart';
 import 'auth_welcome_screen.dart';
 import 'medication_selection_screen.dart';
@@ -61,7 +62,7 @@ class _AuthTestScreenState extends State<AuthTestScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Test Screens'),
+        title: Text('Test Screens'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -69,9 +70,9 @@ class _AuthTestScreenState extends State<AuthTestScreen> {
         padding: const EdgeInsets.all(AppConstants.spacing16),
         child: ListView(
           children: [
-            const Text(
+            Text(
               'Select a screen to test:',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -86,7 +87,7 @@ class _AuthTestScreenState extends State<AuthTestScreen> {
               child: ElevatedButton.icon(
                 onPressed: _quickLogin,
                 icon: const Icon(Icons.login),
-                label: const Text('Quick Login (testdose@example.com)'),
+                label: Text('Quick Login (testdose@example.com)'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
@@ -234,9 +235,9 @@ class _AuthTestScreenState extends State<AuthTestScreen> {
                     borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'Start Full Auth Flow',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),

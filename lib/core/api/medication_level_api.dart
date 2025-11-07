@@ -71,6 +71,20 @@ class MedicationLevelApi {
     }
   }
 
+  /// Get medication level for a specific date
+  Future<Map<String, dynamic>> getMedicationLevelForDate(DateTime date) async {
+    try {
+      final dateString = date.toIso8601String().split('T')[0]; // YYYY-MM-DD format
+      final response = await _dio.get(
+        '/api/treatments/medication-level/date',
+        queryParameters: {'date': dateString},
+      );
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to get medication level for date: ${e.toString()}');
+    }
+  }
+
   /// Get next shot due date and countdown
   Future<Map<String, dynamic>> getNextShotInfo() async {
     try {

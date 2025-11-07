@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/treatment_provider.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class InjectionSiteCard extends StatelessWidget {
   const InjectionSiteCard({super.key});
@@ -38,9 +39,9 @@ class InjectionSiteCard extends StatelessWidget {
                       color: AppColors.primary,
                     ),
                     const SizedBox(width: AppConstants.spacing8),
-                    const Text(
+                    Text(
                       'Injection',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: AppColors.textSecondary,
@@ -67,18 +68,18 @@ class InjectionSiteCard extends StatelessWidget {
                     ],
                   ),
                 ] else ...[
-                  const Text(
+                  Text(
                     'No data',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: AppConstants.spacing8),
-                  const Text(
+                  Text(
                     'Log your first shot',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       color: AppColors.textSecondary,
                     ),

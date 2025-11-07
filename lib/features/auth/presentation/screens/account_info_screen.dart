@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../data/auth_data.dart';
 import 'medication_selection_screen.dart';
 
@@ -67,9 +68,9 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Title
-                      const Text(
+                      Text(
                         'Create your account',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -79,9 +80,9 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                       const SizedBox(height: AppConstants.spacing12),
                       
                       // Subtitle
-                      const Text(
+                      Text(
                         'Let\'s start with some basic information about you.',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 16,
                           color: AppColors.textSecondary,
                         ),
@@ -186,9 +187,9 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                       const SizedBox(height: AppConstants.spacing16),
                       
                       // Gender Selection
-                      const Text(
+                      Text(
                         'Gender',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: AppColors.textPrimary,
@@ -199,7 +200,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                         children: [
                           Expanded(
                             child: RadioListTile<String>(
-                              title: const Text('Male'),
+                              title: Text('Male'),
                               value: 'male',
                               groupValue: _selectedGender,
                               onChanged: (value) {
@@ -211,7 +212,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                           ),
                           Expanded(
                             child: RadioListTile<String>(
-                              title: const Text('Female'),
+                              title: Text('Female'),
                               value: 'female',
                               groupValue: _selectedGender,
                               onChanged: (value) {
@@ -239,14 +240,14 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 child: ElevatedButton(
                   onPressed: _saveAndContinue,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.continueButton,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
                     shape: RoundedRectangleBorder(),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Continue',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),

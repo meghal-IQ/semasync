@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class SemaSyncActivityCard extends StatelessWidget {
   const SemaSyncActivityCard({super.key});
@@ -32,9 +33,9 @@ class SemaSyncActivityCard extends StatelessWidget {
                 size: 20,
               ),
               const SizedBox(width: AppConstants.spacing8),
-              const Text(
+              Text(
                 'Activity',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,

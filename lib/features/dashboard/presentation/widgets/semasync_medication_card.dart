@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class SemaSyncMedicationCard extends StatelessWidget {
   const SemaSyncMedicationCard({super.key});
@@ -32,9 +33,9 @@ class SemaSyncMedicationCard extends StatelessWidget {
                 size: 20,
               ),
               const SizedBox(width: AppConstants.spacing8),
-              const Text(
+              Text(
                 'Medication',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -46,9 +47,9 @@ class SemaSyncMedicationCard extends StatelessWidget {
           const SizedBox(height: AppConstants.spacing8),
           
           // Medication info
-          const Text(
+          Text(
             'Mounjaro®',
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: AppColors.textPrimary,
@@ -57,9 +58,9 @@ class SemaSyncMedicationCard extends StatelessWidget {
           
           const SizedBox(height: AppConstants.spacing4),
           
-          const Text(
+          Text(
             '0.346mg',
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -108,7 +109,7 @@ class SemaSyncMedicationCard extends StatelessWidget {
             final isActive = days.indexOf(day) <= 1;
             return Text(
               day,
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 10,
                 color: isActive ? AppColors.primary : AppColors.textSecondary,
                 fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,

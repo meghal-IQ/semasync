@@ -42,12 +42,12 @@ class _QuickActionFABState extends State<QuickActionFAB> {
             crossAxisCount: 3,
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
-            childAspectRatio: 1.0,
+            childAspectRatio: 1.3,
             physics: const NeverScrollableScrollPhysics(),
             children: [
               _buildGridAction(
                 context,
-                icon: Icons.vaccines,
+                icon: 'injection.png',
                 label: 'Log a Shot',
                 iconColor: const Color(0xFF00BCD4), // Cyan
                 onTap: () {
@@ -57,21 +57,21 @@ class _QuickActionFABState extends State<QuickActionFAB> {
                   );
                 },
               ),
+              // _buildGridAction(
+              //   context,
+              //   icon: Icons.add_a_photo,
+              //   label: 'Log Photos',
+              //   iconColor: const Color(0xFFFF9800), // Orange
+              //   onTap: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(builder: (context) => const SimplePhotoLoggingScreen()),
+              //     );
+              //   },
+              // ),
               _buildGridAction(
                 context,
-                icon: Icons.add_a_photo,
-                label: 'Log Photos',
-                iconColor: const Color(0xFFFF9800), // Orange
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SimplePhotoLoggingScreen()),
-                  );
-                },
-              ),
-              _buildGridAction(
-                context,
-                icon: Icons.monitor_weight,
+                icon: 'weight.png',
                 label: 'Log Weight',
                 iconColor: const Color(0xFFE91E63), // Pink
                 onTap: () {
@@ -83,7 +83,7 @@ class _QuickActionFABState extends State<QuickActionFAB> {
               ),
               _buildGridAction(
                 context,
-                icon: Icons.directions_run,
+                icon: 'steps.png',
                 label: 'Log Activity',
                 iconColor: const Color(0xFFFF9800), // Orange
                 onTap: () {
@@ -95,7 +95,7 @@ class _QuickActionFABState extends State<QuickActionFAB> {
               ),
               _buildGridAction(
                 context,
-                icon: Icons.sick,
+                icon: 'side_effect.png',
                 label: 'Log Side Effect',
                 iconColor: const Color(0xFFAED581), // Light green
                 onTap: () {
@@ -105,21 +105,21 @@ class _QuickActionFABState extends State<QuickActionFAB> {
                   );
                 },
               ),
-              _buildGridAction(
-                context,
-                icon: Icons.mic,
-                label: 'Log Voice',
-                iconColor: const Color(0xFF26A69A), // Teal
-                onTap: () {
-                  // TODO: Implement voice logging screen
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Voice logging coming soon!'),
-                      backgroundColor: Colors.blue,
-                    ),
-                  );
-                },
-              ),
+              // _buildGridAction(
+              //   context,
+              //   icon: Icons.mic,
+              //   label: 'Log Voice',
+              //   iconColor: const Color(0xFF26A69A), // Teal
+              //   onTap: () {
+              //     // TODO: Implement voice logging screen
+              //     ScaffoldMessenger.of(context).showSnackBar(
+              //       const SnackBar(
+              //         content: Text('Voice logging coming soon!'),
+              //         backgroundColor: Colors.blue,
+              //       ),
+              //     );
+              //   },
+              // ),
             ],
           ),
         ),
@@ -129,7 +129,7 @@ class _QuickActionFABState extends State<QuickActionFAB> {
 
   Widget _buildGridAction(
     BuildContext context, {
-    required IconData icon,
+    required String icon,
     required String label,
     required Color iconColor,
     required VoidCallback onTap,
@@ -150,11 +150,7 @@ class _QuickActionFABState extends State<QuickActionFAB> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                color: iconColor,
-                size: 32,
-              ),
+              Image.asset('assets/images/$icon', color: iconColor,),
               const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -165,7 +161,7 @@ class _QuickActionFABState extends State<QuickActionFAB> {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 13,
+                    fontSize: 10,
                     fontWeight: FontWeight.w500,
                     height: 1.2,
                   ),

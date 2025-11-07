@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../data/auth_data.dart';
 import 'auth_loading_screen.dart';
 
@@ -41,9 +42,9 @@ class _ConcernsSelectionScreenState extends State<ConcernsSelectionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    const Text(
+                    Text(
                       'What side effects are you most concerned about?',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -53,9 +54,9 @@ class _ConcernsSelectionScreenState extends State<ConcernsSelectionScreen> {
                     const SizedBox(height: AppConstants.spacing12),
                     
                     // Subtitle
-                    const Text(
+                    Text(
                       'Share what\'s on your mind — we\'ll tailor support to your needs.',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 16,
                         color: AppColors.textSecondary,
                       ),
@@ -85,16 +86,16 @@ class _ConcernsSelectionScreenState extends State<ConcernsSelectionScreen> {
                 child: ElevatedButton(
                   onPressed: _selectedConcerns.isNotEmpty ? _onContinue : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedConcerns.isNotEmpty ? Colors.black : AppColors.divider,
+                    backgroundColor: _selectedConcerns.isNotEmpty ? AppColors.continueButton : AppColors.divider,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Continue',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -169,7 +170,7 @@ class _ConcernsSelectionScreenState extends State<ConcernsSelectionScreen> {
           ),
           child: Text(
             concern,
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: isSelected ? AppColors.primary : AppColors.textPrimary,

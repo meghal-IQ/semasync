@@ -3,6 +3,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/barcode_scanner_service.dart';
 import '../../../../core/services/food_database_service.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../logging/presentation/screens/meal_logging_screen.dart';
 
 class BarcodeScannerScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Scan Barcode'),
+        title: Text('Scan Barcode'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -45,9 +46,9 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                     color: AppColors.primary,
                   ),
                   const SizedBox(height: AppConstants.spacing12),
-                  const Text(
+                  Text(
                     'Scan Product Barcode',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -56,7 +57,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                   Text(
                     'Point your camera at a product barcode to automatically identify and log nutrition information.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       color: Colors.grey[600],
                       fontSize: 14,
                     ),
@@ -102,7 +103,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                     const SizedBox(height: AppConstants.spacing16),
                     Text(
                       _isLoading ? 'Scanning...' : 'Tap to Scan',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: _isLoading ? Colors.grey[600] : AppColors.primary,
@@ -111,7 +112,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                     const SizedBox(height: AppConstants.spacing8),
                     Text(
                       'Position the barcode within the camera view',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: Colors.grey[600],
                         fontSize: 14,
                       ),
@@ -139,7 +140,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                     Expanded(
                       child: Text(
                         _errorMessage!,
-                        style: TextStyle(color: AppColors.error, fontSize: 14),
+                        style: AppTextStyles.title(color: AppColors.error, fontSize: 14),
                       ),
                     ),
                   ],
@@ -159,7 +160,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                   );
                 },
                 icon: const Icon(Icons.search),
-                label: const Text('Search Food Manually'),
+                label: Text('Search Food Manually'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   side: BorderSide(color: AppColors.primary),

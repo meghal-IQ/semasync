@@ -90,9 +90,9 @@
 //         Column(
 //           crossAxisAlignment: CrossAxisAlignment.start,
 //           children: [
-//             const Text(
+//             Text(
 //               'Medication Level',
-//               style: TextStyle(
+//               style: AppTextStyles.title(
 //                 fontSize: 16,
 //                 fontWeight: FontWeight.w600,
 //               ),
@@ -100,7 +100,7 @@
 //             const SizedBox(height: AppConstants.spacing4),
 //             Text(
 //               currentLevel > 0 ? '${currentLevel.toStringAsFixed(1)}%' : 'No Data',
-//               style: TextStyle(
+//               style: AppTextStyles.title(
 //                 fontSize: 24,
 //                 fontWeight: FontWeight.bold,
 //                 color: currentLevel > 0 ? _getStatusColor(status) : AppColors.textSecondary,
@@ -121,7 +121,7 @@
 //               ),
 //               child: Text(
 //                 _getStatusLabel(status),
-//                 style: TextStyle(
+//                 style: AppTextStyles.title(
 //                   color: _getStatusColor(status),
 //                   fontWeight: FontWeight.w500,
 //                 ),
@@ -130,7 +130,7 @@
 //             const SizedBox(height: AppConstants.spacing4),
 //             Text(
 //               countdown,
-//               style: TextStyle(
+//               style: AppTextStyles.title(
 //                 fontSize: 12,
 //                 color: isOverdue ? AppColors.error : AppColors.textSecondary,
 //                 fontWeight: isOverdue ? FontWeight.w600 : FontWeight.normal,
@@ -149,9 +149,9 @@
 //         Row(
 //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //           children: [
-//             const Text(
+//             Text(
 //               'Current Level',
-//               style: TextStyle(
+//               style: AppTextStyles.title(
 //                 fontSize: 14,
 //                 fontWeight: FontWeight.w500,
 //                 color: AppColors.textSecondary,
@@ -188,9 +188,9 @@
 //     return Column(
 //       crossAxisAlignment: CrossAxisAlignment.start,
 //       children: [
-//         const Text(
+//         Text(
 //           '7-Day Trend',
-//           style: TextStyle(
+//           style: AppTextStyles.title(
 //             fontSize: 14,
 //             fontWeight: FontWeight.w500,
 //             color: AppColors.textSecondary,
@@ -233,7 +233,7 @@
 //                           ),
 //                         );
 //                       }
-//                       return const Text('');
+//                       return Text('');
 //                     },
 //                   ),
 //                 ),
@@ -338,7 +338,7 @@
 //               const SizedBox(width: AppConstants.spacing4),
 //               Text(
 //                 'Trend: ${_getTrendLabel(analytics.trendDirection)}',
-//                 style: TextStyle(
+//                 style: AppTextStyles.title(
 //                   fontSize: 12,
 //                   fontWeight: FontWeight.w500,
 //                   color: _getTrendColor(analytics.trendDirection),
@@ -392,7 +392,7 @@
 //         child: Text(
 //           'No medication level data available.\nLog your first shot to start tracking.',
 //           textAlign: TextAlign.center,
-//           style: TextStyle(
+//           style: AppTextStyles.title(
 //             color: AppColors.textSecondary,
 //             fontSize: 14,
 //           ),
@@ -418,25 +418,25 @@
 //       //     const SizedBox(height: AppConstants.spacing12),
 //       //     Text(
 //       //       '${currentLevel.toStringAsFixed(1)}%',
-//       //       style: TextStyle(
+//       //       style: AppTextStyles.title(
 //       //         fontSize: 32,
 //       //         fontWeight: FontWeight.bold,
 //       //         color: _getStatusColor(status),
 //       //       ),
 //       //     ),
 //       //     const SizedBox(height: AppConstants.spacing8),
-//       //     const Text(
+//       //     Text(
 //       //       'Current Medication Level',
-//       //       style: TextStyle(
+//       //       style: AppTextStyles.title(
 //       //         fontSize: 14,
 //       //         fontWeight: FontWeight.w500,
 //       //         color: AppColors.textPrimary,
 //       //       ),
 //       //     ),
 //       //     const SizedBox(height: AppConstants.spacing4),
-//       //     const Text(
+//       //     Text(
 //       //       'Chart will appear after multiple shots',
-//       //       style: TextStyle(
+//       //       style: AppTextStyles.title(
 //       //         fontSize: 12,
 //       //         color: AppColors.textSecondary,
 //       //       ),

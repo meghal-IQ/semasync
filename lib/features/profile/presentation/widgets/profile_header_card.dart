@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({super.key});
@@ -20,7 +21,7 @@ class ProfileHeaderCard extends StatelessWidget {
               child: Center(
                 child: Text(
                   'No user data available',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: AppTextStyles.title(color: AppColors.textSecondary),
                 ),
               ),
             ),
@@ -64,7 +65,7 @@ class ProfileHeaderCard extends StatelessWidget {
                           const SizedBox(height: AppConstants.spacing4),
                           Text(
                             user.email,
-                            style: TextStyle(
+                            style: AppTextStyles.title(
                               color: AppColors.textSecondary,
                               fontSize: 14,
                             ),
@@ -72,7 +73,7 @@ class ProfileHeaderCard extends StatelessWidget {
                           const SizedBox(height: AppConstants.spacing4),
                           Text(
                             'GLP-1 Journey • Day $journeyDays',
-                            style: TextStyle(
+                            style: AppTextStyles.title(
                               color: AppColors.textSecondary,
                               fontSize: 14,
                             ),
@@ -180,7 +181,7 @@ class ProfileHeaderCard extends StatelessWidget {
       children: [
         Text(
           value,
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: color,

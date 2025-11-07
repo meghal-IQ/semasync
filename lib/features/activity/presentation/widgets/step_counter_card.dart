@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class StepCounterCard extends StatelessWidget {
   const StepCounterCard({super.key});
@@ -18,19 +19,19 @@ class StepCounterCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Step Counter',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   'Live',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: AppColors.success,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -54,9 +55,9 @@ class StepCounterCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Text(
+                    Text(
                       'steps',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: AppColors.textSecondary,
                         fontSize: 14,
                       ),

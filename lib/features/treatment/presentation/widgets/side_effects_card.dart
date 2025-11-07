@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../screens/side_effect_logging_screen.dart';
 import '../../domain/models/side_effect.dart';
 import '../providers/side_effect_provider.dart';
@@ -59,9 +60,9 @@ class SideEffectsCard extends StatelessWidget {
                           size: 20,
                         ),
                         const SizedBox(width: AppConstants.spacing8),
-                        const Text(
+                        Text(
                           'Side Effects',
-                          style: TextStyle(
+                          style: AppTextStyles.title(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
@@ -117,11 +118,11 @@ class SideEffectsCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
                         'No side effects logged recently.\nTap + to log your first side effect.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           color: AppColors.textSecondary,
                           fontSize: 14,
                         ),

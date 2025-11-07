@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import 'account_info_screen.dart';
 
 class AuthWelcomeScreen extends StatefulWidget {
@@ -31,9 +32,9 @@ class _AuthWelcomeScreenState extends State<AuthWelcomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Title
-                    const Text(
+                    Text(
                       'Ready to feel like you again?',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -44,9 +45,9 @@ class _AuthWelcomeScreenState extends State<AuthWelcomeScreen> {
                     const SizedBox(height: AppConstants.spacing16),
                     
                     // Subtitle
-                    const Text(
+                    Text(
                       'Where are you with your GLP-1 journey?',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 16,
                         color: AppColors.textSecondary,
                       ),
@@ -82,14 +83,14 @@ class _AuthWelcomeScreenState extends State<AuthWelcomeScreen> {
                 child: ElevatedButton(
                   onPressed: _selectedOption != -1 ? _onContinue : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedOption != -1 ? Colors.black : AppColors.divider,
+                    backgroundColor: _selectedOption != -1 ? AppColors.continueButton : AppColors.divider,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
                     shape: RoundedRectangleBorder(),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Continue',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),

@@ -345,4 +345,70 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: express.Respo
   }
 });
 
+/**
+ * @route   DELETE /api/activity/steps/:id
+ * @desc    Delete a step log entry
+ * @access  Private
+ */
+router.delete('/steps/:id', authenticate, async (req: AuthRequest, res: express.Response) => {
+  try {
+    const userId = req.user!._id;
+    const { id } = req.params;
+
+    const stepLog = await StepLog.findOneAndDelete({ _id: id, userId });
+
+    if (!stepLog) {
+      return res.status(404).json({
+        success: false,
+        message: 'Step log entry not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Step log deleted successfully'
+    });
+  } catch (error: any) {
+    console.error('Delete step log error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete step log',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * @route   DELETE /api/activity/workouts/:id
+ * @desc    Delete a workout log entry
+ * @access  Private
+ */
+router.delete('/workouts/:id', authenticate, async (req: AuthRequest, res: express.Response) => {
+  try {
+    const userId = req.user!._id;
+    const { id } = req.params;
+
+    const workoutLog = await WorkoutLog.findOneAndDelete({ _id: id, userId });
+
+    if (!workoutLog) {
+      return res.status(404).json({
+        success: false,
+        message: 'Workout log entry not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Workout log deleted successfully'
+    });
+  } catch (error: any) {
+    console.error('Delete workout log error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete workout log',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 export default router;

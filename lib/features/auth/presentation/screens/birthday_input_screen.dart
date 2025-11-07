@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../data/auth_data.dart';
 import 'height_weight_screen.dart';
 
@@ -32,9 +33,9 @@ class _BirthdayInputScreenState extends State<BirthdayInputScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    const Text(
+                    Text(
                       'When\'s your birthday?',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -44,9 +45,9 @@ class _BirthdayInputScreenState extends State<BirthdayInputScreen> {
                     const SizedBox(height: AppConstants.spacing12),
                     
                     // Subtitle
-                    const Text(
+                    Text(
                       'Your age helps us fine-tune your nutrition goals to keep them accurate and realistic.',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 16,
                         color: AppColors.textSecondary,
                       ),
@@ -145,16 +146,16 @@ class _BirthdayInputScreenState extends State<BirthdayInputScreen> {
                 child: ElevatedButton(
                   onPressed: _onContinue,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: AppColors.continueButton,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Continue',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -225,7 +226,7 @@ class _BirthdayInputScreenState extends State<BirthdayInputScreen> {
               child: Center(
                 child: Text(
                   items[index],
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: isSelected ? 18 : 16,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     color: AppColors.textPrimary.withOpacity(opacity),

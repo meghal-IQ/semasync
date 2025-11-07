@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../dashboard/presentation/screens/simple_semasync_dashboard.dart' as dashboard;
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../dashboard/presentation/screens/meagain_home_screen.dart';
 import '../../../treatment/presentation/screens/treatment_screen.dart';
 import '../../../lifestyle/presentation/screens/lifestyle_screen.dart';
-import '../../../nutrition/presentation/screens/nutrition_screen.dart';
 import '../../../profile/presentation/screens/profile_screen.dart';
 import '../../../weight/presentation/screens/weight_results_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
@@ -81,7 +80,7 @@ class PlaceholderScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Coming Soon',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 color: AppColors.textSecondary,
               ),

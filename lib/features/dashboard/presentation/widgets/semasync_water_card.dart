@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class SemaSyncWaterCard extends StatelessWidget {
   const SemaSyncWaterCard({super.key});
@@ -32,9 +33,9 @@ class SemaSyncWaterCard extends StatelessWidget {
                 size: 20,
               ),
               const SizedBox(width: AppConstants.spacing8),
-              const Text(
+              Text(
                 'Water',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -57,10 +58,10 @@ class SemaSyncWaterCard extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Center(
+              child:  Center(
                 child: Text(
                   '0ml',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textSecondary,
@@ -91,7 +92,7 @@ class SemaSyncWaterCard extends StatelessWidget {
                 ),
                 child: Text(
                   '237ml',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: AppColors.waterBlue,

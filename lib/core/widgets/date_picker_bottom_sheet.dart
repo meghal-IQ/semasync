@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../theme/app_text_styles.dart';
 
 class DatePickerBottomSheet extends StatefulWidget {
   final DateTime selectedDate;
@@ -77,9 +78,9 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                const Text(
+                Text(
                   'Select Date',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -100,9 +101,9 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
                       curve: Curves.easeInOut,
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     'Today',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
                     ),
@@ -182,9 +183,9 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Cancel',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
@@ -205,9 +206,9 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Select',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
@@ -316,7 +317,7 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
                     child: Center(
                       child: Text(
                         '${dayDate.day}',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 14,
                           fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.normal,
                           color: isSelected 

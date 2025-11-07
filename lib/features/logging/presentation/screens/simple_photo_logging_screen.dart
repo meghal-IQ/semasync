@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class SimplePhotoLoggingScreen extends StatefulWidget {
   const SimplePhotoLoggingScreen({super.key});
@@ -36,9 +37,9 @@ class _SimplePhotoLoggingScreenState extends State<SimplePhotoLoggingScreen> {
                       size: 24,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Photo Log',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -150,9 +151,9 @@ class _SimplePhotoLoggingScreenState extends State<SimplePhotoLoggingScreen> {
                     side: const BorderSide(color: Colors.white),
                     padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Retake',
-                    style: TextStyle(color: Colors.white),
+                    style: AppTextStyles.title(color: Colors.white),
                   ),
                 ),
               ),
@@ -164,7 +165,7 @@ class _SimplePhotoLoggingScreenState extends State<SimplePhotoLoggingScreen> {
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
                   ),
-                  child: const Text('Save Photo'),
+                  child: Text('Save Photo'),
                 ),
               ),
             ],
@@ -214,7 +215,7 @@ class _SimplePhotoLoggingScreenState extends State<SimplePhotoLoggingScreen> {
           
           Text(
             'Tap the camera button to capture',
-            style: TextStyle(
+            style: AppTextStyles.title(
               color: Colors.white.withOpacity(0.7),
               fontSize: 14,
             ),
@@ -251,7 +252,7 @@ class _SimplePhotoLoggingScreenState extends State<SimplePhotoLoggingScreen> {
             const SizedBox(width: AppConstants.spacing4),
             Text(
               label,
-              style: TextStyle(
+              style: AppTextStyles.title(
                 color: isSelected ? Colors.black : Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,

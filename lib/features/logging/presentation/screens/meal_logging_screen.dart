@@ -7,6 +7,8 @@ import '../../../../core/services/food_database_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import '../../../../core/theme/app_text_styles.dart';
+
 class MealLoggingScreen extends StatefulWidget {
   final FoodItem? preselectedFood;
   
@@ -297,7 +299,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Log Meal'),
+        title: Text('Log Meal'),
         actions: [
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
@@ -335,13 +337,13 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
           // TEMPORARY: Test button for debugging
           ElevatedButton(
             onPressed: _testRecognitionDialog,
-            child: const Text('Test Recognition Dialog'),
+            child: Text('Test Recognition Dialog'),
           ),
           const SizedBox(height: AppConstants.spacing8),
           // Simple test button
           ElevatedButton(
             onPressed: _simpleTestDialog,
-            child: const Text('Simple Test Dialog'),
+            child: Text('Simple Test Dialog'),
           ),
         ],
       ),
@@ -352,7 +354,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.calendar_today, color: AppColors.primary),
-        title: const Text('Date & Time'),
+        title: Text('Date & Time'),
         subtitle: Text(
           '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate
               .year} at ${_selectedDate.hour}:${_selectedDate.minute.toString()
@@ -368,7 +370,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.restaurant, color: AppColors.primary),
-        title: const Text('Meal Type'),
+        title: Text('Meal Type'),
         subtitle: Text(_selectedMealType),
         trailing: const Icon(Icons.chevron_right),
         onTap: _selectMealType,
@@ -386,9 +388,9 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Search Food',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -483,7 +485,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
             const SizedBox(height: AppConstants.spacing8),
             Text(
               'No food items found',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 color: AppColors.textSecondary,
                 fontSize: 16,
               ),
@@ -491,7 +493,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
             const SizedBox(height: AppConstants.spacing8),
             Text(
               'Try a different search term or category',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 color: AppColors.textSecondary,
                 fontSize: 12,
               ),
@@ -512,9 +514,9 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Quick Add',
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: AppColors.textSecondary,
@@ -551,7 +553,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
                     ),
                     Text(
                       '${food['calories']} cal',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 10,
                         color: AppColors.textSecondary,
                       ),
@@ -668,7 +670,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
                       ),
                       child: Text(
                         food['category'],
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           color: _getCategoryColor(food['category']),
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
@@ -709,9 +711,9 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Serving Size',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -746,14 +748,14 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
               children: [
                 Text(
                   '0.1 serving',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: AppColors.textSecondary,
                     fontSize: 12,
                   ),
                 ),
                 Text(
                   '5.0 servings',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: AppColors.textSecondary,
                     fontSize: 12,
                   ),
@@ -781,7 +783,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
               const SizedBox(height: AppConstants.spacing12),
               Text(
                 'No food items added yet',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   color: AppColors.textSecondary,
                   fontSize: 16,
                 ),
@@ -789,7 +791,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
               const SizedBox(height: AppConstants.spacing8),
               Text(
                 'Search and add food items to log your meal',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   color: AppColors.textSecondary,
                   fontSize: 12,
                 ),
@@ -807,9 +809,9 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Food Items',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -868,9 +870,9 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
                   size: 24,
                 ),
                 const SizedBox(width: AppConstants.spacing8),
-                const Text(
+                Text(
                   'Meal Summary',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -886,15 +888,15 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
                 children: [
                   Text(
                     totalCalories.toStringAsFixed(0),
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Calories',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       color: AppColors.textSecondary,
                     ),
@@ -942,7 +944,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
       children: [
         Text(
           value,
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: color,
@@ -950,7 +952,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
         ),
         Text(
           unit,
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 12,
             color: color.withOpacity(0.7),
           ),
@@ -1021,9 +1023,9 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Nutrition Summary',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -1081,9 +1083,9 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
 
             // Detailed breakdown with better organization
             ExpansionTile(
-              title: const Text(
+              title: Text(
                 'Detailed Nutrition Information',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: AppTextStyles.title(fontWeight: FontWeight.w600),
               ),
               children: [
                 // Carbohydrates Section
@@ -1214,7 +1216,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
       ),
       child: Text(
         text,
-        style: TextStyle(
+        style: AppTextStyles.title(
           color: color,
           fontSize: 10,
           fontWeight: FontWeight.w500,
@@ -1235,7 +1237,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
         children: [
           Text(
             value,
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: color,
@@ -1243,7 +1245,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
           ),
           Text(
             unit,
-            style: TextStyle(
+            style: AppTextStyles.title(
               color: color,
               fontSize: 12,
             ),
@@ -1267,9 +1269,9 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Notes (Optional)',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -1302,9 +1304,9 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
           backgroundColor: AppColors.primary,
           padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
         ),
-        child: const Text(
+        child: Text(
           'Log Meal',
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -1346,7 +1348,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
       context: context,
       builder: (context) =>
           AlertDialog(
-        title: const Text('Select Meal Type'),
+        title: Text('Select Meal Type'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
               children: _mealTypes.map((type) =>
@@ -1438,14 +1440,14 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+                child: Text('Close'),
               ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _addFoodItem(food);
                 },
-                child: const Text('Add to Meal'),
+                child: Text('Add to Meal'),
               ),
             ],
           ),
@@ -1638,7 +1640,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Food Recognition Results'),
+          title: Text('Food Recognition Results'),
           content: SizedBox(
             width: double.maxFinite,
             child: SingleChildScrollView(
@@ -1673,17 +1675,16 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
                 ),
                       const SizedBox(height: AppConstants.spacing16),
                     ],
-                    const Text('Recognized foods:',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text('Recognized foods:',
+                        style: AppTextStyles.title(fontWeight: FontWeight.bold)),
                     const SizedBox(height: AppConstants.spacing12),
                     if (results.isEmpty)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.all(AppConstants.spacing16),
                         child: Text(
                           'No food items were recognized in this image. Please try taking another photo.',
-                          style: TextStyle(
+                          style: AppTextStyles.title(
                             color: AppColors.textSecondary,
-                            fontStyle: FontStyle.italic,
                           ),
                         ),
                       )
@@ -1709,7 +1710,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
                         );
                       }).toList(),
                       const SizedBox(height: 16),
-                      const Text('Detailed View:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('Detailed View:', style: AppTextStyles.title(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       // Detailed cards
                       ...results.map((result) {
@@ -1759,7 +1760,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
                                 Text(
                                   'Confidence: ${(result.confidence * 100)
                                       .toInt()}%',
-                                  style: TextStyle(
+                                  style: AppTextStyles.title(
                                     color: AppColors.textSecondary,
                                     fontSize: 12,
                                   ),
@@ -1849,7 +1850,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
               // actions: [
               //   TextButton(
               //     onPressed: () => Navigator.pop(context),
-              //     child: const Text('Cancel'),
+              //     child: Text('Cancel'),
               //   ),
               // ],
             ),
@@ -1876,7 +1877,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
         ),
         Text(
           label,
-          style: TextStyle(
+          style: AppTextStyles.title(
             color: AppColors.textSecondary,
             fontSize: 12,
           ),
@@ -1994,14 +1995,14 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+                child: Text('Close'),
               ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _addFoodItemFromResult(result);
                 },
-                child: const Text('Add to Meal'),
+                child: Text('Add to Meal'),
             ),
           ],
         ),
@@ -2138,7 +2139,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
       context: context,
       builder: (context) =>
           AlertDialog(
-            title: const Text('Food Recognition Results'),
+            title: Text('Food Recognition Results'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -2156,8 +2157,8 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
                       style: const TextStyle(fontSize: 12, color: Colors.green),
                     ),
                   ),
-                  const Text('Recognized foods:',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Recognized foods:',
+                      style: AppTextStyles.title(fontWeight: FontWeight.bold)),
                   const SizedBox(height: AppConstants.spacing12),
                   ...testResults.map((result) {
                     print('🎯 Test Result: ${result.foodItem.name} (${(result.confidence * 100).toInt()}%)');
@@ -2203,7 +2204,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
                             ),
                             Text(
                               'Confidence: ${(result.confidence * 100).toInt()}%',
-                              style: TextStyle(
+                              style: AppTextStyles.title(
                                 color: AppColors.textSecondary,
                                 fontSize: 12,
                               ),
@@ -2287,7 +2288,7 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
+                child: Text('Cancel'),
               ),
             ],
           ),
@@ -2299,12 +2300,12 @@ class _MealLoggingScreenState extends State<MealLoggingScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Simple Test'),
-        content: const Text('This is a simple test dialog. If you can see this, the dialog system is working.'),
+        title: Text('Simple Test'),
+        content: Text('This is a simple test dialog. If you can see this, the dialog system is working.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text('OK'),
           ),
         ],
       ),

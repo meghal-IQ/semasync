@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:semasync_new/core/theme/app_text_styles.dart';
 import '../../domain/models/side_effect.dart';
 import '../providers/side_effect_provider.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -173,10 +174,10 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Side Effects Log',
-          style: TextStyle(
-            fontSize: 18,
+          style: AppTextStyles.title(
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
@@ -225,12 +226,13 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
-                    shape: RoundedRectangleBorder(),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Log Side Effect',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
+                      color: AppColors.surface,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -250,15 +252,7 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
       margin: const EdgeInsets.all(AppConstants.spacing16),
       padding: const EdgeInsets.all(AppConstants.spacing16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppColors.lightGrey,
       ),
       child: Row(
         children: [
@@ -272,9 +266,9 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Date',
-                  style: TextStyle(
+                Text(
+                  'Date & time',
+                  style: AppTextStyles.title(
                     fontSize: 14,
                     color: AppColors.textSecondary,
                   ),
@@ -282,9 +276,8 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
                 const SizedBox(height: AppConstants.spacing4),
                 Text(
                   dateFormatter.format(_selectedDate),
-                  style: const TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
-                    fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -293,9 +286,9 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
           ),
           TextButton(
             onPressed: _selectDate,
-            child: const Text(
+            child: Text(
               'Change',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w500,
               ),
@@ -308,18 +301,10 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
 
   Widget _buildSideEffectItem(String effectName, double severity) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppConstants.spacing16),
-      padding: const EdgeInsets.all(AppConstants.spacing16),
+      margin: const EdgeInsets.only(bottom: AppConstants.spacing12),
+      padding: const EdgeInsets.all(AppConstants.spacing12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppColors.lightGrey,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,7 +314,7 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
             children: [
               Text(
                 effectName,
-                style: const TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: AppColors.textPrimary,
@@ -337,7 +322,7 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
               ),
               Text(
                 '${severity.toInt()}/10',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: _getSeverityColor(severity),
@@ -345,7 +330,7 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
               ),
             ],
           ),
-          const SizedBox(height: AppConstants.spacing12),
+          // const SizedBox(height: AppConstants.spacing6),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: AppColors.primary,
@@ -353,7 +338,7 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
               thumbColor: AppColors.primary,
               overlayColor: AppColors.primary.withOpacity(0.1),
               valueIndicatorColor: AppColors.primary,
-              valueIndicatorTextStyle: const TextStyle(
+              valueIndicatorTextStyle: AppTextStyles.title(
                 color: Colors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -422,18 +407,18 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
-            title: const Text(
+            title:  Text(
               'Customize Side Effects',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: AppTextStyles.title(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             content: SizedBox(
               width: double.maxFinite,
               height: 400,
               child: Column(
                 children: [
-                  const Text(
+                   Text(
                     'Select side effects to track:',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSecondary,
                     ),
@@ -469,9 +454,9 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
+                child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: AppTextStyles.title(color: AppColors.textSecondary),
                 ),
               ),
               ElevatedButton(
@@ -486,7 +471,7 @@ class _SideEffectLoggingScreenState extends State<SideEffectLoggingScreen> {
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text('Save'),
+                child: Text('Save'),
               ),
             ],
           );

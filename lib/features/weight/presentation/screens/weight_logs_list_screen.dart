@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:semasync_new/core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/health_provider.dart';
@@ -28,10 +29,10 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'All Log Shot',
-          style: TextStyle(
-            fontSize: 18,
+        title: Text(
+          'All Weight Log',
+          style: AppTextStyles.title(
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
@@ -76,18 +77,18 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
                     color: AppColors.textSecondary.withOpacity(0.5),
                   ),
                   const SizedBox(height: AppConstants.spacing16),
-                  const Text(
+                  Text(
                     'No weight logs yet',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: AppConstants.spacing8),
-                  const Text(
+                  Text(
                     'Tap + to add your first entry',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       color: AppColors.textSecondary,
                     ),
@@ -164,7 +165,7 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
         children: [
           // Weight Display - darker grey badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 9),
             decoration: BoxDecoration(
               color: const Color(0xFFFFFFFF),
               borderRadius: BorderRadius.circular(8),
@@ -174,8 +175,8 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
               children: [
                 Text(
                   weightConverted.toStringAsFixed(0),
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: AppTextStyles.title(
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Colors.black,
                   ),
@@ -183,7 +184,7 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
                 Text(
                   preferredUnit.toLowerCase(),
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
                   ),
@@ -199,11 +200,10 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Weight Entry',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                  style: AppTextStyles.title(
+                    fontSize: 14  ,
                     color: Colors.black,
                   ),
                 ),
@@ -219,7 +219,7 @@ class _WeightLogsListScreenState extends State<WeightLogsListScreen> {
                       const SizedBox(width: AppConstants.spacing4),
                       Text(
                         '$sign${change.toStringAsFixed(1)}${preferredUnit.toLowerCase()}',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: isNegative ? const Color(0xFF10B981) : const Color(0xFFDC2626),

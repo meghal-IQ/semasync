@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class SettingsSectionCard extends StatelessWidget {
   const SettingsSectionCard({super.key});
@@ -13,9 +14,9 @@ class SettingsSectionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Settings',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -115,7 +116,7 @@ class SettingsSectionCard extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: TextStyle(
+        style: AppTextStyles.title(
           color: isDestructive ? AppColors.error : AppColors.textPrimary,
           fontWeight: FontWeight.w500,
         ),

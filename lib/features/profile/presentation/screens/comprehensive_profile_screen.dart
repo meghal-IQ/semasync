@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/dashboard_provider.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class ComprehensiveProfileScreen extends StatefulWidget {
   const ComprehensiveProfileScreen({super.key});
@@ -68,7 +69,7 @@ class _ComprehensiveProfileScreenState extends State<ComprehensiveProfileScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Profile'),
+        title: Text('My Profile'),
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.check : Icons.edit),
@@ -95,7 +96,7 @@ class _ComprehensiveProfileScreenState extends State<ComprehensiveProfileScreen>
                   Text('Error: ${provider.errorMessage}'),
                   ElevatedButton(
                     onPressed: () => provider.loadDashboardData(),
-                    child: const Text('Retry'),
+                    child: Text('Retry'),
                   ),
                 ],
               ),
@@ -276,9 +277,9 @@ class _ComprehensiveProfileScreenState extends State<ComprehensiveProfileScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Concerns',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -296,11 +297,10 @@ class _ComprehensiveProfileScreenState extends State<ComprehensiveProfileScreen>
                 )).toList(),
               )
             else
-              const Text(
+              Text(
                 'No concerns listed',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   color: AppColors.textSecondary,
-                  fontStyle: FontStyle.italic,
                 ),
               ),
           ],

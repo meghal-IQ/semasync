@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class TodayTasksCard extends StatelessWidget {
   const TodayTasksCard({super.key});
@@ -13,19 +14,19 @@ class TodayTasksCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Today\'s Tasks',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   '3/5 completed',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
@@ -79,10 +80,10 @@ class TodayTasksCard extends StatelessWidget {
                     size: 20,
                   ),
                   const SizedBox(width: AppConstants.spacing8),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'You have 2 tasks remaining. Keep going!',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: AppColors.activityRed,
                         fontWeight: FontWeight.w500,
                       ),
@@ -137,9 +138,9 @@ class TodayTasksCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontWeight: FontWeight.w500,
-                    decoration: isCompleted ? TextDecoration.lineThrough : null,
+                    // decoration: isCompleted ? TextDecoration.lineThrough : null,
                     color: isCompleted ? AppColors.textSecondary : AppColors.textPrimary,
                   ),
                 ),
@@ -170,7 +171,7 @@ class TodayTasksCard extends StatelessWidget {
                       ),
                       child: Text(
                         priority,
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           color: priorityColor,
                           fontSize: 10,
                           fontWeight: FontWeight.w500,

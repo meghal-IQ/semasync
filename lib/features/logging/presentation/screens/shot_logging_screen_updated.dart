@@ -1,9 +1,10 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/treatment_provider.dart';
+import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/api/models/shot_log_model.dart';
 
 class ShotLoggingScreenUpdated extends StatefulWidget {
@@ -93,8 +94,22 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
       _notes = widget.existingShot!.notes ?? '';
     } else {
       _selectedDate = DateTime.now();
-      _selectedMedication = 'Ozempic®';
+      _selectedMedication = _medications.first; // Default, will be updated in didChangeDependencies
       _selectedDosage = '0.5mg';
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Get medication from user's registration data if not already set from existing shot
+    if (widget.existingShot == null) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userMedication = authProvider.user?.glp1Journey.medication;
+      if (userMedication != null && _medications.contains(userMedication)) {
+        _selectedMedication = userMedication;
+      }
     }
     
     _loadRecommendations();
@@ -172,338 +187,391 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        titleTextStyle: TextStyle(fontWeight: FontWeight.w500, color: Colors.black, fontSize: 20),
-        title: Text(widget.existingShot != null ? 'Edit Shot' : 'Log Shot'),
-        actions: [
-          if (_isSaving)
-            const Center(
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Custom Header
+            _buildHeader(),
+            
+            // Scrollable Content
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                children: [
+                  _buildDateSelector(),
+                  const SizedBox(height: 16),
+                  _buildMedicationSelector(),
+                  const SizedBox(height: 16),
+                  _buildDosageSelector(),
+                  const SizedBox(height: 16),
+                  _buildLocationSelector(),
+                  const SizedBox(height: 24),
+                  _buildPainLevelSlider(),
+                  const SizedBox(height: 24),
+                  _buildSideEffectsSection(),
+                ],
+              ),
+            ),
+            
+            // Log Shot Button
+            _buildLogShotButton(),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      child: Row(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => Navigator.pop(context),
               child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                padding: const EdgeInsets.all(8),
+                child: Icon(
+                  Icons.arrow_back_ios_new,
+                  size: 20,
+                  color: AppColors.textPrimary,
                 ),
               ),
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.check),
-              onPressed: _saveShot,
             ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppConstants.spacing16),
-        children: [
-          _buildDateSelector(),
-          const SizedBox(height: AppConstants.spacing16),
-          _buildMedicationSelector(),
-          const SizedBox(height: AppConstants.spacing16),
-          _buildDosageSelector(),
-          const SizedBox(height: AppConstants.spacing16),
-          _buildLocationSelector(),
-          const SizedBox(height: AppConstants.spacing24),
-          _buildPainLevelSlider(),
-          const SizedBox(height: AppConstants.spacing24),
-          _buildSideEffectsSection(),
-          const SizedBox(height: AppConstants.spacing24),
-          _buildNotesField(),
-          const SizedBox(height: AppConstants.spacing32),
-          _buildSaveButton(),
-          const SizedBox(height: AppConstants.spacing32),
+          ),
+          Expanded(
+            child: Center(
+              child: Text(
+                'Log Shot',
+                style: AppTextStyles.subtitle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 40),
         ],
       ),
     );
   }
 
   Widget _buildDateSelector() {
-    return Card(
-      color: AppColors.lightGrey,
-      elevation: 0,
-      child: ListTile(
-        leading: const Icon(Icons.calendar_today, color: AppColors.primary),
-        title: const Text('Date & Time'),
-        subtitle: Text(
-          '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year} at ${_selectedDate.hour}:${_selectedDate.minute.toString().padLeft(2, '0')}',
+    final formattedDate = '${_formatDay(_selectedDate.day)} ${_formatMonth(_selectedDate.month)}, ${_selectedDate.year} at ${_selectedDate.hour.toString().padLeft(2, '0')}:${_selectedDate.minute.toString().padLeft(2, '0')}';
+    
+    return _buildInputCard(
+      icon: Icons.calendar_today_outlined,
+      label: 'Date & Time',
+      value: formattedDate,
+      onTap: _selectDateTime,
+    );
+  }
+  
+  String _formatDay(int day) {
+    return day.toString();
+  }
+  
+  String _formatMonth(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[month - 1];
+  }
+  
+  Widget _buildInputCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        decoration: BoxDecoration(
+          color: AppColors.lightGrey,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.divider),
         ),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: _selectDateTime,
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 22,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textSecondary,
+                      letterSpacing: -0.1,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              color: AppColors.textSecondary,
+              size: 20,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildMedicationSelector() {
-    return Card(
-      color: AppColors.lightGrey,
-      elevation: 0,
-      child: ListTile(
-        leading: const Icon(Icons.medical_services, color: AppColors.primary),
-        title: const Text('Medication'),
-        subtitle: Text(_selectedMedication),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: _selectMedication,
-      ),
+    return _buildInputCard(
+      icon: Icons.vaccines,
+      label: 'Medication',
+      value: _selectedMedication,
+      onTap: _selectMedication,
     );
   }
 
   Widget _buildDosageSelector() {
-    return Card(
-      color: AppColors.lightGrey,
-      elevation: 0,
-      child: ListTile(
-        leading: const Icon(Icons.science_outlined, color: AppColors.primary),
-        title: const Text('Dosage'),
-        subtitle: Text(_selectedDosage),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: _selectDosage,
-      ),
+    return _buildInputCard(
+      icon: Icons.add_circle_outline,
+      label: 'Dosage',
+      value: _selectedDosage,
+      onTap: _selectDosage,
     );
   }
 
   Widget _buildLocationSelector() {
-    return Consumer<TreatmentProvider>(
-      builder: (context, provider, child) {
-        final hasRecommendations = provider.siteRecommendations != null &&
-            provider.siteRecommendations!.recommendedSites.isNotEmpty;
-
-        return Card(
-          color: AppColors.lightGrey,
-          elevation: 0,
-          child: Column(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.location_on_outlined, color: AppColors.primary),
-                title: const Text('Injection Site'),
-                subtitle: Text(_selectedLocation),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: _selectLocation,
-              ),
-              if (hasRecommendations)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(12),
-                      bottomRight: Radius.circular(12),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.info_outline, size: 16, color: AppColors.primary),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Recommended: ${provider.siteRecommendations!.recommendedSites.join(", ")}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
+    return _buildInputCard(
+      icon: Icons.person_outline,
+      label: 'Injection Site',
+      value: _selectedLocation,
+      onTap: _selectLocation,
     );
   }
 
   Widget _buildPainLevelSlider() {
-    return Card(
-      color: AppColors.lightGrey,
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.spacing16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Pain Level',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.divider),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.brightness_low_outlined,
+                size: 22,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Pain Level',
+                style: AppTextStyles.subtitle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
                 ),
-                Text(
-                  '${_painLevel.round()}/10',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: AppColors.primary,
+              inactiveTrackColor: AppColors.divider,
+              thumbColor: AppColors.primary,
+              overlayColor: AppColors.primary.withOpacity(0.18),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
+              trackHeight: 4,
             ),
-            const SizedBox(height: AppConstants.spacing8),
-            Slider(
+            child: Slider(
               value: _painLevel,
               min: 0,
               max: 10,
               divisions: 10,
-              label: _painLevel.round().toString(),
               onChanged: (value) {
                 setState(() {
                   _painLevel = value;
                 });
               },
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'No Pain',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'No Pain',
+                style: AppTextStyles.subtitle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textSecondary,
                 ),
-                Text(
-                  'Severe',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
+              ),
+              Text(
+                'Severe',
+                style: AppTextStyles.subtitle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textSecondary,
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildSideEffectsSection() {
-    return Card(
-      color: AppColors.lightGrey,
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.spacing16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.divider),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: 2, bottom: 12),
+            child: Text(
               'Side Effects',
-              style: TextStyle(
+              style: AppTextStyles.subtitle(
                 fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: AppConstants.spacing12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _sideEffectOptions.map((effect) {
-                final isSelected = _selectedSideEffects.contains(effect);
-                final isNone = effect == 'None';
-                
-                return FilterChip(
-                  label: Text(effect),
-                  selected: isSelected,
-                  backgroundColor: AppColors.background,
-                  onSelected: (selected) {
-                    setState(() {
-                      if (isNone) {
-                        // If None is selected, clear all others
-                        _selectedSideEffects = ['None'];
-                      } else {
-                        // Remove None if selecting any other effect
-                        _selectedSideEffects.remove('None');
-                        
-                        if (selected) {
-                          _selectedSideEffects.add(effect);
-                        } else {
-                          _selectedSideEffects.remove(effect);
-                        }
-                        
-                        // If no effects selected, default to None
-                        if (_selectedSideEffects.isEmpty) {
-                          _selectedSideEffects = ['None'];
-                        }
-                      }
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotesField() {
-    return Card(
-      color: AppColors.lightGrey,
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.spacing16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Notes (Optional)',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: AppConstants.spacing8),
-            TextField(
-              maxLines: 4,
-              maxLength: 500,
-              decoration: const InputDecoration(
-                hintText: 'Add any additional notes about this shot...',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _notes = value;
-                });
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSaveButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isSaving ? null : _saveShot,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
           ),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _sideEffectOptions.map((effect) {
+              final isSelected = _selectedSideEffects.contains(effect);
+              final isNone = effect == 'None';
+              
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isNone) {
+                      // If None is selected, clear all others
+                      _selectedSideEffects = ['None'];
+                    } else {
+                      // Remove None if selecting any other effect
+                      _selectedSideEffects.remove('None');
+                      
+                      if (isSelected) {
+                        _selectedSideEffects.remove(effect);
+                      } else {
+                        _selectedSideEffects.add(effect);
+                      }
+                      
+                      // If no effects selected, default to None
+                      if (_selectedSideEffects.isEmpty) {
+                        _selectedSideEffects = ['None'];
+                      }
+                    }
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primary
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.divider,
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Text(
+                    effect,
+                    style: AppTextStyles.subtitle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? Colors.white
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _buildLogShotButton() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: _isSaving ? null : _saveShot,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            disabledBackgroundColor: AppColors.primary.withOpacity(0.35),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            elevation: 0,
+            shape: const StadiumBorder(),
+          ),
+          child: _isSaving
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              :  Text(
+                  'Log Shot',
+                  style: AppTextStyles.subtitle(
+                    fontSize: 17,
+                    color: AppColors.background,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.1,
+                  ),
+                ),
         ),
-        child: _isSaving
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : const Text(
-                'Save Shot Log',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
       ),
     );
   }
@@ -548,7 +616,7 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text(
                 medication,
-                style: TextStyle(
+                style: AppTextStyles.subtitle(
                   color: medication == _selectedMedication
                       ? AppColors.primary
                       : AppColors.textPrimary,
@@ -582,7 +650,7 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text(
                 dosage,
-                style: TextStyle(
+                style: AppTextStyles.subtitle(
                   color: dosage == _selectedDosage
                       ? AppColors.primary
                       : AppColors.textPrimary,
@@ -607,9 +675,10 @@ class _ShotLoggingScreenUpdatedState extends State<ShotLoggingScreenUpdated> {
   Future<void> _selectLocation() async {
     String? result = _selectedLocation;
     
-    await showDialog(
+    await showModalBottomSheet(
       context: context,
-      barrierDismissible: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) => _InjectionSiteSelector(
         initialSelection: _selectedLocation,
         onSiteSelected: (site) {
@@ -641,235 +710,334 @@ class _InjectionSiteSelector extends StatefulWidget {
 }
 
 class _InjectionSiteSelectorState extends State<_InjectionSiteSelector> {
-  late String _selectedSite;
-  bool _isSiteSelected = false;
+  String? _selectedSiteId;
+  _InjectionRegion? _selectedRegion;
 
-  // Define injection sites with their positions as fractional coordinates (0.0 to 1.0)
-  // Positions carefully tuned to match the actual PNG image asset locations
-  // Based on body diagram: head at top, torso in middle, legs at bottom
+  // Define injection sites with their positions as fractional coordinates (0.0 - 1.0)
+  // Coordinates are tuned to align with the `body.png` asset injection indicators.
   final List<_InjectionSite> _injectionSites = const [
-    _InjectionSite(name: 'Left Arm', x: 0.20, y: 0.28),           // Upper left shoulder/arm
-    _InjectionSite(name: 'Right Arm', x: 0.80, y: 0.28),          // Upper right shoulder/arm
-    _InjectionSite(name: 'Upper Left Abdomen', x: 0.38, y: 0.40),  // Upper chest/abdomen left
-    _InjectionSite(name: 'Upper Right Abdomen', x: 0.62, y: 0.40), // Upper chest/abdomen right
-    _InjectionSite(name: 'Left Groin', x: 0.32, y: 0.62),         // Left groin/upper thigh area (where selection is)
-    _InjectionSite(name: 'Right Groin', x: 0.68, y: 0.62),       // Right groin/upper thigh area
-    _InjectionSite(name: 'Lower Left Abdomen', x: 0.40, y: 0.75), // Lower abdomen/thigh left
-    _InjectionSite(name: 'Lower Right Abdomen', x: 0.60, y: 0.75), // Lower abdomen/thigh right
+    _InjectionSite(
+      id: 'left_arm_outer',
+      region: _InjectionRegion.leftArm,
+      x: 0.18,
+      y: 0.30,
+    ),
+    _InjectionSite(
+      id: 'right_arm_outer',
+      region: _InjectionRegion.rightArm,
+      x: 0.82,
+      y: 0.30,
+    ),
+    _InjectionSite(
+      id: 'left_abdomen_upper',
+      region: _InjectionRegion.leftAbdomen,
+      x: 0.41,
+      y: 0.44,
+    ),
+    _InjectionSite(
+      id: 'right_abdomen_upper',
+      region: _InjectionRegion.rightAbdomen,
+      x: 0.59,
+      y: 0.44,
+    ),
+    _InjectionSite(
+      id: 'left_abdomen_mid',
+      region: _InjectionRegion.leftAbdomen,
+      x: 0.41,
+      y: 0.52,
+    ),
+    _InjectionSite(
+      id: 'right_abdomen_mid',
+      region: _InjectionRegion.rightAbdomen,
+      x: 0.59,
+      y: 0.52,
+    ),
+    _InjectionSite(
+      id: 'left_abdomen_lower',
+      region: _InjectionRegion.leftAbdomen,
+      x: 0.41,
+      y: 0.60,
+    ),
+    _InjectionSite(
+      id: 'right_abdomen_lower',
+      region: _InjectionRegion.rightAbdomen,
+      x: 0.59,
+      y: 0.60,
+    ),
+    _InjectionSite(
+      id: 'left_thigh_upper',
+      region: _InjectionRegion.leftThigh,
+      x: 0.38,
+      y: 0.74,
+    ),
+    _InjectionSite(
+      id: 'left_thigh_lower',
+      region: _InjectionRegion.leftThigh,
+      x: 0.34,
+      y: 0.82,
+    ),
+    _InjectionSite(
+      id: 'right_thigh_upper',
+      region: _InjectionRegion.rightThigh,
+      x: 0.62,
+      y: 0.74,
+    ),
+    _InjectionSite(
+      id: 'right_thigh_lower',
+      region: _InjectionRegion.rightThigh,
+      x: 0.66,
+      y: 0.82,
+    ),
   ];
   
   @override
   void initState() {
     super.initState();
-    // Map initial selection to visual name if needed
-    _selectedSite = _mapStandardToVisual(widget.initialSelection);
-    // If we have a valid initial selection, mark as selected
-    _isSiteSelected = _injectionSites.any((site) => site.name == _selectedSite);
+    final initialRegion = _regionFromStandard(widget.initialSelection);
+    if (initialRegion != null) {
+      _selectedRegion = initialRegion;
+      _selectedSiteId = _preferredSiteIdForRegion(initialRegion);
+    }
   }
-  
-  // Map standard API names back to visual names (for initial selection)
-  String _mapStandardToVisual(String standardName) {
-    // Find matching visual site - prefer upper positions for initial selection
-    if (standardName == 'Left Abdomen') {
-      return 'Upper Left Abdomen';
+
+  bool get _hasSelection => _selectedRegion != null && _selectedSiteId != null;
+
+  String _regionLabel(_InjectionRegion region) {
+    switch (region) {
+      case _InjectionRegion.leftArm:
+        return 'Left Arm';
+      case _InjectionRegion.rightArm:
+        return 'Right Arm';
+      case _InjectionRegion.leftAbdomen:
+        return 'Left Abdomen';
+      case _InjectionRegion.rightAbdomen:
+        return 'Right Abdomen';
+      case _InjectionRegion.leftThigh:
+        return 'Left Thigh';
+      case _InjectionRegion.rightThigh:
+        return 'Right Thigh';
     }
-    if (standardName == 'Right Abdomen') {
-      return 'Upper Right Abdomen';
-    }
-    if (standardName == 'Left Thigh') {
-      return 'Left Groin';
-    }
-    if (standardName == 'Right Thigh') {
-      return 'Right Groin';
-    }
-    // For arms, return as-is
-    return standardName;
   }
-  
-  // Map visual site names to standard API names
-  String _mapSiteToStandard(String visualName) {
-    if (visualName.contains('Upper Left Abdomen') || visualName.contains('Lower Left Abdomen')) {
-      return 'Left Abdomen';
+
+  String _standardNameForRegion(_InjectionRegion region) => _regionLabel(region);
+
+  _InjectionRegion? _regionFromStandard(String? name) {
+    if (name == null || name.isEmpty) {
+      return null;
     }
-    if (visualName.contains('Upper Right Abdomen') || visualName.contains('Lower Right Abdomen')) {
-      return 'Right Abdomen';
+    final normalized = name.trim();
+    switch (normalized) {
+      case 'Left Arm':
+        return _InjectionRegion.leftArm;
+      case 'Right Arm':
+        return _InjectionRegion.rightArm;
+      case 'Left Abdomen':
+      case 'Upper Left Abdomen':
+      case 'Lower Left Abdomen':
+        return _InjectionRegion.leftAbdomen;
+      case 'Right Abdomen':
+      case 'Upper Right Abdomen':
+      case 'Lower Right Abdomen':
+        return _InjectionRegion.rightAbdomen;
+      case 'Left Thigh':
+      case 'Left Groin':
+        return _InjectionRegion.leftThigh;
+      case 'Right Thigh':
+      case 'Right Groin':
+        return _InjectionRegion.rightThigh;
     }
-    if (visualName.contains('Left Groin')) {
-      return 'Left Thigh';
+    return null;
+  }
+
+  String? _preferredSiteIdForRegion(_InjectionRegion region) {
+    for (final site in _injectionSites) {
+      if (site.region == region) {
+        return site.id;
+      }
     }
-    if (visualName.contains('Right Groin')) {
-      return 'Right Thigh';
-    }
-    return visualName;
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.8,
-        width: MediaQuery.of(context).size.width * 0.9,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.75,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(32),
+          topRight: Radius.circular(32),
         ),
-        child: Column(
-          children: [
-            // Title
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Log Shot',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+      ),
+      child: Column(
+        children: [
+          // Title - "Log Shot" on left, X button on right
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Log Shot',
+                  style: AppTextStyles.subtitle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: AppColors.textPrimary),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
             ),
-            
-            // Body with PNG image and precisely positioned points
-            Expanded(
-              child: Center(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    // Use a fixed aspect ratio approach for consistent positioning
-                    // The body diagram is typically taller than wide
-                    final double containerWidth = constraints.maxWidth * 0.85;
-                    final double containerHeight = constraints.maxHeight * 0.85;
+          ),
+          
+          // Body with human figure and injection sites
+          Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Center(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final double containerWidth = constraints.maxWidth ;
+                      final double containerHeight = constraints.maxHeight;
                     
-                    // Body diagram approximate aspect ratio (width/height)
-                    const double bodyAspectRatio = 0.65;
+                      // Body diagram approximate aspect ratio (width/height)
+                      const double bodyAspectRatio = 274 / 344;
                     
-                    // Calculate how the image will actually render with BoxFit.contain
-                    double imageWidth, imageHeight, imageOffsetX, imageOffsetY;
+                      // Calculate figure dimensions
+                      double figureWidth, figureHeight, figureOffsetX, figureOffsetY;
                     
-                    if (containerWidth / containerHeight > bodyAspectRatio) {
-                      // Container is wider - height is the limiting factor
-                      imageHeight = containerHeight;
-                      imageWidth = imageHeight * bodyAspectRatio;
-                      imageOffsetX = (containerWidth - imageWidth) / 2;
-                      imageOffsetY = 0;
-                    } else {
-                      // Container is taller - width is the limiting factor
-                      imageWidth = containerWidth;
-                      imageHeight = imageWidth / bodyAspectRatio;
-                      imageOffsetX = 0;
-                      imageOffsetY = (containerHeight - imageHeight) / 2;
-                    }
-                    
-                    return SizedBox(
-                      width: containerWidth,
-                      height: containerHeight,
-                      child: Stack(
-                        children: [
-                          // Body outline PNG image
-                          Center(
-                            child: SizedBox(
-                              width: imageWidth,
-                              height: imageHeight,
-                              child: Image.asset(
-                                'assets/images/injection_body.png',
-                                fit: BoxFit.contain,
+                      if (containerWidth / containerHeight > bodyAspectRatio) {
+                        figureHeight = containerHeight;
+                        figureWidth = figureHeight * bodyAspectRatio;
+                        figureOffsetX = (containerWidth - figureWidth) / 2;
+                        figureOffsetY = 0;
+                      } else {
+                        figureWidth = containerWidth;
+                        figureHeight = figureWidth / bodyAspectRatio;
+                        figureOffsetX = 0;
+                        figureOffsetY = (containerHeight - figureHeight) / 2;
+                      }
+
+                      return SizedBox(
+                        width: containerWidth,
+                        height: containerHeight,
+                        child: Stack(
+                          children: [
+                            // Human figure outline
+                            Center(
+                              child: SizedBox(
+                                width: figureWidth,
+                                height: figureHeight,
+                                child: Image.asset(
+                                  'assets/images/body.png',
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
-                          ),
-                          // Points overlay - positioned relative to actual image bounds
-                          ..._injectionSites.map((site) {
-                            return Positioned(
-                              left: imageOffsetX + (imageWidth * site.x) - 14,
-                              top: imageOffsetY + (imageHeight * site.y) - 14,
-                              child: _InjectionPoint(
-                                selected: _selectedSite == site.name,
-                                onTap: () {
-                                  setState(() {
-                                    _selectedSite = site.name;
-                                    _isSiteSelected = true;
-                                  });
-                                },
-                              ),
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    );
-                  },
+                            // Injection sites - positioned relative to figure bounds
+                            ..._injectionSites.map((site) {
+                              final isSelected = site.id == _selectedSiteId;
+                              return Positioned(
+                                left: figureOffsetX + (figureWidth * site.x) - 16,
+                                top: figureOffsetY + (figureHeight * site.y) - 16,
+                                child: _InjectionPoint(
+                                  selected: isSelected,
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedSiteId = site.id;
+                                      _selectedRegion = site.region;
+                                    });
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+          ),
+          
+          // Selected site label - always show if a site is selected
+          if (_hasSelection)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Text(
+                _regionLabel(_selectedRegion!),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),
-            
-            // Selected site label
-            if (_isSiteSelected)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+          
+          // Save button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _hasSelection
+                    ? () {
+                        widget.onSiteSelected(_standardNameForRegion(_selectedRegion!));
+                        Navigator.pop(context);
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _hasSelection ? AppColors.primary : Colors.grey.shade300,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: const StadiumBorder(),
+                  elevation: 0,
+                ),
                 child: Text(
-                  _selectedSite,
-                  style: const TextStyle(
-                    fontSize: 18,
+                  'Save',
+                  style: AppTextStyles.subtitle(
+                    fontSize: 16,
+                    color: AppColors.background,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-            
-            // Save button
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isSiteSelected ? () {
-                    // Map visual name to standard name before returning
-                    widget.onSiteSelected(_mapSiteToStandard(_selectedSite));
-                    Navigator.pop(context);
-                  } : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isSiteSelected ? AppColors.primary : Colors.grey,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
             ),
+          ),
           ],
         ),
-      ),
-    );
+      );
   }
 }
 
+enum _InjectionRegion {
+  leftArm,
+  rightArm,
+  leftAbdomen,
+  rightAbdomen,
+  leftThigh,
+  rightThigh,
+}
+
 class _InjectionSite {
-  final String name;
+  final String id;
+  final _InjectionRegion region;
   final double x; // Position as percentage (0.0 to 1.0)
   final double y; // Position as percentage (0.0 to 1.0)
 
   const _InjectionSite({
-    required this.name,
+    required this.id,
+    required this.region,
     required this.x,
     required this.y,
   });
 }
 
-// Simple circular point widget to match the design (filled purple when selected,
-// outlined circle when not selected).
+// Injection point widget - light gray with dotted outline when unselected,
+// solid purple when selected
 class _InjectionPoint extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
@@ -883,20 +1051,77 @@ class _InjectionPoint extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: 28,
-        height: 28,
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.transparent,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: selected ? AppColors.primary : Colors.grey[400]!,
-            width: selected ? 0 : 2,
-            style: BorderStyle.solid,
-          ),
+      child: SizedBox(
+        width: 32,
+        height: 32,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            CustomPaint(
+              size: const Size(28, 28),
+              painter: _DashedCirclePainter(
+                color: selected
+                    ? AppColors.primary.withOpacity(0.65)
+                    : const Color(0xFFCBD2E1),
+              ),
+            ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              width: selected ? 18 : 10,
+              height: selected ? 18 : 10,
+              decoration: BoxDecoration(
+                color: selected ? AppColors.primary : const Color(0xFFE8ECF5),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: selected ? Colors.white : const Color(0xFFE8ECF5),
+                  width: selected ? 3 : 1.2,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+}
+
+// Custom painter for dashed circle border (for unselected sites)
+class _DashedCirclePainter extends CustomPainter {
+  final Color color;
+
+  const _DashedCirclePainter({this.color = const Color(0xFF9CA3AF)});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 1;
+
+    // Draw dashed circle
+    const dashWidth = 3.0;
+    const dashCount = 20;
+    final angleStep = (2 * 3.14159) / dashCount;
+
+    for (int i = 0; i < dashCount; i++) {
+      if (i % 2 == 0) {
+        final startAngle = i * angleStep;
+        final dashAngle = dashWidth / radius;
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: radius),
+          startAngle,
+          dashAngle,
+          false,
+          paint,
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedCirclePainter oldDelegate) => oldDelegate.color != color;
 }
 

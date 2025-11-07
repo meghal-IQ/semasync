@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../data/auth_data.dart';
 import 'concerns_selection_screen.dart';
 
@@ -42,9 +43,9 @@ class _MotivationSelectionScreenState extends State<MotivationSelectionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    const Text(
+                    Text(
                       'What\'s driving you to reach your goal?',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -54,9 +55,9 @@ class _MotivationSelectionScreenState extends State<MotivationSelectionScreen> {
                     const SizedBox(height: AppConstants.spacing12),
                     
                     // Subtitle
-                    const Text(
+                    Text(
                       'I want to do this because...',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 16,
                         color: AppColors.textSecondary,
                       ),
@@ -86,16 +87,16 @@ class _MotivationSelectionScreenState extends State<MotivationSelectionScreen> {
                 child: ElevatedButton(
                   onPressed: _selectedMotivation != -1 ? _onContinue : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedMotivation != -1 ? Colors.black : AppColors.divider,
+                    backgroundColor: _selectedMotivation != -1 ? AppColors.continueButton : AppColors.divider,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Continue',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),

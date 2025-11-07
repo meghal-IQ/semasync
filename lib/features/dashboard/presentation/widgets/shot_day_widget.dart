@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/api/api_client.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class ShotDayWidget extends StatefulWidget {
   final DateTime selectedDate; // The date selected in the dashboard header
@@ -233,7 +234,7 @@ class _ShotDayWidgetState extends State<ShotDayWidget> {
                         ),
                         child: Text(
                           'Reset',
-                          style: TextStyle(
+                          style: AppTextStyles.title(
                             color: Colors.grey[700],
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
@@ -250,7 +251,7 @@ class _ShotDayWidgetState extends State<ShotDayWidget> {
                       },
                       child: Text(
                         _isExpanded ? 'See Less' : 'See More',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           color: Colors.grey[600],
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -327,22 +328,18 @@ class _ShotDayWidgetState extends State<ShotDayWidget> {
                 children: [
                   Text(
                     task['title'],
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: task['completed'] 
                           ? Colors.grey[500] 
                           : Colors.grey[700],
-                      height: 1.3,
-                      decoration: task['completed'] 
-                          ? TextDecoration.lineThrough 
-                          : null,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     task['time'],
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: isMainTask 

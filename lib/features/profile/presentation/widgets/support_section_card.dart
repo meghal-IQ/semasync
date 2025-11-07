@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class SupportSectionCard extends StatelessWidget {
   const SupportSectionCard({super.key});
@@ -13,9 +14,9 @@ class SupportSectionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Support & Help',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -77,9 +78,9 @@ class SupportSectionCard extends StatelessWidget {
                     size: 24,
                   ),
                   const SizedBox(height: AppConstants.spacing8),
-                  const Text(
+                  Text(
                     'Thank you for using SemaSync!',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       color: AppColors.primary,
                       fontWeight: FontWeight.bold,
                     ),
@@ -87,7 +88,7 @@ class SupportSectionCard extends StatelessWidget {
                   const SizedBox(height: AppConstants.spacing4),
                   Text(
                     'We\'re here to support your health journey every step of the way.',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       color: AppColors.primary.withOpacity(0.8),
                       fontSize: 12,
                     ),

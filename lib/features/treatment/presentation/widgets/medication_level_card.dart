@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'dart:math';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../providers/medication_level_provider.dart';
 import '../../../../core/providers/treatment_provider.dart';
 
@@ -52,9 +53,9 @@ class _MedicationLevelCardState extends State<MedicationLevelCard> {
                       color: AppColors.primary,
                     ),
                     const SizedBox(width: AppConstants.spacing8),
-                    const Text(
+                    Text(
                       'Medication Level',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -127,7 +128,7 @@ class _MedicationLevelCardState extends State<MedicationLevelCard> {
               child: Text(
                 range,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: isSelected ? Colors.white : AppColors.textSecondary,
@@ -184,7 +185,7 @@ class _MedicationLevelCardState extends State<MedicationLevelCard> {
                       ),
                     );
                   }
-                  return const Text('');
+                  return Text('');
                 },
               ),
             ),
@@ -306,7 +307,7 @@ class _MedicationLevelCardState extends State<MedicationLevelCard> {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -318,7 +319,7 @@ class _MedicationLevelCardState extends State<MedicationLevelCard> {
             SizedBox(height: AppConstants.spacing12),
             Text(
               'No medication level data available',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 color: AppColors.textSecondary,
                 fontSize: 14,
               ),
@@ -490,22 +491,22 @@ class _MedicationLevelCardState extends State<MedicationLevelCard> {
               color: AppColors.primary,
             ),
             const SizedBox(width: AppConstants.spacing8),
-            const Text('Medication Level Estimates'),
+            Text('Medication Level Estimates'),
           ],
         ),
-        content: const SingleChildScrollView(
+        content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'The medication levels provided in this app are estimates calculated using established pharmacokinetic principles. Our calculations are based on peer-reviewed studies and official clinical pharmacology data for medications including semaglutide, tirzepatide, and retatrutide.',
-                style: TextStyle(fontSize: 14),
+                style: AppTextStyles.title(fontSize: 14),
               ),
               SizedBox(height: AppConstants.spacing16),
               Text(
                 'How Medication Levels are Calculated:',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: AppTextStyles.title(fontWeight: FontWeight.w600),
               ),
               SizedBox(height: AppConstants.spacing8),
               Text('• Half-life: We factor in the medication\'s half-life—the duration required for the concentration of the drug in the body to reduce by half.'),
@@ -514,14 +515,14 @@ class _MedicationLevelCardState extends State<MedicationLevelCard> {
               SizedBox(height: AppConstants.spacing16),
               Text(
                 'Important Considerations:',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: AppTextStyles.title(fontWeight: FontWeight.w600),
               ),
               SizedBox(height: AppConstants.spacing8),
               Text('These estimations provide a general indication of how medications behave typically in the body but do not account for individual variations in metabolism, health conditions, or other personal factors.'),
               SizedBox(height: AppConstants.spacing16),
               Text(
                 'Professional Advice:',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: AppTextStyles.title(fontWeight: FontWeight.w600),
               ),
               SizedBox(height: AppConstants.spacing8),
               Text('Always consult your healthcare professional for personalized advice related to your medication and health decisions.'),
@@ -531,7 +532,7 @@ class _MedicationLevelCardState extends State<MedicationLevelCard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text('Close'),
           ),
         ],
       ),

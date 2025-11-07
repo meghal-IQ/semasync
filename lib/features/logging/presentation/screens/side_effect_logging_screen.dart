@@ -118,7 +118,7 @@
 //   Widget build(BuildContext context) {
 //     return Scaffold(
 //       appBar: AppBar(
-//         title: const Text('Log Side Effects'),
+//         title: Text('Log Side Effects'),
 //         actions: [
 //           IconButton(
 //             icon: const Icon(Icons.save_outlined),
@@ -151,7 +151,7 @@
 //     return Card(
 //       child: ListTile(
 //         leading: const Icon(Icons.calendar_today, color: AppColors.primary),
-//         title: const Text('Date & Time'),
+//         title: Text('Date & Time'),
 //         subtitle: Text(
 //           '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year} at ${_selectedDate.hour}:${_selectedDate.minute.toString().padLeft(2, '0')}',
 //         ),
@@ -164,8 +164,8 @@
 //   Widget _buildRelatedToShotToggle() {
 //     return Card(
 //       child: SwitchListTile(
-//         title: const Text('Related to Medication Shot?'),
-//         subtitle: const Text('Did these effects occur after taking your shot?'),
+//         title: Text('Related to Medication Shot?'),
+//         subtitle: Text('Did these effects occur after taking your shot?'),
 //         value: _relatedToShot,
 //         activeColor: AppColors.primary,
 //         onChanged: (value) {
@@ -187,9 +187,9 @@
 //             Row(
 //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //               children: [
-//                 const Text(
+//                 Text(
 //                   'Overall Severity',
-//                   style: TextStyle(
+//                   style: AppTextStyles.title(
 //                     fontSize: 16,
 //                     fontWeight: FontWeight.w600,
 //                   ),
@@ -222,14 +222,14 @@
 //               children: [
 //                 Text(
 //                   'No Symptoms',
-//                   style: TextStyle(
+//                   style: AppTextStyles.title(
 //                     color: AppColors.textSecondary,
 //                     fontSize: 12,
 //                   ),
 //                 ),
 //                 Text(
 //                   'Severe Symptoms',
-//                   style: TextStyle(
+//                   style: AppTextStyles.title(
 //                     color: AppColors.textSecondary,
 //                     fontSize: 12,
 //                   ),
@@ -255,7 +255,7 @@
 //                   Expanded(
 //                     child: Text(
 //                       _getSeverityDescription(),
-//                       style: TextStyle(
+//                       style: AppTextStyles.title(
 //                         color: _getSeverityColor(),
 //                         fontWeight: FontWeight.w500,
 //                       ),
@@ -277,9 +277,9 @@
 //         child: Column(
 //           crossAxisAlignment: CrossAxisAlignment.start,
 //           children: [
-//             const Text(
+//             Text(
 //               'Select Side Effects',
-//               style: TextStyle(
+//               style: AppTextStyles.title(
 //                 fontSize: 16,
 //                 fontWeight: FontWeight.w600,
 //               ),
@@ -287,7 +287,7 @@
 //             const SizedBox(height: AppConstants.spacing12),
 //             Text(
 //               'Tap to select side effects you\'re experiencing',
-//               style: TextStyle(
+//               style: AppTextStyles.title(
 //                 color: AppColors.textSecondary,
 //                 fontSize: 14,
 //               ),
@@ -340,7 +340,7 @@
 //             const SizedBox(width: AppConstants.spacing4),
 //             Text(
 //               sideEffect['name'] as String,
-//               style: TextStyle(
+//               style: AppTextStyles.title(
 //                 color: isSelected
 //                     ? sideEffect['color'] as Color
 //                     : AppColors.textSecondary,
@@ -369,7 +369,7 @@
 //               const SizedBox(height: AppConstants.spacing12),
 //               Text(
 //                 'No side effects selected',
-//                 style: TextStyle(
+//                 style: AppTextStyles.title(
 //                   color: AppColors.textSecondary,
 //                   fontSize: 16,
 //                 ),
@@ -377,7 +377,7 @@
 //               const SizedBox(height: AppConstants.spacing8),
 //               Text(
 //                 'Select side effects above to track their severity',
-//                 style: TextStyle(
+//                 style: AppTextStyles.title(
 //                   color: AppColors.textSecondary,
 //                   fontSize: 12,
 //                 ),
@@ -395,9 +395,9 @@
 //         child: Column(
 //           crossAxisAlignment: CrossAxisAlignment.start,
 //           children: [
-//             const Text(
+//             Text(
 //               'Selected Side Effects',
-//               style: TextStyle(
+//               style: AppTextStyles.title(
 //                 fontSize: 16,
 //                 fontWeight: FontWeight.w600,
 //               ),
@@ -440,7 +440,7 @@
 //               ),
 //               Text(
 //                 '${sideEffect['severity'].toInt()}/10',
-//                 style: TextStyle(
+//                 style: AppTextStyles.title(
 //                   color: sideEffect['color'] as Color,
 //                   fontWeight: FontWeight.bold,
 //                 ),
@@ -477,9 +477,9 @@
 //         child: Column(
 //           crossAxisAlignment: CrossAxisAlignment.start,
 //           children: [
-//             const Text(
+//             Text(
 //               'Additional Notes',
-//               style: TextStyle(
+//               style: AppTextStyles.title(
 //                 fontSize: 16,
 //                 fontWeight: FontWeight.w600,
 //               ),
@@ -521,9 +521,9 @@
 //                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
 //                 ),
 //               )
-//             : const Text(
+//             : Text(
 //                 'Log Side Effects',
-//                 style: TextStyle(
+//                 style: AppTextStyles.title(
 //                   fontSize: 16,
 //                   fontWeight: FontWeight.bold,
 //                 ),

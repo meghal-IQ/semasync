@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../theme/app_text_styles.dart';
+
 class BarcodeScannerService {
   static Future<String?> scanBarcode(BuildContext context) async {
     try {
@@ -41,9 +43,9 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text(
+        title: Text(
           'Scan Barcode',
-          style: TextStyle(color: Colors.white),
+          style: AppTextStyles.title(color: Colors.white),
         ),
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
@@ -161,10 +163,10 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
             right: 0,
             child: Container(
               padding: const EdgeInsets.all(16),
-              child: const Text(
+              child: Text(
                 'Position the barcode within the frame',
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: AppTextStyles.title(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,

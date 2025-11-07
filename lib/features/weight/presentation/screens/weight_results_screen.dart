@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:iconify_flutter/icons/healthicons.dart';
+import 'package:iconify_flutter/icons/material_symbols.dart';
+import 'package:iconify_flutter/icons/mingcute.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/health_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/unit_converter.dart';
 import '../../../logging/presentation/screens/weight_logging_screen.dart';
 import '../../../profile/presentation/screens/weight_goal_screen.dart';
@@ -108,7 +113,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
                                       delay: 150,
                                       child: _buildBMICard(healthProvider),
                                     ),
-                                    const SizedBox(height: AppConstants.spacing16),
+                                    const SizedBox(height: AppConstants.spacing12),
                                     _buildAnimatedCard(
                                       delay: 200,
                                       child: _buildDifferenceCard(healthProvider),
@@ -186,8 +191,10 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
             );
           },
           backgroundColor: const Color(0xFF6A34D7),
-          child: const Icon(
-            Icons.add,
+          child: Image.asset(
+            'assets/images/logo.png', // Using logo as plus icon placeholder
+            width: 24,
+            height: 24,
             color: Colors.white,
           ),
         ),
@@ -321,12 +328,11 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const Text(
+           Text(
             'Results',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1F36),
+            style: AppTextStyles.title(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -351,11 +357,13 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
         children: [
           Row(
             children: [
-              Icon(
-                Icons.monitor_weight,
-                color: AppColors.primary,
-                size: 20,
-              ),
+              Iconify(Healthicons.weight),
+              // Image.asset(
+              //   'assets/images/weight.png',
+              //   width: 20,
+              //   height: 20,
+              //   color: AppColors.textPrimary,
+              // ),
               const SizedBox(width: AppConstants.spacing8),
               Text(
                 'Weight($preferredUnit)',
@@ -405,7 +413,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
                       key: const ValueKey('empty'),
                       child: Text(
                         'No weight data for this period',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           color: AppColors.textSecondary,
                           fontSize: 14,
                         ),
@@ -418,8 +426,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
                         currentWeight: stats?.currentWeight != null && stats?.unit != null
                             ? UnitConverter.convertWeight(
                                 UnitConverter.convertWeightToKg(stats!.currentWeight!, stats!.unit),
-                                preferredUnit
-                              )
+                                preferredUnit)
                             : null,
                         unit: preferredUnit,
                       ),
@@ -453,7 +460,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
         child: AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 12,
             fontWeight: FontWeight.w500,
             color: isSelected ? Colors.white : const Color(0xFF6B7280),
@@ -485,10 +492,43 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
     
     double progress = 0.0;
     if (startWeightInKg > 0 && goalWeightKg > 0 && currentWeightInKg > 0) {
-      // Calculate progress in kg for accuracy
-      final totalChange = (goalWeightKg - startWeightInKg).abs();
-      final currentChange = (currentWeightInKg - startWeightInKg).abs();
-      progress = totalChange > 0 ? (currentChange / totalChange * 100).clamp(0, 100) : 0;
+      // Calculate progress based on journey from start to goal
+      if (goalWeightKg < startWeightInKg) {
+        // Weight loss goal: progress = (start - current) / (start - goal) * 100
+        final totalLoss = startWeightInKg - goalWeightKg;
+        final currentLoss = startWeightInKg - currentWeightInKg;
+        if (totalLoss > 0) {
+          // Calculate progress as percentage of total loss achieved
+          progress = (currentLoss / totalLoss * 100).clamp(0, 100);
+          // If current weight is at or below goal, progress is 100%
+          if (currentWeightInKg <= goalWeightKg) {
+            progress = 100;
+          }
+          // Ensure progress doesn't exceed 100% if current weight is above start
+          if (currentWeightInKg > startWeightInKg) {
+            progress = 0;
+          }
+        }
+      } else if (goalWeightKg > startWeightInKg) {
+        // Weight gain goal: progress = (current - start) / (goal - start) * 100
+        final totalGain = goalWeightKg - startWeightInKg;
+        final currentGain = currentWeightInKg - startWeightInKg;
+        if (totalGain > 0) {
+          // Calculate progress as percentage of total gain achieved
+          progress = (currentGain / totalGain * 100).clamp(0, 100);
+          // If current weight is at or above goal, progress is 100%
+          if (currentWeightInKg >= goalWeightKg) {
+            progress = 100;
+          }
+          // Ensure progress doesn't go negative if current weight is below start
+          if (currentWeightInKg < startWeightInKg) {
+            progress = 0;
+          }
+        }
+      } else {
+        // Start and goal are the same, progress is 100% if current matches
+        progress = (currentWeightInKg == goalWeightKg) ? 100 : 0;
+      }
     }
 
     return Container(
@@ -502,18 +542,15 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
         children: [
           Row(
             children: [
-              Icon(
-                Icons.monitor_weight,
-                color: AppColors.textPrimary,
-                size: 20,
+              Image.asset(
+                'assets/images/dosage.png',
               ),
-              const SizedBox(width: AppConstants.spacing8),
-              const Text(
+              const SizedBox(width: AppConstants.spacing4),
+              Text(
                 'Progress',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1A1F36),
                 ),
               ),
             ],
@@ -524,7 +561,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
           Text(
             'Goal Weight: ${goalWeight.toStringAsFixed(1)}$preferredUnit',
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 10,
               color: Color(0xFF6B7280),
             ),
           ),
@@ -533,35 +570,51 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
           
           // Circular Progress
           Center(
-            child: SizedBox(
-              width: 150,
-              height: 150,
-              child: TweenAnimationBuilder<double>(
-                duration: const Duration(milliseconds: 1200),
-                curve: Curves.easeOutCubic,
-                tween: Tween(begin: 0.0, end: progress),
-                builder: (context, value, child) {
-                  return Stack(
+            child: TweenAnimationBuilder<double>(
+              duration: const Duration(milliseconds: 1200),
+              curve: Curves.easeOutCubic,
+              tween: Tween(begin: 0.0, end: progress),
+              builder: (context, value, child) {
+                return SizedBox(
+                  child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      CircularProgressIndicator(
-                        value: value / 100,
-                        backgroundColor: Colors.transparent,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6A34D7)),
-                        strokeWidth: 18,
+                      // Background circle (grey)
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.9,
+                        height: MediaQuery.of(context).size.width / 2.9,
+                        child: CircularProgressIndicator(
+                          value: 1.0,
+                          backgroundColor: AppColors.darkGrey,
+                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.darkGrey),
+                          strokeWidth: 8,
+                        ),
                       ),
+                      // Progress circle (purple)
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.9,
+                        height: MediaQuery.of(context).size.width / 2.9,
+                        child: CircularProgressIndicator(
+                          value: value / 100,
+                          backgroundColor: Colors.transparent,
+                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6A34D7)),
+                          strokeWidth: 8,
+                          strokeCap: StrokeCap.round,
+                        ),
+                      ),
+                      // Percentage text
                       Text(
                         '${value.toInt()}%',
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A1F36),
+                          color: Color(0xFF6A34D7),
                         ),
                       ),
                     ],
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -598,24 +651,21 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
         children: [
           Row(
             children: [
-              Icon(
-                Icons.bar_chart,
-                color: AppColors.textPrimary,
-                size: 20,
+              Image.asset(
+                'assets/images/dosage.png',
               ),
-              const SizedBox(width: AppConstants.spacing8),
-              const Text(
+              const SizedBox(width: AppConstants.spacing4),
+               Text(
                 'BMI',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1A1F36),
                 ),
               ),
             ],
           ),
           
-          const SizedBox(height: AppConstants.spacing16),
+          const SizedBox(height: AppConstants.spacing6),
           
           TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 1000),
@@ -624,10 +674,9 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
             builder: (context, value, child) {
               return Text(
                 value > 0 ? value.toStringAsFixed(1) : '--',
-                style: const TextStyle(
-                  fontSize: 28,
+                style: AppTextStyles.title(
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1F36),
                 ),
               );
             },
@@ -640,7 +689,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
                 ? '${_formatDate(latestDate)}, ${_formatTime(latestDate)}'
                 : 'Today',
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 10,
               color: Color(0xFF6B7280),
             ),
           ),
@@ -681,24 +730,23 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
         children: [
           Row(
             children: [
-              Icon(
-                Icons.monitor_weight,
-                color: AppColors.textPrimary,
-                size: 20,
-              ),
-              const SizedBox(width: AppConstants.spacing8),
-              const Text(
+                 Center(
+                  child: Image.asset(
+                    'assets/images/dosage.png',
+                  ),
+                ),
+              const SizedBox(width: AppConstants.spacing4),
+               Text(
                 'Difference',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1A1F36),
                 ),
               ),
             ],
           ),
           
-          const SizedBox(height: AppConstants.spacing16),
+          const SizedBox(height: AppConstants.spacing6),
           
           TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 1000),
@@ -707,10 +755,9 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
             builder: (context, value, child) {
               return Text(
                 totalChangeRaw != 0 ? '$sign${value.toStringAsFixed(1)}$preferredUnit' : '--',
-                style: const TextStyle(
-                  fontSize: 28,
+                style: AppTextStyles.title(
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1F36),
                 ),
               );
             },
@@ -723,7 +770,7 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
                 ? 'From ${startWeight.toStringAsFixed(1)} $preferredUnit, ${_formatDate(firstDate)}'
                 : 'No data yet',
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 10,
               color: Color(0xFF6B7280),
             ),
           ),
@@ -791,15 +838,16 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.auto_awesome,
+                Image.asset(
+                  'assets/images/injection_line.png', // Person icon with outstretched arms
+                  width: 20,
+                  height: 20,
                   color: AppColors.textPrimary,
-                  size: 20,
                 ),
                 const SizedBox(width: AppConstants.spacing8),
-                const Text(
+                Text(
                   'TimeLine',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1A1F36),
@@ -932,24 +980,19 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
           children: [
             Row(
               children: [
-                const Icon(
-                  Icons.monitor_weight,
-                  color: AppColors.textPrimary,
-                  size: 20,
-                ),
+                Iconify(Healthicons.weight),
                 const SizedBox(width: AppConstants.spacing12),
-                const Text(
+                Text(
                   "Today's Log",
-                  style: TextStyle(
+                  style: AppTextStyles.subtitle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
                     color: Color(0xFF1A1F36),
                   ),
                 ),
                 const Spacer(),
-                const Text(
+                Text(
                   'See less',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 12,
                     color: Color(0xFF6B7280),
                   ),
@@ -966,13 +1009,12 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'OPTIONS',
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 12,
             fontWeight: FontWeight.w500,
             color: AppColors.textSecondary,
-            letterSpacing: 1.2,
           ),
         ),
         
@@ -1007,15 +1049,11 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.monitor_weight,
-                  color: AppColors.textPrimary,
-                  size: 20,
-                ),
+                Iconify(Healthicons.weight),
                 const SizedBox(width: AppConstants.spacing12),
-                const Text(
+                Text(
                   'Weight Settings',
-                  style: TextStyle(
+                  style: AppTextStyles.subtitle(
                     fontSize: 16,
                     color: AppColors.textPrimary,
                   ),
@@ -1062,15 +1100,16 @@ class _WeightResultsScreenState extends State<WeightResultsScreen> with SingleTi
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.list_alt,
+                Image.asset(
+                  'assets/images/list.png', // List icon - replace with actual list icon
+                  width: 20,
+                  height: 20,
                   color: AppColors.textPrimary,
-                  size: 20,
                 ),
                 const SizedBox(width: AppConstants.spacing12),
-                const Text(
+                Text(
                   'Show All Weight Logs',
-                  style: TextStyle(
+                  style: AppTextStyles.subtitle(
                     fontSize: 16,
                     color: AppColors.textPrimary,
                   ),
@@ -1246,6 +1285,14 @@ class WeightGraphPainter extends CustomPainter {
       if (weightInKg > maxWeightKg) maxWeightKg = weightInKg;
     }
     
+    // Include currentWeight in min/max calculation if available
+    if (currentWeight != null) {
+      // currentWeight is already in the preferred unit, convert to kg for comparison
+      final currentWeightKg = UnitConverter.convertWeightToKg(currentWeight!, unit);
+      if (currentWeightKg < minWeightKg) minWeightKg = currentWeightKg;
+      if (currentWeightKg > maxWeightKg) maxWeightKg = currentWeightKg;
+    }
+    
     // Convert to preferred unit
     double minWeight = UnitConverter.convertWeight(minWeightKg, unit);
     double maxWeight = UnitConverter.convertWeight(maxWeightKg, unit);
@@ -1325,10 +1372,17 @@ class WeightGraphPainter extends CustomPainter {
           : leftMargin + (i / (sortedHistory.length - 1)) * graphWidth;
       
       // Convert weight: first to kg, then to preferred unit
-      final entryWeight = _getWeightFromEntry(sortedHistory[i]);
-      final entryUnit = _getUnitFromEntry(sortedHistory[i]);
-      final weightInKg = UnitConverter.convertWeightToKg(entryWeight, entryUnit);
-      final weightConverted = UnitConverter.convertWeight(weightInKg, unit);
+      // For the last point, use currentWeight if available (more accurate)
+      double weightConverted;
+      if (i == sortedHistory.length - 1 && currentWeight != null) {
+        // Use currentWeight for the last point to ensure label matches position
+        weightConverted = currentWeight!;
+      } else {
+        final entryWeight = _getWeightFromEntry(sortedHistory[i]);
+        final entryUnit = _getUnitFromEntry(sortedHistory[i]);
+        final weightInKg = UnitConverter.convertWeightToKg(entryWeight, entryUnit);
+        weightConverted = UnitConverter.convertWeight(weightInKg, unit);
+      }
       
       final normalizedWeight = (weightConverted - minWeight) / (maxWeight - minWeight);
       final y = topMargin + graphHeight - (normalizedWeight * graphHeight);
@@ -1487,7 +1541,7 @@ class WeightGraphPainter extends CustomPainter {
       // Draw text
       final dateSpan = TextSpan(
         text: dates.last,
-        style: TextStyle(
+        style: AppTextStyles.title(
           color: Colors.grey.shade500,
           fontSize: 9,
         ),

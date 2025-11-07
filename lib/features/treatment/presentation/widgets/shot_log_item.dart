@@ -6,6 +6,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/api/models/shot_log_model.dart';
 import '../../../../core/api/services/treatment_service.dart';
 import '../../../../core/providers/treatment_provider.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/models/side_effect.dart';
 import '../../../logging/presentation/screens/shot_logging_screen_updated.dart';
 
@@ -56,13 +57,14 @@ class ShotLogItem extends StatelessWidget {
             color: AppColors.lightGrey,
           ),
           child: Padding(
-            padding: const EdgeInsets.all(AppConstants.spacing16),
+            padding: const EdgeInsets.all(AppConstants.spacing6),
             child: Row(
           children: [
             // Syringe icon
             Container(
-              padding: const EdgeInsets.all(9),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
                 color: AppColors.background,
               ),
               child: Image.asset('assets/images/injection.png')
@@ -79,7 +81,7 @@ class ShotLogItem extends StatelessWidget {
                   Text(
                     '${shot.dosage} of ${shot.medication}',
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -91,7 +93,7 @@ class ShotLogItem extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(9),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           color: AppColors.background,
@@ -99,7 +101,7 @@ class ShotLogItem extends StatelessWidget {
                         child: Text(
                           '${shot.injectionSite}',
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 12,
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -108,7 +110,7 @@ class ShotLogItem extends StatelessWidget {
                       const SizedBox(width: AppConstants.spacing4),
 
                       Container(
-                        padding: const EdgeInsets.all(9),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           color: AppColors.background,
@@ -116,7 +118,7 @@ class ShotLogItem extends StatelessWidget {
                         child: Text(
                           '${shot.painLevel}/10 pain',
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 12,
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -147,7 +149,7 @@ class ShotLogItem extends StatelessWidget {
                           const SizedBox(width: AppConstants.spacing4),
                           Text(
                             '${sideEffects.length + shot.sideEffects.where((e) => e != 'None').length} side effects',
-                            style: TextStyle(
+                            style: AppTextStyles.title(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: AppColors.warning,
@@ -169,7 +171,7 @@ class ShotLogItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   _getTimeDisplay(shot.date, isToday, isYesterday),
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary,
                   ),
@@ -198,12 +200,12 @@ class ShotLogItem extends StatelessWidget {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Shot Log'),
-        content: const Text('Are you sure you want to delete this shot log? This action cannot be undone.'),
+        title: Text('Delete Shot Log'),
+        content: Text('Are you sure you want to delete this shot log? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -234,7 +236,7 @@ class ShotLogItem extends StatelessWidget {
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Delete'),
+            child: Text('Delete'),
           ),
         ],
       ),
@@ -250,7 +252,7 @@ class ShotLogItem extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.edit, color: AppColors.primary),
-              title: const Text('Edit Shot'),
+              title: Text('Edit Shot'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -269,7 +271,7 @@ class ShotLogItem extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: AppColors.error),
-              title: const Text('Delete Shot'),
+              title: Text('Delete Shot'),
               onTap: () async {
                 Navigator.pop(context);
                 final confirmed = await _confirmDelete(context);
@@ -280,7 +282,7 @@ class ShotLogItem extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.cancel),
-              title: const Text('Cancel'),
+              title: Text('Cancel'),
               onTap: () => Navigator.pop(context),
             ),
           ],

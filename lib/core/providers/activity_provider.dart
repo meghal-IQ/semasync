@@ -56,6 +56,38 @@ class ActivityProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> deleteStepLog(String id) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final response = await _activityService.deleteStepLog(id);
+
+      if (response.success) {
+        // Clear error before reloading
+        _clearError();
+        // Remove the deleted step log from local list immediately
+        _stepsHistory.removeWhere((log) => log.id == id);
+        notifyListeners();
+        // Then reload data in background
+        loadActivityData().catchError((e) {
+          // Silently handle reload errors after deletion
+          print('Error reloading after deletion: $e');
+        });
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response.message);
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to delete step log: $e');
+      _setLoading(false);
+      return false;
+    }
+  }
+
   // ============================================================================
   // WORKOUT TRACKING
   // ============================================================================
@@ -83,12 +115,45 @@ class ActivityProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> deleteWorkoutLog(String id) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final response = await _activityService.deleteWorkoutLog(id);
+
+      if (response.success) {
+        // Clear error before reloading
+        _clearError();
+        // Remove the deleted workout from local list immediately
+        _workoutsHistory.removeWhere((log) => log.id == id);
+        notifyListeners();
+        // Then reload data in background
+        loadActivityData().catchError((e) {
+          // Silently handle reload errors after deletion
+          print('Error reloading after deletion: $e');
+        });
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response.message);
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _setError('Failed to delete workout log: $e');
+      _setLoading(false);
+      return false;
+    }
+  }
+
   // ============================================================================
   // DATA LOADING
   // ============================================================================
 
   Future<void> loadActivityData() async {
     _setLoading(true);
+    _clearError(); // Clear any previous errors before loading
 
     try {
       final results = await Future.wait([
@@ -99,6 +164,7 @@ class ActivityProvider extends ChangeNotifier {
         _activityService.getActivitySummary(),
       ]);
 
+      // Update data only if requests succeeded
       if (results[0].success && results[0].data != null) {
         _stepsHistory = results[0].data as List<StepLog>;
       }
@@ -109,6 +175,16 @@ class ActivityProvider extends ChangeNotifier {
 
       if (results[2].success && results[2].data != null) {
         _workoutsHistory = results[2].data as List<WorkoutLog>;
+      } else if (!results[2].success) {
+        // If workout history fails, check if it's a 404 (route not found)
+        final errorMsg = results[2].message.toLowerCase();
+        if (errorMsg.contains('route not found') || errorMsg.contains('404')) {
+          // If route doesn't exist, just set empty list instead of showing error
+          _workoutsHistory = [];
+        } else {
+          // Only set error for non-404 errors
+          _setError(results[2].message);
+        }
       }
 
       if (results[3].success && results[3].data != null) {
@@ -121,7 +197,15 @@ class ActivityProvider extends ChangeNotifier {
 
       _setLoading(false);
     } catch (e) {
-      _setError('Failed to load activity data: $e');
+      final errorMsg = e.toString().toLowerCase();
+      // Only show error if it's not a 404 or route not found
+      if (!errorMsg.contains('route not found') && !errorMsg.contains('404')) {
+        _setError('Failed to load activity data: $e');
+      } else {
+        // For 404 errors, just set empty lists
+        _workoutsHistory = [];
+        _stepsHistory = [];
+      }
       _setLoading(false);
     }
   }

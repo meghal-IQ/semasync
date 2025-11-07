@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/health_provider.dart';
 import '../../../../core/api/models/weight_log_model.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class WeightLoggingScreen extends StatefulWidget {
   const WeightLoggingScreen({super.key});
@@ -88,9 +89,9 @@ class _WeightLoggingScreenState extends State<WeightLoggingScreen> {
             ),
           ),
           const SizedBox(width: AppConstants.spacing16),
-          const Text(
+          Text(
             'Weight Log',
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -118,9 +119,9 @@ class _WeightLoggingScreenState extends State<WeightLoggingScreen> {
             size: 20,
           ),
           const SizedBox(width: AppConstants.spacing12),
-          const Text(
+          Text(
             'Date',
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 16,
               color: AppColors.textPrimary,
             ),
@@ -151,9 +152,9 @@ class _WeightLoggingScreenState extends State<WeightLoggingScreen> {
   Widget _buildCurrentWeightDisplay() {
     return Column(
       children: [
-        const Text(
+        Text(
           'Current Weight',
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 16,
             color: AppColors.textSecondary,
           ),
@@ -336,7 +337,7 @@ class _WeightLoggingScreenState extends State<WeightLoggingScreen> {
                 child: Text(
                   'Imperial',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: !_isMetric ? Colors.white : AppColors.textPrimary,
                     fontWeight: FontWeight.w500,
                   ),
@@ -356,7 +357,7 @@ class _WeightLoggingScreenState extends State<WeightLoggingScreen> {
                 child: Text(
                   'Metric',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: _isMetric ? Colors.white : AppColors.textPrimary,
                     fontWeight: FontWeight.w500,
                   ),
@@ -391,9 +392,9 @@ class _WeightLoggingScreenState extends State<WeightLoggingScreen> {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : const Text(
+            : Text(
                 'Log Weight',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,

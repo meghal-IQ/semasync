@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class WorkoutCard extends StatelessWidget {
   const WorkoutCard({super.key});
@@ -13,19 +14,19 @@ class WorkoutCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Workouts',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   'Today',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
@@ -59,7 +60,7 @@ class WorkoutCard extends StatelessWidget {
                       // TODO: Start new workout
                     },
                     icon: const Icon(Icons.play_arrow, size: 20),
-                    label: const Text('Start Workout'),
+                    label: Text('Start Workout'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.activityRed,
                       side: const BorderSide(color: AppColors.activityRed),
@@ -76,7 +77,7 @@ class WorkoutCard extends StatelessWidget {
                       // TODO: Log workout
                     },
                     icon: const Icon(Icons.add, size: 20),
-                    label: const Text('Log Workout'),
+                    label: Text('Log Workout'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.activityRed,
                       padding: const EdgeInsets.symmetric(
@@ -158,7 +159,7 @@ class WorkoutCard extends StatelessWidget {
                       ),
                       child: Text(
                         intensity,
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           color: color,
                           fontSize: 10,
                           fontWeight: FontWeight.w500,

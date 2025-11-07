@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/api/helpers/registration_helper.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../data/auth_data.dart';
 import 'auth_complete_screen.dart';
 
@@ -214,7 +215,7 @@ class _AuthLoadingScreenState extends State<AuthLoadingScreen>
                       });
                       _startRegistration();
                     },
-                    child: const Text('Try Again'),
+                    child: Text('Try Again'),
                   ),
                 ],
               ),
@@ -291,9 +292,9 @@ class _AuthLoadingScreenState extends State<AuthLoadingScreen>
       );
     } else if (_currentStep == 1) {
       // Weightlifting emoji for exercise step
-      return const Text(
+      return Text(
         '🏋️',
-        style: TextStyle(fontSize: 64),
+        style: AppTextStyles.title(fontSize: 64),
       );
     } else if (_currentStep == 2) {
       // Water drop for water intake step

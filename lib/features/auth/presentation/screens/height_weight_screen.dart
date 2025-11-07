@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../data/auth_data.dart';
 import 'motivation_selection_screen.dart';
 
@@ -95,44 +96,48 @@ class _HeightWeightScreenState extends State<HeightWeightScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Title
-                      const Text(
+                      Text(
                         'Your Height & Weight',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                        style: AppTextStyles.title(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A1F36),
+                          letterSpacing: -0.5,
+                          height: 1.2,
                         ),
                       ),
                       
-                      const SizedBox(height: AppConstants.spacing12),
+                      const SizedBox(height: 8),
                       
                       // Subtitle
-                      const Text(
+                      Text(
                         'Your current height and weight help us calculate your BMI and personalize your daily nutrition and activity goals.',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.textSecondary,
+                        style: AppTextStyles.title(
+                          fontSize: 15,
+                          color: Color(0xFF6B7280),
+                          fontWeight: FontWeight.w400,
+                          height: 1.4,
                         ),
                       ),
                       
-                      const SizedBox(height: AppConstants.spacing32),
+                      const SizedBox(height: 32),
                       
                       // Unit Toggle
                       _buildUnitToggle(),
                       
-                      const SizedBox(height: AppConstants.spacing24),
+                      const SizedBox(height: 32),
                       
                       // Height Picker
                       _buildHeightPicker(),
                       
-                      const SizedBox(height: AppConstants.spacing24),
+                      const SizedBox(height: 24),
                       
                       // Start Weight Field (Current weight on first registration)
                       _buildWeightField(
                         controller: _startWeightController,
-                        label: 'Current Weight *',
+                        label: 'Current Weight',
                         unit: weightUnit,
-                        hint: 'Your current weight',
+                        hint: 'Enter weight',
                         onChanged: (value) {
                           final weight = double.tryParse(value);
                           if (weight != null) {
@@ -141,14 +146,14 @@ class _HeightWeightScreenState extends State<HeightWeightScreen> {
                         },
                       ),
                       
-                      const SizedBox(height: AppConstants.spacing16),
+                      const SizedBox(height: 16),
                       
                       // Goal Weight Field
                       _buildWeightField(
                         controller: _goalWeightController,
-                        label: 'Goal Weight *',
+                        label: 'Goal Weight',
                         unit: weightUnit,
-                        hint: 'Your target weight',
+                        hint: 'Enter goal weight',
                         onChanged: (value) {
                           final weight = double.tryParse(value);
                           if (weight != null) {
@@ -163,24 +168,26 @@ class _HeightWeightScreenState extends State<HeightWeightScreen> {
               
               // Continue Button
               Padding(
-                padding: const EdgeInsets.all(AppConstants.spacing24),
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _onContinue,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: AppColors.continueButton,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Continue',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      style: AppTextStyles.title(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ),
@@ -230,34 +237,41 @@ class _HeightWeightScreenState extends State<HeightWeightScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Height *',
-          style: TextStyle(
-            fontSize: 16,
+        Text(
+          'Height',
+          style: AppTextStyles.title(
+            fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: Color(0xFF1A1F36),
+            letterSpacing: -0.2,
           ),
         ),
-        const SizedBox(height: AppConstants.spacing12),
+        const SizedBox(height: 12),
         Container(
-          height: 200,
+          height: 180,
           decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-            border: Border.all(color: AppColors.divider),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFE5E7EB),
+              width: 1,
+            ),
           ),
-          child: _buildPickerColumn(
-            items: _currentHeights,
-            selectedItem: _selectedHeight,
-            onSelected: (item) {
-              setState(() {
-                if (_isImperial) {
-                  _heightCm = _convertFeetInchesToCm(item);
-                } else {
-                  _heightCm = double.parse(item.replaceAll('cm', ''));
-                }
-              });
-            },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: _buildPickerColumn(
+              items: _currentHeights,
+              selectedItem: _selectedHeight,
+              onSelected: (item) {
+                setState(() {
+                  if (_isImperial) {
+                    _heightCm = _convertFeetInchesToCm(item);
+                  } else {
+                    _heightCm = double.parse(item.replaceAll('cm', ''));
+                  }
+                });
+              },
+            ),
           ),
         ),
       ],
@@ -277,26 +291,58 @@ class _HeightWeightScreenState extends State<HeightWeightScreen> {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: Color(0xFF1A1F36),
+            letterSpacing: -0.2,
           ),
         ),
-        const SizedBox(height: AppConstants.spacing8),
+        const SizedBox(height: 10),
         TextFormField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF1A1F36),
+          ),
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: const TextStyle(
+              color: Color(0xFF9CA3AF),
+              fontWeight: FontWeight.w400,
+            ),
             suffixText: unit,
+            suffixStyle: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w500,
+            ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: Color(0xFFE5E7EB),
+                width: 1,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: Color(0xFFE5E7EB),
+                width: 1,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: Color(0xFF8B5CF6),
+                width: 2,
+              ),
             ),
             filled: true,
-            fillColor: AppColors.surface,
+            fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppConstants.spacing16,
-              vertical: AppConstants.spacing16,
+              horizontal: 16,
+              vertical: 18,
             ),
           ),
           onChanged: onChanged,
@@ -321,28 +367,32 @@ class _HeightWeightScreenState extends State<HeightWeightScreen> {
     required Function(String) onSelected,
   }) {
     final selectedIndex = items.indexOf(selectedItem);
+    final scrollController = ScrollController(
+      initialScrollOffset: selectedIndex > 2 ? (selectedIndex - 2) * 60.0 : 0,
+    );
     
     return ListView.builder(
-      controller: ScrollController(
-        initialScrollOffset: selectedIndex > 2 ? (selectedIndex - 2) * 50.0 : 0,
-      ),
+      controller: scrollController,
       itemCount: items.length,
       itemBuilder: (context, index) {
         final isSelected = index == selectedIndex;
         final distance = (index - selectedIndex).abs();
-        final opacity = distance == 0 ? 1.0 : distance == 1 ? 0.5 : 0.3;
+        final opacity = distance == 0 ? 1.0 : distance == 1 ? 0.4 : distance == 2 ? 0.2 : 0.1;
         
         return GestureDetector(
           onTap: () => onSelected(items[index]),
           child: Container(
-            height: 50,
+            height: 60,
             child: Center(
               child: Text(
                 items[index],
-                style: TextStyle(
-                  fontSize: isSelected ? 18 : 16,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: AppColors.textPrimary.withOpacity(opacity),
+                style: AppTextStyles.title(
+                  fontSize: isSelected ? 20 : 16,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected
+                      ? const Color(0xFF1A1F36)
+                      : const Color(0xFF6B7280).withOpacity(opacity),
+                  letterSpacing: -0.3,
                 ),
               ),
             ),
@@ -353,57 +403,88 @@ class _HeightWeightScreenState extends State<HeightWeightScreen> {
   }
 
   Widget _buildUnitToggle() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          'imperial',
-          style: TextStyle(
-            fontSize: 14,
-            color: _isImperial ? AppColors.textPrimary : AppColors.textSecondary,
-            fontWeight: _isImperial ? FontWeight.w600 : FontWeight.normal,
-          ),
+    return Center(
+      child: Container(
+        width: 200,
+        height: 36,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3F4F6),
+          borderRadius: BorderRadius.circular(8),
         ),
-        const SizedBox(width: AppConstants.spacing12),
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              _isImperial = !_isImperial;
-              _updateWeightControllers();
-            });
-          },
-          child: Container(
-            width: 50,
-            height: 30,
-            decoration: BoxDecoration(
-              color: AppColors.divider,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: AnimatedAlign(
+        child: Stack(
+          children: [
+            AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
-              alignment: _isImperial ? Alignment.centerLeft : Alignment.centerRight,
+              curve: Curves.easeInOut,
+              left: _isImperial ? 4 : 100,
+              top: 4,
               child: Container(
-                width: 26,
-                height: 26,
-                margin: const EdgeInsets.all(2),
+                width: 96,
+                height: 28,
                 decoration: BoxDecoration(
-                  color: _isImperial ? Colors.black : Colors.white,
-                  borderRadius: BorderRadius.circular(13),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      if (!_isImperial) {
+                        setState(() {
+                          _isImperial = true;
+                          _updateWeightControllers();
+                        });
+                      }
+                    },
+                    child: Center(
+                      child: Text(
+                        'Imperial',
+                        style: AppTextStyles.title(
+                          fontSize: 14,
+                          fontWeight: _isImperial ? FontWeight.w600 : FontWeight.w400,
+                          color: _isImperial ? const Color(0xFF1A1F36) : const Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_isImperial) {
+                        setState(() {
+                          _isImperial = false;
+                          _updateWeightControllers();
+                        });
+                      }
+                    },
+                    child: Center(
+                      child: Text(
+                        'Metric',
+                        style: AppTextStyles.title(
+                          fontSize: 14,
+                          fontWeight: !_isImperial ? FontWeight.w600 : FontWeight.w400,
+                          color: !_isImperial ? const Color(0xFF1A1F36) : const Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-        const SizedBox(width: AppConstants.spacing12),
-        Text(
-          'metric',
-          style: TextStyle(
-            fontSize: 14,
-            color: !_isImperial ? AppColors.textPrimary : AppColors.textSecondary,
-            fontWeight: !_isImperial ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
-      ],
+      ),
     );
   }
 

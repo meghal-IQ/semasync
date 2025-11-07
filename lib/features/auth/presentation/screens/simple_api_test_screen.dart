@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/api/helpers/registration_helper.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class SimpleApiTestScreen extends StatefulWidget {
   const SimpleApiTestScreen({super.key});
@@ -112,7 +113,7 @@ class _SimpleApiTestScreenState extends State<SimpleApiTestScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SemaSync API'),
+        title: Text('SemaSync API'),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
       ),
@@ -130,9 +131,9 @@ class _SimpleApiTestScreenState extends State<SimpleApiTestScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Sign In',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: AppTextStyles.title(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 24),
                     TextField(
@@ -160,7 +161,7 @@ class _SimpleApiTestScreenState extends State<SimpleApiTestScreen> {
                         foregroundColor: Colors.white,
                         minimumSize: const Size(double.infinity, 48),
                       ),
-                      child: const Text('Sign In'),
+                      child: Text('Sign In'),
                     ),
                   ],
                 ),

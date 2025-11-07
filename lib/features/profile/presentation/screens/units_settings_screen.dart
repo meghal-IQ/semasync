@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class UnitsSettingsScreen extends StatefulWidget {
   const UnitsSettingsScreen({super.key});
@@ -109,19 +110,19 @@ class _UnitsSettingsScreenState extends State<UnitsSettingsScreen> {
           final shouldSave = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Unsaved Changes'),
-              content: const Text('Do you want to save your changes?'),
+              title: Text('Unsaved Changes'),
+              content: Text('Do you want to save your changes?'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Discard'),
+                  child: Text('Discard'),
                 ),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context, true),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                   ),
-                  child: const Text('Save'),
+                  child: Text('Save'),
                 ),
               ],
             ),
@@ -136,87 +137,108 @@ class _UnitsSettingsScreenState extends State<UnitsSettingsScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text(
-            'Units',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
-          ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
-          ),
-          actions: [
-            if (_hasChanges)
-              TextButton(
-                onPressed: _isLoading ? null : _saveSettings,
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text(
-                        'Save',
-                        style: TextStyle(
-                          color: AppColors.primary,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.chevron_left, color: Colors.black),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Units',
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.title(
+                          fontSize: 18,
                           fontWeight: FontWeight.w600,
+                          color: Colors.black,
                         ),
                       ),
+                    ),
+                    if (_hasChanges)
+                      TextButton(
+                        onPressed: _isLoading ? null : _saveSettings,
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : Text(
+                                'Save',
+                                style: AppTextStyles.title(
+                                  color: Color(0xFF6A34D7),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      )
+                    else
+                      const SizedBox(width: 64), // Placeholder for centering
+                  ],
+                ),
               ),
-          ],
-        ),
-        body: ListView(
-          children: [
-            _buildSectionHeader('WEIGHT'),
-            _buildUnitOption('Pounds (lbs)', 'lbs', _weightUnit, (val) {
-              setState(() {
-                _weightUnit = val;
-                _hasChanges = true;
-              });
-            }),
-            _buildUnitOption('Kilogram (kg)', 'kg', _weightUnit, (val) {
-              setState(() {
-                _weightUnit = val;
-                _hasChanges = true;
-              });
-            }),
+              
+              // Content
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                  children: [
+            _buildSectionHeader('Settings'),
+            _buildSegmentedControl(
+              option1: 'Pounds (lbs)',
+              option2: 'Kilogram (kg)',
+              value1: 'lbs',
+              value2: 'kg',
+              currentValue: _weightUnit,
+              onChanged: (val) {
+                setState(() {
+                  _weightUnit = val;
+                  _hasChanges = true;
+                });
+              },
+            ),
             
             const SizedBox(height: AppConstants.spacing24),
-            _buildSectionHeader('HEIGHT'),
-            _buildUnitOption('Feet/Inches (ft/in)', 'ft', _heightUnit, (val) {
-              setState(() {
-                _heightUnit = val;
-                _hasChanges = true;
-              });
-            }),
-            _buildUnitOption('Centimeter (cm)', 'cm', _heightUnit, (val) {
-              setState(() {
-                _heightUnit = val;
-                _hasChanges = true;
-              });
-            }),
+            _buildSectionHeader('Height'),
+            _buildSegmentedControl(
+              option1: 'Feet/Inches (ft/in)',
+              option2: 'Centimeter (cm)',
+              value1: 'ft',
+              value2: 'cm',
+              currentValue: _heightUnit,
+              onChanged: (val) {
+                setState(() {
+                  _heightUnit = val;
+                  _hasChanges = true;
+                });
+              },
+            ),
             
             const SizedBox(height: AppConstants.spacing24),
-            _buildSectionHeader('WATER'),
-            _buildUnitOption('Ounces (oz)', 'oz', _waterUnit, (val) {
-              setState(() {
-                _waterUnit = val;
-                _hasChanges = true;
-              });
-            }),
-            _buildUnitOption('Millilitre (ml)', 'ml', _waterUnit, (val) {
-              setState(() {
-                _waterUnit = val;
-                _hasChanges = true;
-              });
-            }),
+            _buildSectionHeader('Water'),
+            _buildSegmentedControl(
+              option1: 'Ounces (oz)',
+              option2: 'Millilitre (ml)',
+              value1: 'oz',
+              value2: 'ml',
+              currentValue: _waterUnit,
+              onChanged: (val) {
+                setState(() {
+                  _waterUnit = val;
+                  _hasChanges = true;
+                });
+              },
+            ),
           ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -225,45 +247,89 @@ class _UnitsSettingsScreenState extends State<UnitsSettingsScreen> {
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppConstants.spacing16,
         vertical: AppConstants.spacing12,
       ),
       child: Text(
         title,
         style: const TextStyle(
           fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textSecondary,
-          letterSpacing: 0.5,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF6B7280),
         ),
       ),
     );
   }
 
-  Widget _buildUnitOption(String title, String value, String currentValue, Function(String) onTap) {
-    final isSelected = value == currentValue;
+  Widget _buildSegmentedControl({
+    required String option1,
+    required String option2,
+    required String value1,
+    required String value2,
+    required String currentValue,
+    required Function(String) onChanged,
+  }) {
+    final isFirstSelected = currentValue == value1;
     
-    return InkWell(
-      onTap: () => onTap(value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppConstants.spacing16,
-          vertical: AppConstants.spacing16,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                color: AppColors.textPrimary,
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppConstants.spacing12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF6A34D7)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => onChanged(value1),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: isFirstSelected ? const Color(0xFF6A34D7) : Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(11),
+                    bottomLeft: Radius.circular(11),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    option1,
+                    style: AppTextStyles.title(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: isFirstSelected ? Colors.white : const Color(0xFF6A34D7),
+                    ),
+                  ),
+                ),
               ),
             ),
-            if (isSelected)
-              const Icon(Icons.check, color: AppColors.primary),
-          ],
-        ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => onChanged(value2),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: !isFirstSelected ? const Color(0xFF6A34D7) : Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(11),
+                    bottomRight: Radius.circular(11),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    option2,
+                    style: AppTextStyles.title(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: !isFirstSelected ? Colors.white : const Color(0xFF6A34D7),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

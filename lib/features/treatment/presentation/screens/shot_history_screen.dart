@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:semasync_new/features/logging/presentation/screens/shot_logging_screen_updated.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/api/services/treatment_service.dart';
 import '../../../../core/api/models/shot_log_model.dart';
 import '../../../../core/api/models/api_response.dart';
 import '../../../../core/providers/treatment_provider.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../logging/presentation/screens/shot_logging_screen.dart';
 import '../providers/side_effect_provider.dart';
 import '../widgets/shot_log_item.dart';
@@ -67,10 +69,10 @@ class _ShotHistoryScreenState extends State<ShotHistoryScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        title:  Text(
           'All Shot Logs',
-          style: TextStyle(
-            fontSize: 18,
+          style: AppTextStyles.title(
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
@@ -87,8 +89,8 @@ class _ShotHistoryScreenState extends State<ShotHistoryScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ShotLoggingScreen()),
-              ).then((_) => _loadShots()); // Reload after adding new shot
+                MaterialPageRoute(builder: (context) => const ShotLoggingScreenUpdated()),
+              ).then((_) => _loadShots());
             },
           ),
         ],
@@ -127,7 +129,7 @@ class _ShotHistoryScreenState extends State<ShotHistoryScreen> {
             const SizedBox(height: AppConstants.spacing16),
             Text(
               'Failed to load shot history',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey[600],
@@ -136,7 +138,7 @@ class _ShotHistoryScreenState extends State<ShotHistoryScreen> {
             const SizedBox(height: AppConstants.spacing8),
             Text(
               _error!,
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 14,
                 color: Colors.grey[500],
               ),
@@ -149,7 +151,7 @@ class _ShotHistoryScreenState extends State<ShotHistoryScreen> {
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Retry'),
+              child: Text('Retry'),
             ),
           ],
         ),
@@ -169,7 +171,7 @@ class _ShotHistoryScreenState extends State<ShotHistoryScreen> {
             const SizedBox(height: AppConstants.spacing16),
             Text(
               'No shots logged yet',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey[600],
@@ -178,7 +180,7 @@ class _ShotHistoryScreenState extends State<ShotHistoryScreen> {
             const SizedBox(height: AppConstants.spacing8),
             Text(
               'Tap the + button to log your first shot',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 14,
                 color: Colors.grey[500],
               ),

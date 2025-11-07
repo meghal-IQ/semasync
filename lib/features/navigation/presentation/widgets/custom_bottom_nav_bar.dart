@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -105,7 +106,7 @@ class CustomBottomNavBar extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 label,
-                style: TextStyle(
+                style: AppTextStyles.title(
                   color: isSelected ? AppColors.primary : const Color(0xFF9CA3AF),
                   fontSize: 10,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,

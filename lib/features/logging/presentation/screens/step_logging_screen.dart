@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/activity_provider.dart';
 import '../../../../core/api/models/activity_log_model.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class StepLoggingScreen extends StatefulWidget {
   const StepLoggingScreen({super.key});
@@ -73,7 +74,7 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Log Steps'),
+        title: Text('Log Steps'),
         actions: [
           if (_isSaving)
             const Center(
@@ -137,7 +138,7 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.calendar_today, color: AppColors.primary),
-        title: const Text('Date'),
+        title: Text('Date'),
         subtitle: Text(
           '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
         ),
@@ -177,9 +178,9 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
               ],
             ),
             const SizedBox(height: AppConstants.spacing8),
-            const Text(
+            Text(
               'steps',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 color: AppColors.textSecondary,
               ),
@@ -201,7 +202,7 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
             const SizedBox(height: AppConstants.spacing8),
             Text(
               '${progress.toStringAsFixed(0)}% of goal',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: progress >= 100 ? AppColors.success : AppColors.primary,
@@ -220,14 +221,14 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
                   color: AppColors.success.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.emoji_events, color: AppColors.success, size: 16),
                     SizedBox(width: 4),
                     Text(
                       'Goal Reached!',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: AppColors.success,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
@@ -249,9 +250,9 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // const Text(
+            // Text(
             //   'Adjust Steps',
-            //   style: TextStyle(
+            //   style: AppTextStyles.title(
             //     fontSize: 16,
             //     fontWeight: FontWeight.w500,
             //   ),
@@ -364,9 +365,9 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Daily Goal',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -401,9 +402,9 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Estimated Metrics',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -454,7 +455,7 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
           const SizedBox(height: AppConstants.spacing4),
           Text(
             value,
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: color,
@@ -479,9 +480,9 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Notes (Optional)',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -528,9 +529,9 @@ class _StepLoggingScreenState extends State<StepLoggingScreen> {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : const Text(
+            : Text(
                 'Log Steps',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),

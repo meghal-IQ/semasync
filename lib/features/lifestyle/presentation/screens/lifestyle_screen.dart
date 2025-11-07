@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:semasync_new/features/activity/presentation/screens/activity_history_screen.dart';
+import 'package:semasync_new/features/activity/presentation/screens/workout_history_screen.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/nutrition_provider.dart';
 import '../../../../core/providers/activity_provider.dart';
 import '../../../../core/api/models/nutrition_log_model.dart';
+import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/standard_widgets.dart';
 import '../../../dashboard/presentation/widgets/protein_card.dart';
 import '../../../dashboard/presentation/widgets/fiber_card.dart';
 import '../../../dashboard/presentation/widgets/water_card.dart';
@@ -18,21 +22,64 @@ class LifestyleScreen extends StatefulWidget {
 }
 
 class _LifestyleScreenState extends State<LifestyleScreen> {
-  int _selectedDayIndex = 4; // Default to today
+  // Calculate today's index dynamically based on date range
+  // CustomDayPicker shows dates from -60 to +60 (120 days total: ~2 months back and forward)
+  // Today (when offset is 0) is at index 60
+  int get _todayIndex {
+    final startOffset = -60; // Start from 2 months ago
+    final todayOffset = 0; // Today has offset 0
+    return todayOffset - startOffset; // 0 - (-60) = 60
+  }
+  
+  late int _selectedDayIndex;
   
   @override
   void initState() {
     super.initState();
+    // Initialize to today's index
+    _selectedDayIndex = _todayIndex;
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<NutritionProvider>().loadNutritionData();
       context.read<ActivityProvider>().loadActivityData();
     });
   }
   
+  DateTime _getDateFromIndex(int index) {
+    final now = DateTime.now();
+    final startOffset = -60; // Start from 2 months ago
+    final selectedOffset = index - _todayIndex; // Calculate offset from today
+    return now.add(Duration(days: selectedOffset));
+  }
+
   void _onDaySelected(int index) {
     setState(() {
       _selectedDayIndex = index;
     });
+    
+    // Load data for the selected date
+    final selectedDate = _getDateFromIndex(index);
+    _loadDataForSelectedDate(selectedDate);
+  }
+
+  void _loadDataForSelectedDate(DateTime selectedDate) {
+    final now = DateTime.now();
+    final isToday = selectedDate.year == now.year &&
+                    selectedDate.month == now.month &&
+                    selectedDate.day == now.day;
+    
+    // Format date as YYYY-MM-DD for API
+    final dateString = '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
+    
+    if (isToday) {
+      // Load current day data
+      context.read<NutritionProvider>().loadNutritionData();
+      context.read<ActivityProvider>().loadActivityData();
+    } else {
+      // Load historical data for selected date
+      context.read<NutritionProvider>().loadDailySummary(date: dateString);
+      context.read<ActivityProvider>().loadActivityData(); // This loads all history, cards filter by date
+    }
   }
 
   @override
@@ -46,13 +93,12 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
               child: Row(
                 children: [
-                  const Text(
+                  Text(
           'Lifestyle Goals',
-          style: TextStyle(
+          style: AppTextStyles.title(
                       fontSize: 28,
             fontWeight: FontWeight.w800,
             color: Color(0xFF1A1F36),
-            letterSpacing: -0.5,
           ),
         ),
                 ],
@@ -103,6 +149,30 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     _buildWorkoutCardForLifestyle(),
                     
                     const SizedBox(height: 30),
+              //
+              // StandardNavigationItem(
+              //   icon: Icons.access_time, // Clock with arrow
+              //   title: 'Activity History',
+              //   onTap: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(builder: (context) => const ActivityHistoryScreen()),
+              //     );
+              //   },
+              // ),
+              //       // const SizedBox(height: 30),
+              //
+              // StandardNavigationItem(
+              //   icon: Icons.access_time, // Clock with arrow
+              //   title: 'Workout History',
+              //   onTap: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(builder: (context) => const WorkoutHistoryScreen()),
+              //     );
+              //   },
+              // ),
+              //       const SizedBox(height: 30),
                   ],
                 ),
               ),
@@ -186,12 +256,11 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Other',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1A1F36),
+                style: AppTextStyles.title(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
                 ),
               ),
               
@@ -209,10 +278,10 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                   //   ),
                   // ),
                   // const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Calories',
-                    style: TextStyle(
-                      fontSize: 14,
+                    style: AppTextStyles.title(
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
                     ),
@@ -221,7 +290,7 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                   Text(
                     '${calories.toInt()}/1268kcal',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 10,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
                     ),
@@ -256,10 +325,10 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
               // Carbs row with icon and progress
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'Carbs',
-                    style: TextStyle(
-                      fontSize: 14,
+                    style: AppTextStyles.title(
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
                     ),
@@ -268,7 +337,7 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                   Text(
                     '${carbs.toInt()}/154g',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 10,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
                     ),
@@ -303,10 +372,10 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
               // Fat row with icon and progress
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'Fat',
-                    style: TextStyle(
-                      fontSize: 14,
+                    style: AppTextStyles.title(
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
                     ),
@@ -315,7 +384,7 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                   Text(
                     '${fat.toInt()}/42g',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 10,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
                     ),
@@ -354,79 +423,114 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
   Widget _buildActivityCardForLifestyle() {
     return Consumer<ActivityProvider>(
       builder: (context, activityProvider, child) {
-        final activitySummary = activityProvider.activitySummary;
-        final steps = activitySummary?.todaySteps ?? 0;
-        final stepsGoal = activitySummary?.stepsGoal ?? 10000;
+        final selectedDate = _getDateFromIndex(_selectedDayIndex);
+        final now = DateTime.now();
+        final isToday = selectedDate.year == now.year &&
+                        selectedDate.month == now.month &&
+                        selectedDate.day == now.day;
+        
+        int steps = 0;
+        int stepsGoal = 10000;
+        
+        if (isToday) {
+          final activitySummary = activityProvider.activitySummary;
+          steps = activitySummary?.todaySteps ?? 0;
+          stepsGoal = activitySummary?.stepsGoal ?? 10000;
+        } else {
+          // Get steps for selected date from history
+          final selectedDateOnly = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+          final stepsForDate = activityProvider.stepsHistory.where((step) {
+            final stepDate = DateTime(step.date.year, step.date.month, step.date.day);
+            return stepDate.year == selectedDateOnly.year &&
+                   stepDate.month == selectedDateOnly.month &&
+                   stepDate.day == selectedDateOnly.day;
+          }).toList();
+          
+          if (stepsForDate.isNotEmpty) {
+            final stepLog = stepsForDate.first;
+            steps = stepLog.steps;
+            stepsGoal = stepLog.goal;
+          }
+        }
+        
         final progress = (steps / stepsGoal).clamp(0.0, 1.0);
         
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.lightGrey,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  // Activity icon using image
-                  Image.asset(
-                    'assets/images/activity_logo.png',
-                    fit: BoxFit.contain,
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Activity',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1F36),
-                    ),
-                  ),
-                  const Spacer(),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Steps',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600]!,
-                        ),
-                      ),
-                      Text(
-                        '$steps / $stepsGoal',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A1F36),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // 10 footprint icons using images
-              Row(
-                children: List.generate(10, (index) {
-                  final isActive = index < (progress * 10);
-                  return Padding(
-                    padding: EdgeInsets.only(right: index == 9 ? 0 : 6),
-                    child: Image.asset(
-                      isActive ? 'assets/images/step_fill.png' : 'assets/images/step_blank.png',
-                      width: 20,
-                      height: 20,
+        return InkWell(
+          onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ActivityHistoryScreen()),
+                );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.lightGrey,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    // Activity icon using image
+                    Image.asset(
+                      'assets/images/activity_logo.png',
                       fit: BoxFit.contain,
                     ),
-                  );
-                }),
-              ),
-            ],
+                    const SizedBox(width: 8),
+                    Text(
+                      'Activity',
+                      style: AppTextStyles.title(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1A1F36),
+                      ),
+                    ),
+                    const Spacer(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Steps',
+                          style: AppTextStyles.title(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600]!,
+                          ),
+                        ),
+                        Text(
+                          '$steps / $stepsGoal',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1A1F36),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // 10 footprint icons using images
+                Row(
+                  children: List.generate(10, (index) {
+                    final isActive = index < (progress * 10);
+                    return Padding(
+                      padding: EdgeInsets.only(right: index == 9 ? 0 : 6),
+                      child: Image.asset(
+                        isActive ? 'assets/images/step_fill.png' : 'assets/images/step_blank.png',
+                        width: 20,
+                        height: 20,
+                        fit: BoxFit.contain,
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -437,14 +541,16 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
     return Consumer<ActivityProvider>(
       builder: (context, activityProvider, child) {
         final workoutsHistory = activityProvider.workoutsHistory;
-        final today = DateTime.now();
-        final todaysWorkouts = workoutsHistory.where((workout) {
-          return workout.date.year == today.year &&
-                 workout.date.month == today.month &&
-                 workout.date.day == today.day;
+        final selectedDate = _getDateFromIndex(_selectedDayIndex);
+        final selectedDateOnly = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+        final workoutsForDate = workoutsHistory.where((workout) {
+          final workoutDate = DateTime(workout.date.year, workout.date.month, workout.date.day);
+          return workoutDate.year == selectedDateOnly.year &&
+                 workoutDate.month == selectedDateOnly.month &&
+                 workoutDate.day == selectedDateOnly.day;
         }).toList();
         
-        final workoutMinutes = todaysWorkouts.fold<int>(
+        final workoutMinutes = workoutsForDate.fold<int>(
           0,
           (sum, workout) => sum + workout.duration,
         );
@@ -452,77 +558,85 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
         const workoutGoal = 30;
         final progress = (workoutMinutes / workoutGoal).clamp(0.0, 1.0);
         
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.lightGrey,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.fitness_center,
-                    color: Colors.black,
-                    size: 20,
+        return InkWell(
+          onTap: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) =>  WorkoutHistoryScreen()),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.lightGrey,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.fitness_center,
+                      color: Colors.black,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Workout',
+                      style: AppTextStyles.title(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1A1F36),
+                      ),
+                    ),
+                    const Spacer(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Workout',
+                          style: AppTextStyles.title(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600]!,
+                          ),
+                        ),
+                        Text(
+                          '${workoutMinutes.toString().padLeft(2, '0')} / ${workoutGoal.toString().padLeft(2, '0')} Min',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1A1F36),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Progress bar
+                Container(
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  const SizedBox(width: 6),
-                  const Text(
-                    'Workout',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1F36),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: progress,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF52D7D5),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
-                  const Spacer(),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Workout',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600]!,
-                        ),
-                      ),
-                      Text(
-                        '${workoutMinutes.toString().padLeft(2, '0')} / ${workoutGoal.toString().padLeft(2, '0')} Min',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A1F36),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Progress bar
-              Container(
-                height: 8,
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(4),
                 ),
-                child: FractionallySizedBox(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: progress,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF52D7D5),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -632,11 +746,10 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: AppTextStyles.title(
         fontSize: 12,
         fontWeight: FontWeight.w600,
         color: Colors.grey[500],
-        letterSpacing: 0.5,
       ),
     );
   }
@@ -674,9 +787,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Protein',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
@@ -700,9 +813,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Text(
+                  Text(
                     '/ 120g',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       color: Color(0xFF6B7280),
                       fontWeight: FontWeight.w500,
@@ -751,9 +864,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Protein',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
@@ -811,9 +924,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                 children: [
                   _buildControlButton(Icons.remove, () => _decrementProtein()),
                   const SizedBox(width: AppConstants.spacing12),
-                  const Text(
+                  Text(
                     '5g',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       color: Color(0xFF9CA3AF),
                       fontWeight: FontWeight.w500,
@@ -863,9 +976,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Fiber',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
@@ -889,9 +1002,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Text(
+                  Text(
                     '/ 25g',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       color: Color(0xFF6B7280),
                       fontWeight: FontWeight.w500,
@@ -940,9 +1053,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Fiber',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
@@ -1000,9 +1113,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                 children: [
                   _buildControlButton(Icons.remove, () => _decrementFiber()),
                   const SizedBox(width: AppConstants.spacing12),
-                  const Text(
+                  Text(
                     '1g',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       color: Color(0xFF9CA3AF),
                       fontWeight: FontWeight.w500,
@@ -1042,9 +1155,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Carbs',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF1A1F36),
@@ -1066,9 +1179,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Text(
+                  Text(
                     '/ 168g',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       color: Color(0xFF6B7280),
                       fontWeight: FontWeight.w500,
@@ -1117,9 +1230,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-              const Text(
+              Text(
                 'Carbs',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
@@ -1192,9 +1305,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Fat',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF1A1F36),
@@ -1216,9 +1329,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Text(
+                  Text(
                     '/ 55g',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       color: Color(0xFF6B7280),
                       fontWeight: FontWeight.w500,
@@ -1267,9 +1380,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-              const Text(
+              Text(
                 'Fat',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
@@ -1343,9 +1456,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
               Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Other',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF1A1F36),
@@ -1365,9 +1478,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Calories',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
@@ -1452,9 +1565,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Calories',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1A1F36),
@@ -1561,9 +1674,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'Water',
-                          style: TextStyle(
+                          style: AppTextStyles.title(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF1A1F36),
@@ -1574,20 +1687,21 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     const SizedBox(height: 8),
                     Text(
                       'Goal: ${waterGoal.toInt()}ml',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 14,
                         color: Colors.grey[600],
                     fontWeight: FontWeight.w500,
                       ),
                     ),
+
                     const SizedBox(height: 12),
                     Row(
                       children: [
                         _buildControlButton(Icons.remove, () => _decrementWater()),
                         const SizedBox(width: 12),
-                        const Text(
+                        Text(
                           '237ml',
-                          style: TextStyle(
+                          style: AppTextStyles.title(
                             fontSize: 14,
                             color: Color(0xFF6B7280),
                             fontWeight: FontWeight.w600,
@@ -1690,9 +1804,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'Water',
-                          style: TextStyle(
+                          style: AppTextStyles.title(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF1A1F36),
@@ -1715,9 +1829,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                       children: [
                         _buildControlButton(Icons.remove, () => _decrementWater()),
                         const SizedBox(width: 12),
-                        const Text(
+                        Text(
                           '237ml',
-                          style: TextStyle(
+                          style: AppTextStyles.title(
                             fontSize: 14,
                             color: Color(0xFF9CA3AF),
                             fontWeight: FontWeight.w500,
@@ -1769,9 +1883,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     size: 20,
                   ),
                   const SizedBox(width: 6),
-                  const Text(
+                  Text(
                     'Activity',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
@@ -1783,7 +1897,7 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     children: [
                       Text(
                         'Steps',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[600]!,
@@ -1859,9 +1973,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Steps',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -1955,9 +2069,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     size: 20,
                   ),
                   const SizedBox(width: 6),
-                  const Text(
+                  Text(
                     'Workout',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),
@@ -1969,7 +2083,7 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                 children: [
                   Text(
                     'Workout',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[600]!,
@@ -2061,9 +2175,9 @@ class _LifestyleScreenState extends State<LifestyleScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Workout',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1F36),

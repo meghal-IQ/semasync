@@ -4,6 +4,7 @@ import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/api/services/health_service.dart';
 import '../../../../core/api/models/auth_models.dart';
 import '../../../../core/api/helpers/registration_helper.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class ApiTestScreen extends StatefulWidget {
   const ApiTestScreen({super.key});
@@ -111,7 +112,7 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('API Test Screen'),
+        title: Text('API Test Screen'),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
       ),
@@ -133,9 +134,9 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
                         children: [
                           const Icon(Icons.health_and_safety, color: Colors.green),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             'API Health Status',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: AppTextStyles.title(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const Spacer(),
                           if (_isLoading)
@@ -149,7 +150,7 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
                       const SizedBox(height: 8),
                       Text(
                         _healthStatus ?? 'Checking...',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           color: _healthStatus?.contains('healthy') == true 
                               ? Colors.green 
                               : Colors.red,
@@ -159,7 +160,7 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
                       // ElevatedButton.icon(
                       //   onPressed: _checkHealth,
                       //   icon: const Icon(Icons.refresh),
-                      //   label: const Text('Check Health'),
+                      //   label: Text('Check Health'),
                       // ),
                     ],
                   ),
@@ -188,9 +189,9 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
                                     : Colors.red,
                               ),
                               const SizedBox(width: 8),
-                              const Text(
+                              Text(
                                 'Authentication Status',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                style: AppTextStyles.title(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -217,13 +218,13 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
                                   backgroundColor: Colors.red,
                                   foregroundColor: Colors.white,
                                 ),
-                                child: const Text('Logout'),
+                                child: Text('Logout'),
                               ),
                               const SizedBox(width: 8),
                               if (authProvider.isAuthenticated)
                                 ElevatedButton(
                                   onPressed: () => authProvider.refreshUser(),
-                                  child: const Text('Refresh User'),
+                                  child: Text('Refresh User'),
                                 ),
                             ],
                           ),
@@ -243,9 +244,9 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Login Test',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: AppTextStyles.title(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -290,7 +291,7 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white,
                         ),
-                        child: const Text('Test Login'),
+                        child: Text('Test Login'),
                       ),
                     ],
                   ),
@@ -306,9 +307,9 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Registration Test',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: AppTextStyles.title(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
                       Row(
@@ -528,7 +529,7 @@ class _ApiTestScreenState extends State<ApiTestScreen> {
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
                         ),
-                        child: const Text('Test Registration'),
+                        child: Text('Test Registration'),
                       ),
                     ],
                   ),

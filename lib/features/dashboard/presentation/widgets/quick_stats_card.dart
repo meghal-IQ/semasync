@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class QuickStatsCard extends StatelessWidget {
   const QuickStatsCard({super.key});
@@ -13,9 +14,9 @@ class QuickStatsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Quick Stats',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -84,10 +85,10 @@ class QuickStatsCard extends StatelessWidget {
                     size: 20,
                   ),
                   const SizedBox(width: AppConstants.spacing8),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Tip: Try adding a protein shake to reach your daily protein goal!',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: AppColors.warning,
                         fontWeight: FontWeight.w500,
                       ),
@@ -120,7 +121,7 @@ class QuickStatsCard extends StatelessWidget {
         children: [
           Text(
             value,
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: color,
@@ -146,7 +147,7 @@ class QuickStatsCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   change,
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: isPositive ? AppColors.success : AppColors.warning,
                     fontSize: 10,
                   ),

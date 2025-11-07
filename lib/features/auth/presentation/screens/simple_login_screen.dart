@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../navigation/presentation/screens/main_navigation_screen.dart';
 import 'auth_welcome_screen.dart';
 
@@ -164,22 +165,21 @@ class _SimpleLoginScreenState extends State<SimpleLoginScreen> {
                         const SizedBox(height: 24),
                         
                         // Title with modern typography
-                        const Text(
+                        Text(
                           'Welcome Back',
-                          style: TextStyle(
+                          style: AppTextStyles.title(
                             fontSize: 32,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
-                            letterSpacing: -0.5,
                           ),
                           textAlign: TextAlign.center,
                         ),
                         
                         const SizedBox(height: 8),
                         
-                        const Text(
+                        Text(
                           'Sign in to continue your health journey',
-                          style: TextStyle(
+                          style: AppTextStyles.title(
                             fontSize: 16,
                             color: Colors.white,
                             fontWeight: FontWeight.w500,
@@ -215,10 +215,10 @@ class _SimpleLoginScreenState extends State<SimpleLoginScreen> {
                       },
                       decoration: const InputDecoration(
                         labelText: 'Email',
-                        labelStyle: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        // labelstyle: TextStyle(
+                        //   color: AppColors.primary,
+                        //   fontWeight: FontWeight.w500,
+                        // ),
                         prefixIcon: Icon(
                           Icons.email_outlined,
                           color: AppColors.primary,
@@ -405,9 +405,9 @@ class _SimpleLoginScreenState extends State<SimpleLoginScreen> {
                                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
-                          : const Text(
+                          : Text(
                               'Sign In',
-                              style: TextStyle(
+                              style: AppTextStyles.title(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.5,
@@ -478,9 +478,9 @@ class _SimpleLoginScreenState extends State<SimpleLoginScreen> {
                         side: BorderSide.none,
                         elevation: 0,
                       ),
-                      child: const Text(
+                      child: Text(
                         'Create New Account',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -501,9 +501,9 @@ class _SimpleLoginScreenState extends State<SimpleLoginScreen> {
                         ),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       'Forgot Password?',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: AppColors.primary,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

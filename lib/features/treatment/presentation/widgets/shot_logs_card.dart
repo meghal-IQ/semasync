@@ -6,6 +6,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/api/services/treatment_service.dart';
 import '../../../../core/api/models/shot_log_model.dart';
 import '../../../../core/api/models/api_response.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../providers/side_effect_provider.dart';
 
 class ShotLogsCard extends StatefulWidget {
@@ -75,9 +76,9 @@ class _ShotLogsCardState extends State<ShotLogsCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Shot History',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -112,7 +113,7 @@ class _ShotLogsCardState extends State<ShotLogsCard> {
                     Expanded(
                       child: Text(
                         _error!,
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           color: AppColors.error,
                           fontSize: 14,
                         ),
@@ -128,11 +129,11 @@ class _ShotLogsCardState extends State<ShotLogsCard> {
                   color: AppColors.surface,
                   border: Border.all(color: AppColors.border),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'No shots logged yet.\nTap the + button to log your first shot.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       color: AppColors.textSecondary,
                       fontSize: 14,
                     ),
@@ -274,7 +275,7 @@ class _ShotLogsCardState extends State<ShotLogsCard> {
                       const SizedBox(width: AppConstants.spacing4),
                       Text(
                         'Side Effects (${shotSideEffects.length})',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.warning,
@@ -306,9 +307,9 @@ class _ShotLogsCardState extends State<ShotLogsCard> {
                         color: AppColors.warning,
                       ),
                       const SizedBox(width: AppConstants.spacing4),
-                      const Text(
+                      Text(
                         'Reported Side Effects',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.warning,
@@ -332,7 +333,7 @@ class _ShotLogsCardState extends State<ShotLogsCard> {
                               ),
                               child: Text(
                                 effect,
-                                style: TextStyle(
+                                style: AppTextStyles.title(
                                   fontSize: 10,
                                   color: AppColors.warning,
                                 ),
@@ -410,7 +411,7 @@ class _ShotLogsCardState extends State<ShotLogsCard> {
         const SizedBox(height: AppConstants.spacing2),
         Text(
           value,
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 12,
             fontWeight: FontWeight.w500,
             color: color ?? AppColors.textPrimary,

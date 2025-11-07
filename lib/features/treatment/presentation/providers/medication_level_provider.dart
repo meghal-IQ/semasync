@@ -88,6 +88,36 @@ class MedicationLevelProvider with ChangeNotifier {
     }
   }
 
+  /// Load medication level for a specific date
+  Future<void> loadMedicationLevelForDate(DateTime date, {bool forceRefresh = false}) async {
+    if (_isLoading && !forceRefresh) return;
+
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      debugPrint('🔄 Loading medication level for date: $date...');
+      final response = await _medicationLevelApi.getMedicationLevelForDate(date);
+      debugPrint('📊 Medication level response for date: $response');
+
+      if (response['success'] == true) {
+        _currentLevel = response;
+        debugPrint('✅ Medication level loaded successfully for date');
+        debugPrint('📊 Current level data: ${response['data']}');
+      } else {
+        _error = response['message'] ?? 'Failed to load medication level for date';
+        debugPrint('❌ Medication level failed: $_error');
+      }
+    } catch (e) {
+      _error = 'Failed to load medication level for date: ${e.toString()}';
+      debugPrint('❌ Error loading medication level for date: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   /// Load historical medication level data
   Future<void> loadHistoricalData({
     int days = 30,

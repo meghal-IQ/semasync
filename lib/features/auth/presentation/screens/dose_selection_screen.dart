@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../data/auth_data.dart';
 import 'frequency_selection_screen.dart';
 
@@ -40,9 +41,9 @@ class _DoseSelectionScreenState extends State<DoseSelectionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    const Text(
+                    Text(
                       'Do you know your recommended starting dose?',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -52,9 +53,9 @@ class _DoseSelectionScreenState extends State<DoseSelectionScreen> {
                     const SizedBox(height: AppConstants.spacing12),
                     
                     // Subtitle
-                    const Text(
+                    Text(
                       'It\'s okay if you\'re not sure!',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 16,
                         color: AppColors.textSecondary,
                       ),
@@ -84,16 +85,16 @@ class _DoseSelectionScreenState extends State<DoseSelectionScreen> {
                 child: ElevatedButton(
                   onPressed: _selectedDose != -1 ? _onContinue : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedDose != -1 ? Colors.black : AppColors.divider,
+                    backgroundColor: _selectedDose != -1 ? AppColors.continueButton : AppColors.divider,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Continue',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),

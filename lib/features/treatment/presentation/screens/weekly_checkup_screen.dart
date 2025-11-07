@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/weekly_checkup_provider.dart';
 import '../../../../core/providers/health_provider.dart';
@@ -24,30 +25,23 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
   
   bool _isSubmitting = false;
 
-  // Available side effects
+  // Available side effects - matching the design
   final List<String> _availableSideEffects = [
     'Nausea',
     'Vomiting',
-    'Diarrhea',
     'Constipation',
-    'Fatigue',
-    'Headache',
-    'Dizziness',
     'Abdominal Pain',
     'Decreased Appetite',
-    'Injection Site Reaction',
-    'Heartburn',
+    'Fatigue',
+    'Diarrhea',
+    'Dizziness',
+    'Headache',
     'Bloating',
-    'Hair Loss',
-    'Muscle Loss',
-    'Low Blood Sugar',
+    'Heartburn',
     'Mood Changes',
-    'Sleep Disturbances',
-    'Dry Mouth',
-    'Sulfur Burps',
-    'Food Noise',
+    'Muscle Loss',
     'Loose Skin',
-    'Injection Anxiety',
+    'Hair Loss',
   ];
 
   @override
@@ -80,14 +74,24 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Weekly Checkup'),
-        // backgroundColor: AppColors.primary,
-        // foregroundColor: Colors.white,
-        // elevation: 0,
+        title: Text(
+          'Weekly Checkup',
+          style: AppTextStyles.title(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppConstants.spacing6),
+        padding: const EdgeInsets.all(AppConstants.spacing16),
         child: Form(
           key: _formKey,
           child: Column(
@@ -113,40 +117,28 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
   Widget _buildHeaderCard() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: AppColors.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+        color: AppColors.primarylight,
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.spacing16),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon(
-            //   Icons.medical_services,
-            //   color: AppColors.primary,
-            //   size: 32,
-            // ),
-            // const SizedBox(width: AppConstants.spacing16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Weekly Health Checkup',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(height: AppConstants.spacing4),
-                  Text(
-                    'Track your progress and get personalized dosage recommendations based on your weight and side effects.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ],
+            Text(
+              'Weekly Health Checkup',
+              style: AppTextStyles.title(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacing8),
+            Text(
+              'Track your progress and get personalized dosage recommendations based on your weight and side effects.',
+              style: AppTextStyles.text(
+                fontSize: 14,
+                color: AppColors.textSecondary,
               ),
             ),
           ],
@@ -158,7 +150,8 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
   Widget _buildWeightSection() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.spacing16),
@@ -170,15 +163,14 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
                 Icon(
                   Icons.monitor_weight,
                   color: AppColors.darkGrey,
-                  size: 24,
+                  size: 20,
                 ),
                 const SizedBox(width: AppConstants.spacing8),
-                const Text(
+                Text(
                   'Current Weight',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -187,75 +179,100 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
             Row(
               children: [
                 Expanded(
-                  child: TextFormField(
-                    controller: _weightController,
-                    keyboardType: TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(
-                      hintText: 'Enter your current weight',
-                      border: const OutlineInputBorder(),
-                      suffixText: _weightUnit,
-                      prefixIcon: const Icon(Icons.scale),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.primary),
+                      borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your weight';
-                      }
-                      final weight = double.tryParse(value);
-                      if (weight == null) {
-                        return 'Please enter a valid weight';
-                      }
-                      // Adjust validation based on unit
-                      if (_weightUnit == 'lbs') {
-                        if (weight < 50 || weight > 500) {
-                          return 'Please enter a valid weight (50-500 lbs)';
+                    child: TextFormField(
+                      controller: _weightController,
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      style: AppTextStyles.text(
+                        fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Enter weight',
+                        border: InputBorder.none,
+                        prefixIcon: const Icon(Icons.scale, color: AppColors.primary),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppConstants.spacing12,
+                          vertical: AppConstants.spacing16,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your weight';
                         }
-                      } else {
-                        if (weight < 20 || weight > 250) {
-                          return 'Please enter a valid weight (20-250 kg)';
+                        final weight = double.tryParse(value);
+                        if (weight == null) {
+                          return 'Please enter a valid weight';
                         }
-                      }
-                      return null;
-                    },
+                        if (_weightUnit == 'lbs') {
+                          if (weight < 50 || weight > 500) {
+                            return 'Please enter a valid weight (50-500 lbs)';
+                          }
+                        } else {
+                          if (weight < 20 || weight > 250) {
+                            return 'Please enter a valid weight (20-250 kg)';
+                          }
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                 ),
-                const SizedBox(width: AppConstants.spacing12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacing12),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.textSecondary),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _weightUnit,
-                    underline: const SizedBox(),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          // Convert weight when changing units
-                          final currentWeight = double.tryParse(_weightController.text);
-                          if (currentWeight != null) {
-                            if (_weightUnit == 'lbs' && newValue == 'kg') {
-                              // Convert lbs to kg
-                              _weightController.text = (currentWeight * 0.453592).toStringAsFixed(1);
-                            } else if (_weightUnit == 'kg' && newValue == 'lbs') {
-                              // Convert kg to lbs
-                              _weightController.text = (currentWeight * 2.20462).toStringAsFixed(1);
-                            }
-                          }
-                          _weightUnit = newValue;
-                        });
-                      }
-                    },
-                    items: <String>['lbs', 'kg'].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
+                const SizedBox(width: AppConstants.spacing8),
+                // Unit toggle buttons
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildUnitButton('lbs', _weightUnit == 'lbs'),
+                    const SizedBox(width: AppConstants.spacing4),
+                    _buildUnitButton('kg', _weightUnit == 'kg'),
+                  ],
                 ),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUnitButton(String unit, bool isSelected) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          final currentWeight = double.tryParse(_weightController.text);
+          if (currentWeight != null) {
+            if (_weightUnit == 'lbs' && unit == 'kg') {
+              _weightController.text = (currentWeight * 0.453592).toStringAsFixed(1);
+            } else if (_weightUnit == 'kg' && unit == 'lbs') {
+              _weightController.text = (currentWeight * 2.20462).toStringAsFixed(1);
+            }
+          }
+          _weightUnit = unit;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppConstants.spacing16,
+          vertical: AppConstants.spacing12,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.darkGrey,
+          ),
+        ),
+        child: Text(
+          unit,
+          style: AppTextStyles.text(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: isSelected ? Colors.white : AppColors.textPrimary,
+          ),
         ),
       ),
     );
@@ -264,14 +281,8 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
   Widget _buildSideEffectsSection() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.spacing16),
@@ -281,118 +292,112 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
             Row(
               children: [
                 Icon(
-                  Icons.warning_amber,
-                  color: AppColors.warning,
-                  size: 24,
+                  Icons.person_outline,
+                  color: AppColors.darkGrey,
+                  size: 20,
                 ),
                 const SizedBox(width: AppConstants.spacing8),
-                const Text(
+                Text(
                   'Side Effects',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: AppConstants.spacing16),
-            
-            // Side effect selection
-            const Text(
-              'Select any side effects you\'re experiencing:',
-              style: TextStyle(
+            const SizedBox(height: AppConstants.spacing12),
+            Text(
+              'Select any side effects you\'re experiencing',
+              style: AppTextStyles.text(
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: AppConstants.spacing12),
+            const SizedBox(height: AppConstants.spacing16),
             
-            Wrap(
-              spacing: AppConstants.spacing8,
-              runSpacing: AppConstants.spacing8,
-              children: _availableSideEffects.map((effect) {
+            // Side effect grid
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 3.5,
+                crossAxisSpacing: AppConstants.spacing8,
+                mainAxisSpacing: AppConstants.spacing8,
+              ),
+              itemCount: _availableSideEffects.length,
+              itemBuilder: (context, index) {
+                final effect = _availableSideEffects[index];
                 final isSelected = _selectedSideEffects.contains(effect);
-                return FilterChip(
-                  label: Text(effect),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        _selectedSideEffects.add(effect);
-                      } else {
-                        _selectedSideEffects.remove(effect);
-                      }
-                    });
-                  },
-                  selectedColor: AppColors.primary.withOpacity(0.2),
-                  checkmarkColor: AppColors.primary,
-                );
-              }).toList(),
+                return _buildSideEffectButton(effect, isSelected);
+              },
             ),
             
             const SizedBox(height: AppConstants.spacing24),
             
             // Overall severity slider
-            const Text(
+            Text(
               'Overall Severity (0-10)',
-              style: TextStyle(
+              style: AppTextStyles.title(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: AppConstants.spacing8),
+            const SizedBox(height: AppConstants.spacing12),
             
             Row(
               children: [
                 Expanded(
-                  child: Slider(
-                    value: _overallSeverity,
-                    min: 0,
-                    max: 10,
-                    divisions: 10,
-                    label: _overallSeverity.toStringAsFixed(1),
-                    onChanged: (value) {
-                      setState(() {
-                        _overallSeverity = value;
-                      });
-                    },
-                    activeColor: _getSeverityColor(_overallSeverity),
+                  child: SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: AppColors.primary,
+                      inactiveTrackColor: AppColors.darkGrey,
+                      thumbColor: AppColors.primary,
+                      overlayColor: AppColors.primary.withOpacity(0.1),
+                      trackHeight: 4,
+                    ),
+                    child: Slider(
+                      value: _overallSeverity,
+                      min: 0,
+                      max: 10,
+                      divisions: 10,
+                      onChanged: (value) {
+                        setState(() {
+                          _overallSeverity = value;
+                        });
+                      },
+                    ),
                   ),
                 ),
+                const SizedBox(width: AppConstants.spacing8),
                 Container(
-                  width: 60,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: AppConstants.spacing8,
-                    vertical: AppConstants.spacing4,
+                    horizontal: AppConstants.spacing12,
+                    vertical: AppConstants.spacing6,
                   ),
                   decoration: BoxDecoration(
-                    color: _getSeverityColor(_overallSeverity).withOpacity(0.1),
-                    border: Border.all(
-                      color: _getSeverityColor(_overallSeverity).withOpacity(0.3),
-                    ),
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
                   ),
                   child: Text(
-                    _overallSeverity.toStringAsFixed(1),
-                    style: TextStyle(
-                      fontSize: 16,
+                    _overallSeverity.toStringAsFixed(0),
+                    style: AppTextStyles.text(
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: _getSeverityColor(_overallSeverity),
+                      color: Colors.white,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
             ),
             
-            // Severity description
+            const SizedBox(height: AppConstants.spacing4),
             Text(
               _getSeverityDescription(_overallSeverity),
-              style: const TextStyle(
+              style: AppTextStyles.text(
                 fontSize: 12,
                 color: AppColors.textSecondary,
-                fontStyle: FontStyle.italic,
               ),
             ),
           ],
@@ -401,17 +406,45 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
     );
   }
 
+  Widget _buildSideEffectButton(String effect, bool isSelected) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            _selectedSideEffects.remove(effect);
+          } else {
+            _selectedSideEffects.add(effect);
+          }
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.darkGrey,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            effect,
+            style: AppTextStyles.text(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: isSelected ? Colors.white : AppColors.textPrimary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildNotesSection() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.spacing16),
@@ -421,17 +454,16 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
             Row(
               children: [
                 Icon(
-                  Icons.note_alt,
-                  color: AppColors.textSecondary,
-                  size: 24,
+                  Icons.description_outlined,
+                  color: AppColors.darkGrey,
+                  size: 20,
                 ),
                 const SizedBox(width: AppConstants.spacing8),
-                const Text(
-                  'Additional Notes (Optional)',
-                  style: TextStyle(
+                Text(
+                  'Additional Notes',
+                  style: AppTextStyles.title(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -440,9 +472,28 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
             TextFormField(
               controller: _notesController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                hintText: 'Any additional observations or concerns...',
-                border: OutlineInputBorder(),
+              style: AppTextStyles.text(
+                fontSize: 14,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Any additional Observations or concerns....',
+                hintStyle: AppTextStyles.text(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+                  borderSide: BorderSide(color: AppColors.darkGrey),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+                  borderSide: BorderSide(color: AppColors.darkGrey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+                  borderSide: BorderSide(color: AppColors.primary),
+                ),
+                contentPadding: const EdgeInsets.all(AppConstants.spacing12),
                 alignLabelWithHint: true,
               ),
             ),
@@ -455,9 +506,18 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
   Widget _buildSubmitButton() {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton.icon(
+      child: ElevatedButton(
         onPressed: _isSubmitting ? null : _submitCheckup,
-        icon: _isSubmitting
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+          ),
+          elevation: 0,
+        ),
+        child: _isSubmitting
             ? const SizedBox(
                 height: 20,
                 width: 20,
@@ -466,30 +526,21 @@ class _WeeklyCheckupScreenState extends State<WeeklyCheckupScreen> {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : const Icon(Icons.medical_services),
-        label: Text(_isSubmitting ? 'Submitting...' : 'Submit Weekly Checkup'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: AppConstants.spacing16),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+            : Text(
+                'Submit Weekly Checkup',
+                style: AppTextStyles.text(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
       ),
     );
   }
 
-  Color _getSeverityColor(double severity) {
-    if (severity <= 2) return AppColors.success;
-    if (severity <= 4) return AppColors.warning;
-    if (severity <= 6) return Colors.orange;
-    return AppColors.error;
-  }
 
   String _getSeverityDescription(double severity) {
-    if (severity == 0) return 'No side effects';
+    if (severity == 0) return 'No Side Effects';
     if (severity <= 2) return 'Mild - barely noticeable';
     if (severity <= 4) return 'Moderate - noticeable but manageable';
     if (severity <= 6) return 'Moderate to severe - affecting daily activities';

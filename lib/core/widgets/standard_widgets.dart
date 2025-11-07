@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:semasync_new/core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 
@@ -71,7 +72,7 @@ class StandardSectionHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: AppTextStyles.subtitle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -128,7 +129,7 @@ class StandardNavigationItem extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: AppTextStyles.subtitle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary,
@@ -139,7 +140,7 @@ class StandardNavigationItem extends StatelessWidget {
                 const SizedBox(width: AppConstants.spacing8),
                 Text(
                   subtitle!,
-                  style: const TextStyle(
+                  style: AppTextStyles.subtitle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
                   ),
@@ -190,7 +191,7 @@ class StandardPageScaffold extends StatelessWidget {
       appBar: showAppBar && title != null ? AppBar(
         title: Text(
           title!,
-          style: const TextStyle(
+          style: AppTextStyles.subtitle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: Colors.black,

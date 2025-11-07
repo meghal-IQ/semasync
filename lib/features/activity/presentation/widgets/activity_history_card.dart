@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class ActivityHistoryCard extends StatelessWidget {
   const ActivityHistoryCard({super.key});
@@ -28,19 +29,19 @@ class ActivityHistoryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Activity History',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   'Last 7 days',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
@@ -174,7 +175,7 @@ class ActivityHistoryCard extends StatelessWidget {
       children: [
         Text(
           value,
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: color,

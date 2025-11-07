@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class SemaSyncGoalCard extends StatelessWidget {
   const SemaSyncGoalCard({super.key});
@@ -32,9 +33,9 @@ class SemaSyncGoalCard extends StatelessWidget {
                 size: 20,
               ),
               const SizedBox(width: AppConstants.spacing8),
-              const Text(
+              Text(
                 'Goal',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -71,9 +72,9 @@ class SemaSyncGoalCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                     ),
-                    child: const Text(
+                    child: Text(
                       '100% of goal',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: Colors.white,
@@ -81,17 +82,17 @@ class SemaSyncGoalCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: AppConstants.spacing4),
-                  const Text(
+                  Text(
                     '143.3kg',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Sep 20, 1:35 PM',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 10,
                       color: AppColors.textSecondary,
                     ),

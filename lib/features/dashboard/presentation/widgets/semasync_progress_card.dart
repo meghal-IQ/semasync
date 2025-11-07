@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/app_constants.dart';
 
 class SemaSyncProgressCard extends StatelessWidget {
@@ -205,7 +206,7 @@ class SemaSyncProgressCard extends StatelessWidget {
           ),
           child: Text(
             '${increment}$unit',
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: color,

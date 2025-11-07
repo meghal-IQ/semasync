@@ -6,6 +6,7 @@ import '../../../../core/providers/weekly_checkup_provider.dart';
 import '../../../../core/providers/health_provider.dart';
 import '../../../../core/providers/treatment_provider.dart';
 import '../../../../core/api/models/weekly_checkup_model.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../screens/weekly_checkup_screen.dart';
 
 class WeeklyCheckupCard extends StatelessWidget {
@@ -33,9 +34,9 @@ class WeeklyCheckupCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Weekly Checkup',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -77,8 +78,8 @@ class WeeklyCheckupCard extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () => _showWeeklyCheckupDialog(context),
-                    icon: const Icon(Icons.add_box_outlined,),
-                    label: const Text('View Checkup'),
+                    // icon: const Icon(Icons.add_box_outlined,),
+                    label: Text('View Checkup'),
                     style: ElevatedButton.styleFrom(
                       textStyle: TextStyle( fontSize: 16, fontWeight: FontWeight.bold),
                       backgroundColor: AppColors.primary,
@@ -202,7 +203,9 @@ class WeeklyCheckupCard extends StatelessWidget {
               child: _buildCheckupCard(
                 icon: Icons.monitor_weight,
                 title: 'Weight',
-                badge: '${checkup.weightChange! > 0 ? '+' : ''}${checkup.weightChange!.toStringAsFixed(1)} ${checkup.weightUnit}',
+                badge: checkup.weightChange != null 
+                    ? '${checkup.weightChange! > 0 ? '+' : ''}${checkup.weightChange!.toStringAsFixed(1)} ${checkup.weightUnit}'
+                    : null,
                 value: '${checkup.currentWeight.toStringAsFixed(1)} ${checkup.weightUnit}',
               ),
             ),
@@ -336,7 +339,7 @@ class WeeklyCheckupCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   recommendation.displayName,
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: isContinue ? AppColors.success : cardColor,
@@ -384,18 +387,18 @@ class WeeklyCheckupCard extends StatelessWidget {
             color: AppColors.textSecondary,
           ),
           const SizedBox(height: AppConstants.spacing12),
-          const Text(
+          Text(
             'No weekly checkup yet',
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: AppConstants.spacing8),
-          const Text(
+          Text(
             'Start your first weekly checkup to get personalized dosage recommendations based on your weight and side effects.',
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 14,
               color: AppColors.textSecondary,
             ),

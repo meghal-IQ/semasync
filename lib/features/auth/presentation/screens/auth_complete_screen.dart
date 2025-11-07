@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../navigation/presentation/screens/main_navigation_screen.dart';
 
 class AuthCompleteScreen extends StatelessWidget {
@@ -41,11 +42,11 @@ class AuthCompleteScreen extends StatelessWidget {
                     const SizedBox(height: AppConstants.spacing24),
                     
                     // Title
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: AppConstants.spacing16),
                       child: Text(
                         'Congratulations your personal SemaSync plan is ready!',
-                        style: TextStyle(
+                        style: AppTextStyles.title(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -123,9 +124,9 @@ class AuthCompleteScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Let\'s get started',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -191,9 +192,9 @@ class AuthCompleteScreen extends StatelessWidget {
                 size: 20,
               ),
               const SizedBox(width: AppConstants.spacing8),
-              const Text(
+              Text(
                 'Timeline - Dream Goal',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -208,24 +209,24 @@ class AuthCompleteScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 '119lbs',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),
               ),
-              const Text(
+              Text(
                 '119lbs',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
                 ),
               ),
-              const Text(
+              Text(
                 '135lbs',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),
@@ -259,9 +260,9 @@ class AuthCompleteScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Today, 11:47 AM',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 12,
                   color: AppColors.textSecondary,
                 ),
@@ -292,10 +293,10 @@ class AuthCompleteScreen extends StatelessWidget {
                 size: 18,
               ),
               const SizedBox(width: AppConstants.spacing6),
-              const Expanded(
+               Expanded(
                 child: Text(
                   'Shot Schedule',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -307,9 +308,9 @@ class AuthCompleteScreen extends StatelessWidget {
           
           const SizedBox(height: AppConstants.spacing8),
           
-          const Text(
+          Text(
             'Friday',
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -318,9 +319,9 @@ class AuthCompleteScreen extends StatelessWidget {
           
           const SizedBox(height: AppConstants.spacing2),
           
-          const Text(
+          Text(
             'Every Friday',
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 11,
               color: AppColors.textSecondary,
             ),
@@ -349,9 +350,9 @@ class AuthCompleteScreen extends StatelessWidget {
                 size: 18,
               ),
               const SizedBox(width: AppConstants.spacing6),
-              const Text(
+              Text(
                 'Water',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -374,10 +375,10 @@ class AuthCompleteScreen extends StatelessWidget {
                   width: 2,
                 ),
               ),
-              child: const Center(
+              child:  Center(
                 child: Text(
                   '68oz',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 9,
                     fontWeight: FontWeight.bold,
                     color: AppColors.waterBlue,
@@ -410,9 +411,9 @@ class AuthCompleteScreen extends StatelessWidget {
                 size: 18,
               ),
               const SizedBox(width: AppConstants.spacing6),
-              const Text(
+              Text(
                 'Protein',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -451,10 +452,10 @@ class AuthCompleteScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const Center(
+                  Center(
                     child: Text(
                       '65g',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -489,9 +490,9 @@ class AuthCompleteScreen extends StatelessWidget {
                 size: 18,
               ),
               const SizedBox(width: AppConstants.spacing6),
-              const Text(
+              Text(
                 'Fiber',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -502,9 +503,9 @@ class AuthCompleteScreen extends StatelessWidget {
           
           const SizedBox(height: AppConstants.spacing8),
           
-          const Text(
+          Text(
             '25g',
-            style: TextStyle(
+            style: AppTextStyles.title(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,

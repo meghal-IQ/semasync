@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/date_picker_bottom_sheet.dart';
 
@@ -55,9 +56,9 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                 //     ),
                 //   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'SemaSync',
-                    style: TextStyle(
+                    style: AppTextStyles.title(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,

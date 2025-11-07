@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class MotivationalCard extends StatelessWidget {
   const MotivationalCard({super.key});
@@ -23,7 +24,7 @@ class MotivationalCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+             Row(
               children: [
                 Icon(
                   Icons.auto_awesome,
@@ -33,7 +34,7 @@ class MotivationalCard extends StatelessWidget {
                 SizedBox(width: AppConstants.spacing8),
                 Text(
                   'Daily Motivation',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -82,9 +83,9 @@ class MotivationalCard extends StatelessWidget {
                       color: AppColors.primary.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
                     ),
-                    child: const Text(
+                    child: Text(
                       'You\'re doing amazing!',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w500,
                       ),
@@ -102,7 +103,7 @@ class MotivationalCard extends StatelessWidget {
                       // TODO: Share progress
                     },
                     icon: const Icon(Icons.share, size: 16),
-                    label: const Text('Share Progress'),
+                    label: Text('Share Progress'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       side: const BorderSide(color: AppColors.primary),
@@ -116,7 +117,7 @@ class MotivationalCard extends StatelessWidget {
                       // TODO: View achievements
                     },
                     icon: const Icon(Icons.emoji_events, size: 16),
-                    label: const Text('Achievements'),
+                    label: Text('Achievements'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                     ),

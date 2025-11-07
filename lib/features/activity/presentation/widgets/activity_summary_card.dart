@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text_styles.dart';
 
 class ActivitySummaryCard extends StatelessWidget {
   const ActivitySummaryCard({super.key});
@@ -13,19 +14,19 @@ class ActivitySummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Today\'s Activity',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   'Sep 17, 2024',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
@@ -101,10 +102,10 @@ class ActivitySummaryCard extends StatelessWidget {
                     size: 20,
                   ),
                   const SizedBox(width: AppConstants.spacing8),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Great job! You\'re on track to meet your daily goals.',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         color: AppColors.success,
                         fontWeight: FontWeight.w500,
                       ),

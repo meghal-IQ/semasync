@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../navigation/presentation/screens/main_navigation_screen.dart';
 import 'auth_welcome_screen.dart';
 import 'dart:math' as math;
@@ -433,9 +434,9 @@ class _HolographicLoginScreenState extends State<HolographicLoginScreen>
         const SizedBox(height: 20),
         
         // App Title
-        const Text(
+        Text(
           'Sema Sync',
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 32,
             fontWeight: FontWeight.bold,
             color: AppColors.primary,
@@ -445,9 +446,9 @@ class _HolographicLoginScreenState extends State<HolographicLoginScreen>
         const SizedBox(height: 12),
         
         // Welcome Message
-        const Text(
+        Text(
           'Welcome back! Please sign in \nto continue.',
-          style: TextStyle(
+          style: AppTextStyles.title(
             fontSize: 16,
             fontWeight: FontWeight.w400,
             color: AppColors.secondary,
@@ -504,7 +505,7 @@ class _HolographicLoginScreenState extends State<HolographicLoginScreen>
                       Expanded(
                         child: Text(
                           authProvider.errorMessage!,
-                          style: TextStyle(
+                          style: AppTextStyles.title(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -531,9 +532,9 @@ class _HolographicLoginScreenState extends State<HolographicLoginScreen>
                   authProvider.clearError();
                 }
               },
-              decoration: const InputDecoration(
+              decoration:  InputDecoration(
                 labelText: 'Email',
-                labelStyle: TextStyle(
+                labelStyle: AppTextStyles.title(
                   color: AppColors.primary,
                   fontWeight: FontWeight.w400,
                 ),
@@ -640,9 +641,9 @@ class _HolographicLoginScreenState extends State<HolographicLoginScreen>
           //     onPressed: () {
           //       // TODO: Implement forgot password functionality
           //     },
-          //     child: const Text(
+          //     child: Text(
           //       'Forgot Password?',
-          //       style: TextStyle(
+          //       style: AppTextStyles.title(
           //         color: AppColors.primary,
           //         fontWeight: FontWeight.w500,
           //       ),
@@ -682,9 +683,9 @@ class _HolographicLoginScreenState extends State<HolographicLoginScreen>
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                  : const Text(
+                  : Text(
                       'Sign In',
-                      style: TextStyle(
+                      style: AppTextStyles.title(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -704,11 +705,11 @@ class _HolographicLoginScreenState extends State<HolographicLoginScreen>
                   thickness: 1,
                 ),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
                   'OR',
-                  style: TextStyle(
+                  style: AppTextStyles.title(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w500,
                   ),
@@ -744,9 +745,9 @@ class _HolographicLoginScreenState extends State<HolographicLoginScreen>
                 ),
                 backgroundColor: Colors.white,
               ),
-              child: const Text(
+              child: Text(
                 'Create Account',
-                style: TextStyle(
+                style: AppTextStyles.title(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primary,
